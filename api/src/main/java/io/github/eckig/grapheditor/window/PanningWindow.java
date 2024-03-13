@@ -657,7 +657,7 @@ public class PanningWindow extends Region {
      * @param y
      *            the scene-y position of the cursor
      */
-    private void startPanning(final double x, final double y)
+    public void startPanning(final double x, final double y)
     {
         setCursor(Cursor.MOVE);
 
