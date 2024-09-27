@@ -456,7 +456,7 @@ public class GraphEditorController<E extends GraphEditor>
      */
     protected void processingDone()
     {
-        mConnectionLayouter.redrawAll();
+        mConnectionLayouter.draw();
     }
 
     private void nodePositionChanged(final Notification pChange)
