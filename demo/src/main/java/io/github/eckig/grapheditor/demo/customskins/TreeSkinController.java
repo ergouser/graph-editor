@@ -2,6 +2,10 @@ package io.github.eckig.grapheditor.demo.customskins;
 
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -19,10 +23,6 @@ import io.github.eckig.grapheditor.demo.customskins.tree.TreeNodeSkin;
 import io.github.eckig.grapheditor.demo.customskins.tree.TreeSkinConstants;
 import io.github.eckig.grapheditor.demo.customskins.tree.TreeTailSkin;
 import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
 import javafx.geometry.Side;
 
 /**
@@ -81,10 +81,10 @@ public class TreeSkinController implements SkinController {
         final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
         final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
 
-        final GNode node = GraphFactory.eINSTANCE.createGNode();
+        final GNode node = new GNode();
         node.setY(TREE_NODE_INITIAL_Y + windowYOffset);
 
-        final GConnector output = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector output = new GConnector();
         node.getConnectors().add(output);
 
         final double initialX = graphEditorContainer.getWidth() / (2 * currentZoomFactor) - node.getWidth() / 2;

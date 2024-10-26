@@ -5,7 +5,8 @@ package io.github.eckig.grapheditor;
 
 import java.util.List;
 
-import io.github.eckig.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.ResizableBox;
 import javafx.geometry.Point2D;

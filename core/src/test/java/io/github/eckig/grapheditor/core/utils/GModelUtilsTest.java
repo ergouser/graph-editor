@@ -8,14 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.eckig.grapheditor.core.connections.ConnectionCopier;
-
 import org.junit.Test;
 
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GNode;
+
+import io.github.eckig.grapheditor.core.connections.ConnectionCopier;
 
 public class GModelUtilsTest {
 
@@ -70,10 +69,10 @@ public class GModelUtilsTest {
 
     private static final GNode createNode() {
 
-        final GNode node = GraphFactory.eINSTANCE.createGNode();
+        final GNode node = new GNode();
 
-        final GConnector firstConnector = GraphFactory.eINSTANCE.createGConnector();
-        final GConnector secondConnector = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector firstConnector = new GConnector();
+        final GConnector secondConnector = new GConnector();
 
         node.getConnectors().add(firstConnector);
         node.getConnectors().add(secondConnector);
@@ -83,7 +82,7 @@ public class GModelUtilsTest {
 
     private static final void connect(final GConnector source, final GConnector target) {
 
-        final GConnection connection = GraphFactory.eINSTANCE.createGConnection();
+        final GConnection connection = new GConnection();
 
         source.getConnections().add(connection);
         target.getConnections().add(connection);

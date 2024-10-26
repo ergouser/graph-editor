@@ -6,12 +6,14 @@ package io.github.eckig.grapheditor.demo.customskins.titled;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
+
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.demo.utils.AwesomeIcon;
-import io.github.eckig.grapheditor.model.GNode;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
@@ -294,13 +296,13 @@ public class TitledNodeSkin extends GNodeSkin {
 
         for (final GConnectorSkin skin : inputConnectorSkins) {
             if (skin instanceof TitledConnectorSkin) {
-            	editor.getSelectionManager().select(skin.getItem());
+            	editor.getSelectionManager().select((Selectable)skin.getItem());
             }
         }
 
         for (final GConnectorSkin skin : outputConnectorSkins) {
             if (skin instanceof TitledConnectorSkin) {
-            	editor.getSelectionManager().select(skin.getItem());
+            	editor.getSelectionManager().select((Selectable)skin.getItem());
             }
         }
     }

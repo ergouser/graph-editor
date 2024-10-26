@@ -3,7 +3,7 @@
  */
 package io.github.eckig.grapheditor;
 
-import io.github.eckig.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector;
 
 /**
  * The skin class for a {@link GConnector}. Responsible for visualizing connectors in the graph editor.

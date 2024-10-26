@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.ConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.DetouredConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.GappedConnectionSegment;
-import io.github.eckig.grapheditor.model.GConnection;
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;

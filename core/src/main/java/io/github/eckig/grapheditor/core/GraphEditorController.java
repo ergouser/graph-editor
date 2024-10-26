@@ -11,6 +11,26 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
+import javax.management.Notification;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.ergotech.grapheditor.model.CommandStackListener;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+
+import io.github.eckig.grapheditor.Commands;
+import io.github.eckig.grapheditor.GConnectorValidator;
+import io.github.eckig.grapheditor.GJointSkin;
+import io.github.eckig.grapheditor.GNodeSkin;
+import io.github.eckig.grapheditor.GraphEditor;
+import io.github.eckig.grapheditor.SelectionManager;
+import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.ConnectionEventManager;
 import io.github.eckig.grapheditor.core.connections.ConnectorDragManager;
 import io.github.eckig.grapheditor.core.model.DefaultModelEditingManager;
@@ -21,33 +41,8 @@ import io.github.eckig.grapheditor.core.skins.SkinManager;
 import io.github.eckig.grapheditor.core.view.ConnectionLayouter;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
 import io.github.eckig.grapheditor.core.view.impl.DefaultConnectionLayouter;
-import io.github.eckig.grapheditor.utils.GraphEditorProperties;
-
-import org.eclipse.emf.common.command.CommandStackListener;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EContentAdapter;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.github.eckig.grapheditor.Commands;
-import io.github.eckig.grapheditor.GConnectorValidator;
-import io.github.eckig.grapheditor.GJointSkin;
-import io.github.eckig.grapheditor.GNodeSkin;
-import io.github.eckig.grapheditor.GraphEditor;
-import io.github.eckig.grapheditor.SelectionManager;
-import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
 import io.github.eckig.grapheditor.model.GraphPackage;
+import io.github.eckig.grapheditor.utils.GraphEditorProperties;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;

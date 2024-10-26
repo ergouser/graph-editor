@@ -1,0 +1,20 @@
+
+dependencies {
+
+    implementation project(':api')
+    implementation project(':model')
+    }
+
+// Exclude the package 'io.github.eckig.grapheditor.model' and its subpackages
+sourceSets {
+    main {
+        java {
+            exclude 'io/github/eckig/grapheditor/core/GraphEditorController.java'
+        }
+    }
+    test {
+        java {
+            exclude 'io/github/eckig/grapheditor/core/GraphEditorController.java'
+        }
+    }
+}

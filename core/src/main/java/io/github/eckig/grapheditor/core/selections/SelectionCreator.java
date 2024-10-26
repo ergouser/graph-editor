@@ -8,7 +8,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.emf.ecore.EObject;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -20,11 +25,6 @@ import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.utils.EventUtils;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
 import io.github.eckig.grapheditor.utils.GraphEventManager;
 import io.github.eckig.grapheditor.utils.GraphInputGesture;
 import javafx.event.Event;
@@ -65,7 +65,7 @@ public class SelectionCreator
     private final EventHandler<MouseEvent> viewDraggedHandler = this::handleViewDragged;
     private final EventHandler<MouseEvent> viewReleasedHandler = this::handleViewReleased;
 
-    private final Set<EObject> selectedElementsBackup = new HashSet<>();
+    private final Set<Selectable> selectedElementsBackup = new HashSet<>();
 
     private Rectangle2D selection;
 

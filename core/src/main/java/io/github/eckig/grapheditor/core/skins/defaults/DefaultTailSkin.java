@@ -6,14 +6,14 @@ package io.github.eckig.grapheditor.core.skins.defaults;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
-import io.github.eckig.grapheditor.core.skins.defaults.tail.RectangularPathCreator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GTailSkin;
-import io.github.eckig.grapheditor.model.GConnector;
+import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
+import io.github.eckig.grapheditor.core.skins.defaults.tail.RectangularPathCreator;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;

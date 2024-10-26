@@ -2,6 +2,11 @@ package io.github.eckig.grapheditor.core.skins;
 
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GJointSkin;
@@ -9,10 +14,6 @@ import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.GraphEditorSkins;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.view.ConnectionLayouter;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GNode;
 
 
 /**

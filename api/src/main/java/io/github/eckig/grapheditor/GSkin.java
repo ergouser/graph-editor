@@ -5,10 +5,9 @@ package io.github.eckig.grapheditor;
 
 import java.util.function.Consumer;
 
+import com.ergotech.grapheditor.model.Selectable;
+
 import io.github.eckig.grapheditor.utils.DraggableBox;
-
-import org.eclipse.emf.ecore.EObject;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -20,9 +19,9 @@ import javafx.scene.Node;
  * skins.
  *
  * @param <T>
- *            A subtype of {@link EObject} that the Skin represents.
+ *            A subtype of {@link Selectable} that the Skin represents.
  */
-public abstract class GSkin<T extends EObject>
+public abstract class GSkin<T extends Selectable>
 {
 
     private final BooleanProperty selectedProperty = new BooleanPropertyBase(false)

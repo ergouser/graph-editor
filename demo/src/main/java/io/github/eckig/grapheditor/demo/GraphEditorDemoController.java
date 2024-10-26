@@ -7,10 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
+import com.ergotech.grapheditor.model.command.CommandStack;
+
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.EditorElement;
 import io.github.eckig.grapheditor.GraphEditor;
+import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.SimpleConnectionSkin;
+import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
 import io.github.eckig.grapheditor.demo.customskins.DefaultSkinController;
 import io.github.eckig.grapheditor.demo.customskins.SkinController;
 import io.github.eckig.grapheditor.demo.customskins.TitledSkinController;
@@ -20,16 +27,6 @@ import io.github.eckig.grapheditor.demo.customskins.tree.TreeConnectorValidator;
 import io.github.eckig.grapheditor.demo.customskins.tree.TreeSkinConstants;
 import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
 import io.github.eckig.grapheditor.demo.utils.AwesomeIcon;
-
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-
-import io.github.eckig.grapheditor.core.DefaultGraphEditor;
-import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -127,7 +124,7 @@ public class GraphEditorDemoController {
      */
     public void initialize() {
 
-        final GModel model = GraphFactory.eINSTANCE.createGModel();
+        final GModel model = new GModel();
 
         graphEditor.setModel(model);
         graphEditorContainer.setGraphEditor(graphEditor);
@@ -237,7 +234,7 @@ public class GraphEditorDemoController {
 
     @FXML
     public void deleteSelection() {
-        final List<EObject> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedItems());
+        final List<Selectable> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedItems());
         graphEditor.delete(selection);
     }
 
@@ -321,7 +318,7 @@ public class GraphEditorDemoController {
 
         minimapButton.setGraphic(AwesomeIcon.MAP.node());
 
-        final SetChangeListener<? super EObject> selectedNodesListener = change -> checkConnectorButtonsToDisable();
+        final SetChangeListener<? super Selectable> selectedNodesListener = change -> checkConnectorButtonsToDisable();
         graphEditor.getSelectionManager().getSelectedItems().addListener(selectedNodesListener);
         checkConnectorButtonsToDisable();
     }
@@ -425,10 +422,7 @@ public class GraphEditorDemoController {
      */
     private void flushCommandStack() {
 
-        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(graphEditor.getModel());
-        if (editingDomain != null) {
-            editingDomain.getCommandStack().flush();
-        }
+      CommandStack.getCommandStack(graphEditor.getModel()).flush();
     }
 
     /**

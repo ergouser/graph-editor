@@ -1,0 +1,10 @@
+
+application {
+    mainClass = 'io.github.eckig.grapheditor.demo.GraphEditorDemo'
+ }
+
+dependencies {
+    implementation project(':model')
+    implementation project(':core')
+    implementation project(':api')
+ }

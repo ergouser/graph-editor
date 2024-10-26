@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.core.skins.defaults;
 
+import com.ergotech.grapheditor.model.GJoint;
+
 import io.github.eckig.grapheditor.GJointSkin;
-import io.github.eckig.grapheditor.model.GJoint;
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;

@@ -3,16 +3,16 @@
  */
 package io.github.eckig.grapheditor.core.skins.defaults;
 
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
-import io.github.eckig.grapheditor.core.skins.defaults.utils.AnimatedColor;
-import io.github.eckig.grapheditor.core.skins.defaults.utils.ColorAnimationUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
-import io.github.eckig.grapheditor.model.GConnector;
+import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
+import io.github.eckig.grapheditor.core.skins.defaults.utils.AnimatedColor;
+import io.github.eckig.grapheditor.core.skins.defaults.utils.ColorAnimationUtils;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;

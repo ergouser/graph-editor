@@ -8,217 +8,175 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import com.ergotech.grapheditor.model.CommandStackListener;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.RemoveCommand;
+
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.utils.RemoveContext;
-
-import org.eclipse.emf.common.command.BasicCommandStack;
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CommandStackListener;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory.Descriptor.Registry;
-
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.ModelEditingManager;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphPackage;
-
+import io.github.eckig.grapheditor.utils.RemoveContext;
 
 /**
  * Default {@link ModelEditingManager} implementation
  */
-public class DefaultModelEditingManager implements ModelEditingManager
-{
+public class DefaultModelEditingManager implements ModelEditingManager {
 
-    private static final URI DEFAULT_URI = URI.createFileURI("");
+  private GModel model;
 
-    private final CommandStackListener commandStackListener;
+  private BiFunction<RemoveContext, GConnection, Command> mOnConnectionRemoved;
 
-    private EditingDomain editingDomain;
-    private GModel model;
+  private BiFunction<RemoveContext, GNode, Command> mOnNodeRemoved;
 
-    private BiFunction<RemoveContext, GConnection, Command> mOnConnectionRemoved;
-    private BiFunction<RemoveContext, GNode, Command> mOnNodeRemoved;
+  /**
+   * Creates a new model editing manager. Only one instance should exist per {@link DefaultGraphEditor} instance.
+   *
+   * @param pCommandStackListener
+   *          the {@link CommandStackListener} that listens for changes in the model
+   */
+  public DefaultModelEditingManager() {
+  }
 
-    /**
-     * Creates a new model editing manager. Only one instance should exist per
-     * {@link DefaultGraphEditor} instance.
-     *
-     * @param pCommandStackListener
-     *            the {@link CommandStackListener} that listens for changes in
-     *            the model
-     */
-    public DefaultModelEditingManager(final CommandStackListener pCommandStackListener)
-    {
-        commandStackListener = pCommandStackListener;
+  @Override
+  public void initialize(final GModel pModel) {
+    // Only initialize the editing domain if the model object has actually changed.
+//    if (!pModel.equals(model)) {
+//      initializeEditingDomain(model, pModel);
+//    }
+    model = pModel;
+  }
+
+  @Override
+  public void setOnConnectionRemoved(final BiFunction<RemoveContext, GConnection, Command> pOnConnectionRemoved) {
+    mOnConnectionRemoved = pOnConnectionRemoved;
+  }
+
+  @Override
+  public void setOnNodeRemoved(final BiFunction<RemoveContext, GNode, Command> pOnNodeRemoved) {
+    mOnNodeRemoved = pOnNodeRemoved;
+  }
+
+  @Override
+  public void updateLayoutValues(final SkinLookup skinLookup) {
+    final CompoundCommand command = new CompoundCommand();
+
+    CommandStack.getCommandStack(model).suspendStackChangeNotifications();
+
+    Commands.updateLayoutValues(command, model, skinLookup);
+
+    if (command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
     }
 
-    @Override
-    public void initialize(final GModel pModel)
-    {
-        // Only initialize the editing domain if the model object has actually changed.
-        if (!pModel.equals(model))
-        {
-            initializeEditingDomain(model, pModel);
-        }
-        model = pModel;
+    CommandStack.getCommandStack(model).resumeStackChangeNotifications();
+  }
+
+  @Override
+  public void remove(final Collection<Selectable> pToRemove) {
+    if (pToRemove == null || pToRemove.isEmpty()) {
+      return;
     }
 
-    @Override
-    public void setOnConnectionRemoved(final BiFunction<RemoveContext, GConnection, Command> pOnConnectionRemoved)
-    {
-        mOnConnectionRemoved = pOnConnectionRemoved;
-    }
+    final CompoundCommand command = new CompoundCommand();
+    final RemoveContext editContext = new RemoveContext();
+    final List<Selectable> delete = new ArrayList<>(pToRemove.size());
 
-    @Override
-    public void setOnNodeRemoved(final BiFunction<RemoveContext, GNode, Command> pOnNodeRemoved)
-    {
-        mOnNodeRemoved = pOnNodeRemoved;
-    }
-
-    @Override
-    public void updateLayoutValues(final SkinLookup skinLookup)
-    {
-        final CompoundCommand command = new CompoundCommand();
-
-        Commands.updateLayoutValues(command, model, skinLookup);
-
-        editingDomain.getCommandStack().removeCommandStackListener(commandStackListener);
-
-        if (command.canExecute())
-        {
-            editingDomain.getCommandStack().execute(command);
-        }
-
-        editingDomain.getCommandStack().addCommandStackListener(commandStackListener);
-    }
-
-    @Override
-    public void remove(final Collection<EObject> pToRemove)
-    {
-        if (pToRemove == null || pToRemove.isEmpty())
-        {
-            return;
-        }
-
-        final CompoundCommand command = new CompoundCommand();
-        final RemoveContext editContext = new RemoveContext();
-        final List<EObject> delete = new ArrayList<>(pToRemove.size());
-
-        // pre-fill the RemoveContext with all elements to be removed:
-        for (final EObject obj : pToRemove)
-        {
-            if (obj instanceof GNode n && editContext.canRemove(obj))
-            {
-                delete.add(obj);
-                for (final GConnector connector : n.getConnectors())
-                {
-                    for (final GConnection connection : connector.getConnections())
-                    {
-                        if (connection != null && editContext.canRemove(connection))
-                        {
-                            delete.add(connection);
-                        }
-                    }
-                }
+    // pre-fill the RemoveContext with all elements to be removed:
+    for (final Selectable obj : pToRemove) {
+      if (obj instanceof GNode n && editContext.canRemove(obj)) {
+        delete.add(obj);
+        for (final GConnector connector : n.getConnectors()) {
+          for (final GConnection connection : connector.getConnections()) {
+            if (connection != null && editContext.canRemove(connection)) {
+              delete.add(connection);
             }
-            else if (obj instanceof GConnection && editContext.canRemove(obj))
-            {
-                delete.add(obj);
-            }
+          }
         }
-
-        // delete the elements and call business logic add-ins:
-        for (final EObject obj : delete)
-        {
-            if (obj instanceof GNode)
-            {
-                command.append(RemoveCommand.create(editingDomain, model, GraphPackage.Literals.GMODEL__NODES, obj));
-
-                final Command onRemoved = mOnNodeRemoved == null ? null : mOnNodeRemoved.apply(editContext, (GNode) obj);
-                if (onRemoved != null)
-                {
-                    command.append(onRemoved);
-                }
-            }
-            else if (obj instanceof GConnection)
-            {
-                remove(editContext, command, (GConnection) obj);
-            }
-        }
-
-        if (!command.isEmpty() && command.canExecute())
-        {
-            editingDomain.getCommandStack().execute(command);
-        }
+      } else if (obj instanceof GConnection && editContext.canRemove(obj)) {
+        delete.add(obj);
+      }
     }
 
-    private void remove(final RemoveContext pRemoveContext, final CompoundCommand pCommand, final GConnection pToDelete)
-    {
-        final GConnector source = pToDelete.getSource();
-        final GConnector target = pToDelete.getTarget();
+    // delete the elements and call business logic add-ins:
+    for (final Selectable obj : delete) {
+      if (obj instanceof GNode) {
+        command.append(RemoveCommand.create(model, owner -> model.getNodes(), (GNode)obj));
 
-        pCommand.append(RemoveCommand.create(editingDomain, model, GraphPackage.Literals.GMODEL__CONNECTIONS, pToDelete));
-        pCommand.append(RemoveCommand.create(editingDomain, source, GraphPackage.Literals.GCONNECTOR__CONNECTIONS, pToDelete));
-        pCommand.append(RemoveCommand.create(editingDomain, target, GraphPackage.Literals.GCONNECTOR__CONNECTIONS, pToDelete));
-
-        final Command onRemoved = mOnConnectionRemoved == null ? null : mOnConnectionRemoved.apply(pRemoveContext, pToDelete);
-        if (onRemoved != null)
-        {
-            pCommand.append(onRemoved);
+        final Command onRemoved = mOnNodeRemoved == null ? null : mOnNodeRemoved.apply(editContext, (GNode) obj);
+        if (onRemoved != null) {
+          command.append(onRemoved);
         }
+      } else if (obj instanceof GConnection) {
+        remove(editContext, command, (GConnection) obj);
+      }
     }
 
-    /**
-     * Initializes the editing domain and resource for the new model.
-     *
-     * <p>
-     * If a resource and/or editing domain are already associated to this model,
-     * these will be used. Otherwise they will be created.
-     * </p>
-     */
-    private void initializeEditingDomain(final GModel oldModel, final GModel newModel)
-    {
-        // First remove the listener from the old model, if it exists.
-        if (oldModel != null)
-        {
-            final EditingDomain oldDomain = AdapterFactoryEditingDomain.getEditingDomainFor(oldModel);
-            if (oldDomain != null)
-            {
-                oldDomain.getCommandStack().removeCommandStackListener(commandStackListener);
-            }
-        }
-
-        if (newModel.eResource() == null)
-        {
-            final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
-            final Resource resource = resourceFactory.createResource(DEFAULT_URI);
-            resource.getContents().add(newModel);
-        }
-
-        editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(newModel);
-
-        if (editingDomain == null)
-        {
-            final Registry registry = ComposedAdapterFactory.Descriptor.Registry.INSTANCE;
-            final AdapterFactory adapterFactory = new ComposedAdapterFactory(registry);
-
-            editingDomain = new AdapterFactoryEditingDomain(adapterFactory, new BasicCommandStack());
-            editingDomain.getResourceSet().getResources().add(newModel.eResource());
-        }
-
-        editingDomain.getCommandStack().addCommandStackListener(commandStackListener);
+    if (!command.isEmpty() && command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
     }
+  }
+
+  private void remove(final RemoveContext pRemoveContext, final CompoundCommand pCommand, final GConnection pToDelete) {
+    final GConnector source = pToDelete.getSource();
+    final GConnector target = pToDelete.getTarget();
+
+    // Remove the connection from the model's connections list
+    pCommand.append(RemoveCommand.create(model, owner -> model.getConnections(), pToDelete));
+
+    // Remove the connection from the source connector's connections list
+    pCommand.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), pToDelete));
+
+    // Remove the connection from the target connector's connections list
+    pCommand.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), pToDelete));
+
+    final Command onRemoved = mOnConnectionRemoved == null ? null
+        : mOnConnectionRemoved.apply(pRemoveContext, pToDelete);
+    if (onRemoved != null) {
+        pCommand.append(onRemoved);
+    }
+}
+  /**
+   * Initializes the editing domain and resource for the new model.
+   *
+   * <p>
+   * If a resource and/or editing domain are already associated to this model, these will be used. Otherwise they will
+   * be created.
+   * </p>
+   * @throws NoSuchMethodException this method is not implemented
+   */
+  private void initializeEditingDomain(final GModel oldModel, final GModel newModel) throws NoSuchMethodException {
+    throw new NoSuchMethodException("initializeEditingDomain not implemented");
+    // First remove the listener from the old model, if it exists.
+//    if (oldModel != null) {
+//      final EditingDomain oldDomain = AdapterFactoryEditingDomain.getEditingDomainFor(oldModel);
+//      if (oldDomain != null) {
+//        oldDomain.getCommandStack().removeCommandStackListener(commandStackListener);
+//      }
+//    }
+//
+//    if (newModel.eResource() == null) {
+//      final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
+//      final Resource resource = resourceFactory.createResource(DEFAULT_URI);
+//      resource.getContents().add(newModel);
+//    }
+//
+//    editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(newModel);
+//
+//    if (editingDomain == null) {
+//      final Registry registry = ComposedAdapterFactory.Descriptor.Registry.INSTANCE;
+//      final AdapterFactory adapterFactory = new ComposedAdapterFactory(registry);
+//
+//      editingDomain = new AdapterFactoryEditingDomain(adapterFactory, new BasicCommandStack());
+//      editingDomain.getResourceSet().getResources().add(newModel.eResource());
+//    }
+
+ }
 }

@@ -6,7 +6,8 @@ package io.github.eckig.grapheditor;
 import java.util.List;
 import java.util.Map;
 
-import io.github.eckig.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;

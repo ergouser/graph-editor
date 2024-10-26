@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GNode;
 
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GNode;
+import io.github.eckig.grapheditor.core.utils.BeanUtils;
 
 
 /**
@@ -70,7 +70,7 @@ public final class ConnectionCopier
                         final GConnection copiedConnection;
                         if (!copiedConnections.containsKey(connection))
                         {
-                            copiedConnection = EcoreUtil.copy(connection);
+                            copiedConnection = BeanUtils.copyBean(connection);
                             copiedConnections.put(connection, copiedConnection);
                         }
                         else
@@ -118,7 +118,7 @@ public final class ConnectionCopier
             opposingConnector = connection.getSource();
         }
 
-        if (opposingConnector != null && opposingConnector.getParent() instanceof GNode)
+        if (opposingConnector != null && opposingConnector.getParent() != null)
         {
             return opposingConnector.getParent();
         }

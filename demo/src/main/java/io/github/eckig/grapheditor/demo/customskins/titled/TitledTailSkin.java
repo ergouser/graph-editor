@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.titled;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
-import io.github.eckig.grapheditor.model.GConnector;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 

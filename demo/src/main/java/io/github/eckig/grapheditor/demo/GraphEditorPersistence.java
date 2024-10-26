@@ -1,19 +1,10 @@
 package io.github.eckig.grapheditor.demo;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
+
+import com.ergotech.grapheditor.model.GModel;
 
 import io.github.eckig.grapheditor.GraphEditor;
-
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-
-import io.github.eckig.grapheditor.model.GModel;
-import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -42,17 +33,17 @@ public class GraphEditorPersistence {
      * @param graphEditor the graph editor whose model state is to be saved
      */
     public void saveToFile(final GraphEditor graphEditor) {
-
-        final Scene scene = graphEditor.getView().getScene();
-
-        if (scene != null) {
-
-            final File file = showFileChooser(scene.getWindow(), true);
-
-            if (file != null && graphEditor.getModel() != null) {
-                saveModel(file, graphEditor.getModel());
-            }
-        }
+//
+//        final Scene scene = graphEditor.getView().getScene();
+//
+//        if (scene != null) {
+//
+//            final File file = showFileChooser(scene.getWindow(), true);
+//
+//            if (file != null && graphEditor.getModel() != null) {
+//                saveModel(file, graphEditor.getModel());
+//            }
+//        }
     }
 
     /**
@@ -62,16 +53,16 @@ public class GraphEditorPersistence {
      */
     public void loadFromFile(final GraphEditor graphEditor) {
 
-        final Scene scene = graphEditor.getView().getScene();
-
-        if (scene != null) {
-
-            final File file = showFileChooser(scene.getWindow(), false);
-
-            if (file != null) {
-                loadModel(file, graphEditor);
-            }
-        }
+//        final Scene scene = graphEditor.getView().getScene();
+//
+//        if (scene != null) {
+//
+//            final File file = showFileChooser(scene.getWindow(), false);
+//
+//            if (file != null) {
+//                loadModel(file, graphEditor);
+//            }
+//        }
     }
 
     /**
@@ -117,21 +108,21 @@ public class GraphEditorPersistence {
      */
     private void loadSample(final String file, final GraphEditor graphEditor) {
 
-        final String samplePath = getClass().getResource(file).toExternalForm();
-
-        final URI fileUri = URI.createURI(samplePath);
-        final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
-        final Resource resource = resourceFactory.createResource(fileUri);
-
-        try {
-            resource.load(Collections.EMPTY_MAP);
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-
-        if (!resource.getContents().isEmpty() && resource.getContents().get(0) instanceof GModel model) {
-            graphEditor.setModel(model);
-        }
+//        final String samplePath = getClass().getResource(file).toExternalForm();
+//
+//        final URI fileUri = URI.createURI(samplePath);
+//        final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
+//        final Resource resource = resourceFactory.createResource(fileUri);
+//
+//        try {
+//            resource.load(Collections.EMPTY_MAP);
+//        } catch (final IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (!resource.getContents().isEmpty() && resource.getContents().get(0) instanceof GModel model) {
+//            graphEditor.setModel(model);
+//        }
     }
 
     /**
@@ -169,28 +160,28 @@ public class GraphEditorPersistence {
      */
     private void saveModel(final File file, final GModel model) {
 
-        String absolutePath = file.getAbsolutePath();
-        if (!absolutePath.endsWith(FILE_EXTENSION)) {
-            absolutePath += FILE_EXTENSION;
-        }
-
-        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
-
-        final URI fileUri = URI.createFileURI(absolutePath);
-        final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
-        final Resource resource = resourceFactory.createResource(fileUri);
-        resource.getContents().add(model);
-
-        try {
-            resource.save(Collections.EMPTY_MAP);
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-
-        editingDomain.getResourceSet().getResources().clear();
-        editingDomain.getResourceSet().getResources().add(resource);
-
-        initialDirectory = file.getParentFile();
+//        String absolutePath = file.getAbsolutePath();
+//        if (!absolutePath.endsWith(FILE_EXTENSION)) {
+//            absolutePath += FILE_EXTENSION;
+//        }
+//
+//        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
+//
+//        final URI fileUri = URI.createFileURI(absolutePath);
+//        final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
+//        final Resource resource = resourceFactory.createResource(fileUri);
+//        resource.getContents().add(model);
+//
+//        try {
+//            resource.save(Collections.EMPTY_MAP);
+//        } catch (final IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        editingDomain.getResourceSet().getResources().clear();
+//        editingDomain.getResourceSet().getResources().add(resource);
+//
+//        initialDirectory = file.getParentFile();
     }
 
     /**
@@ -201,21 +192,21 @@ public class GraphEditorPersistence {
      */
     private void loadModel(final File file, final GraphEditor graphEditor) {
 
-        final URI fileUri = URI.createFileURI(file.getAbsolutePath());
-
-        final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
-        final Resource resource = resourceFactory.createResource(fileUri);
-
-        try {
-            resource.load(Collections.EMPTY_MAP);
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-
-        if (!resource.getContents().isEmpty() && resource.getContents().get(0) instanceof GModel model) {
-            graphEditor.setModel(model);
-        }
-
-        initialDirectory = file.getParentFile();
+//        final URI fileUri = URI.createFileURI(file.getAbsolutePath());
+//
+//        final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
+//        final Resource resource = resourceFactory.createResource(fileUri);
+//
+//        try {
+//            resource.load(Collections.EMPTY_MAP);
+//        } catch (final IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (!resource.getContents().isEmpty() && resource.getContents().get(0) instanceof GModel model) {
+//            graphEditor.setModel(model);
+//        }
+//
+//        initialDirectory = file.getParentFile();
     }
 }

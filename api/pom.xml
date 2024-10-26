@@ -47,6 +47,11 @@
             <version>${org.openjfx.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${org.openjfx.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>openjfx-monocle</artifactId>
             <version>${openjfx-monocle.version}</version>

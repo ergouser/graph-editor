@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.core.connections;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
-import io.github.eckig.grapheditor.model.GConnection;
 import javafx.geometry.Side;
 
 

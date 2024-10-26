@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.core.data.skins;
 
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultNodeSkin;
-import io.github.eckig.grapheditor.model.GNode;
 
 public class CustomNodeSkin extends DefaultNodeSkin {
 

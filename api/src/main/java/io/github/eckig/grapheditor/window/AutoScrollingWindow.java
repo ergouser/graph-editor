@@ -19,19 +19,19 @@ import javafx.util.Duration;
  */
 public class AutoScrollingWindow extends PanningWindow
 {
-    private static final Duration JUMP_PERIOD = Duration.millis(25);
+    protected static final Duration JUMP_PERIOD = Duration.millis(25);
 
-    private double baseJumpAmount = 1;
-    private double maxJumpAmount = 50;
-    private double jumpAmountIncreasePerJump = 0.5;
-    private double insetToBeginScroll = 1;
+    protected double baseJumpAmount = 1;
+    protected double maxJumpAmount = 50;
+    protected double jumpAmountIncreasePerJump = 0.5;
+    protected double insetToBeginScroll = 1;
 
-    private Timeline timeline;
-    private boolean isScrolling;
-    private Point2D jumpDistance;
+    protected Timeline timeline;
+    protected boolean isScrolling;
+    protected Point2D jumpDistance;
 
-    private boolean autoScrollingEnabled = true;
-    private int jumpsTaken;
+    protected boolean autoScrollingEnabled = true;
+    protected int jumpsTaken;
 
     /**
      * Creates a new {@link AutoScrollingWindow}.
@@ -75,7 +75,7 @@ public class AutoScrollingWindow extends PanningWindow
      *
      * @param event the mouse-dragged event object
      */
-    private void handleMouseDragged(final MouseEvent event)
+    protected void handleMouseDragged(final MouseEvent event)
     {
         if (event.isPrimaryButtonDown() && event.getTarget() instanceof Node && !isScrollBar(event))
         {
@@ -92,7 +92,7 @@ public class AutoScrollingWindow extends PanningWindow
         }
     }
 
-    private boolean isScrollBar(final MouseEvent pEvent)
+    protected boolean isScrollBar(final MouseEvent pEvent)
     {
         if (pEvent.getTarget() instanceof Node node)
         {
@@ -120,7 +120,7 @@ public class AutoScrollingWindow extends PanningWindow
      * @param cursorY the cursor-y position in this {@link PanningWindow}
      * @return the distance to jump, or null if no jump should occur
      */
-    private Point2D getDistanceToJump(final double cursorX, final double cursorY)
+    protected Point2D getDistanceToJump(final double cursorX, final double cursorY)
     {
         double jumpX = 0;
         double jumpY = 0;
@@ -167,7 +167,7 @@ public class AutoScrollingWindow extends PanningWindow
      * @param y
      *            the vertical distance to move the window by
      */
-    private void panBy(final double x, final double y)
+    protected void panBy(final double x, final double y)
     {
         if (x != 0 && y != 0)
         {
@@ -186,7 +186,7 @@ public class AutoScrollingWindow extends PanningWindow
     /**
      * Starts the auto-scrolling.
      */
-    private void startScrolling()
+    protected void startScrolling()
     {
         isScrolling = true;
         jumpsTaken = 0;
@@ -209,7 +209,7 @@ public class AutoScrollingWindow extends PanningWindow
     /**
      * Stops the auto-scrolling.
      */
-    private void endScrolling()
+    protected void endScrolling()
     {
         isScrolling = false;
 

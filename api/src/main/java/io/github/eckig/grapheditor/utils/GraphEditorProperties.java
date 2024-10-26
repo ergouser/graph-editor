@@ -17,7 +17,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.Event;
 
-
 /**
  * General properties for the graph editor.
  *
@@ -34,30 +33,36 @@ import javafx.event.Event;
  * Also stores properties for whether the grid is visible and/or snap-to-grid is on.
  * </p>
  */
-public class GraphEditorProperties implements GraphEventManager
-{
+public class GraphEditorProperties implements GraphEventManager {
 
     /**
      * The default max width of the editor region, set on startup.
      */
     public static final double DEFAULT_MAX_WIDTH = Double.MAX_VALUE;
+
     /**
      * The default max height of the editor region, set on startup.
      */
     public static final double DEFAULT_MAX_HEIGHT = Double.MAX_VALUE;
 
     public static final double DEFAULT_BOUND_VALUE = 15;
+
     public static final double DEFAULT_GRID_SPACING = 12;
 
     // The distance from the editor edge at which the objects should stop when dragged / resized.
     private double northBoundValue = DEFAULT_BOUND_VALUE;
+
     private double southBoundValue = DEFAULT_BOUND_VALUE;
+
     private double eastBoundValue = DEFAULT_BOUND_VALUE;
+
     private double westBoundValue = DEFAULT_BOUND_VALUE;
 
     // Off by default.
     private final BooleanProperty gridVisible = new SimpleBooleanProperty(this, "gridVisible"); //$NON-NLS-1$
+
     private final BooleanProperty snapToGrid = new SimpleBooleanProperty(this, "snapToGrid"); //$NON-NLS-1$
+
     private final DoubleProperty gridSpacing = new SimpleDoubleProperty(this, "gridSpacing", DEFAULT_GRID_SPACING); //$NON-NLS-1$
 
     private final Map<EditorElement, BooleanProperty> readOnly = new EnumMap<>(EditorElement.class);
@@ -67,26 +72,22 @@ public class GraphEditorProperties implements GraphEventManager
     private final GraphEventManager eventManager = new GraphEventManagerImpl();
 
     /**
-     * Creates a new editor properties instance containing a set of default
-     * properties.
+   * Creates a new editor properties instance containing a set of default properties.
      */
-    public GraphEditorProperties()
-    {
+  public GraphEditorProperties() {
     }
 
     /**
      * Copy constructor.
      *
      * <p>
-     * Creates a new editor properties instance with all values copied over from
-     * an existing instance.
+   * Creates a new editor properties instance with all values copied over from an existing instance.
      * </p>
      *
      * @param editorProperties
      *         an existing {@link GraphEditorProperties} instance
      */
-    public GraphEditorProperties(final GraphEditorProperties editorProperties)
-    {
+  public GraphEditorProperties(final GraphEditorProperties editorProperties) {
         northBoundValue = editorProperties.getNorthBoundValue();
         southBoundValue = editorProperties.getSouthBoundValue();
         eastBoundValue = editorProperties.getEastBoundValue();
@@ -96,8 +97,7 @@ public class GraphEditorProperties implements GraphEventManager
         snapToGrid.set(editorProperties.isSnapToGridOn());
         gridSpacing.set(editorProperties.getGridSpacing());
 
-        for (final Map.Entry<EditorElement, BooleanProperty> entry : editorProperties.readOnly.entrySet())
-        {
+    for (final Map.Entry<EditorElement, BooleanProperty> entry : editorProperties.readOnly.entrySet()) {
             readOnly.computeIfAbsent(entry.getKey(), k -> new SimpleBooleanProperty()).set(entry.getValue().get());
         }
 
@@ -109,8 +109,7 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return the value of the north bound
      */
-    public double getNorthBoundValue()
-    {
+  public double getNorthBoundValue() {
         return northBoundValue;
     }
 
@@ -120,8 +119,7 @@ public class GraphEditorProperties implements GraphEventManager
      * @param pNorthBoundValue
      *         the value of the north bound
      */
-    public void setNorthBoundValue(final double pNorthBoundValue)
-    {
+  public void setNorthBoundValue(final double pNorthBoundValue) {
         northBoundValue = pNorthBoundValue;
     }
 
@@ -130,8 +128,7 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return the value of the south bound
      */
-    public double getSouthBoundValue()
-    {
+  public double getSouthBoundValue() {
         return southBoundValue;
     }
 
@@ -141,8 +138,7 @@ public class GraphEditorProperties implements GraphEventManager
      * @param pSouthBoundValue
      *         the value of the south bound
      */
-    public void setSouthBoundValue(final double pSouthBoundValue)
-    {
+  public void setSouthBoundValue(final double pSouthBoundValue) {
         southBoundValue = pSouthBoundValue;
     }
 
@@ -151,8 +147,7 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return the value of the east bound
      */
-    public double getEastBoundValue()
-    {
+  public double getEastBoundValue() {
         return eastBoundValue;
     }
 
@@ -162,8 +157,7 @@ public class GraphEditorProperties implements GraphEventManager
      * @param pEastBoundValue
      *         the value of the east bound
      */
-    public void setEastBoundValue(final double pEastBoundValue)
-    {
+  public void setEastBoundValue(final double pEastBoundValue) {
         eastBoundValue = pEastBoundValue;
     }
 
@@ -172,8 +166,7 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return the value of the west bound
      */
-    public double getWestBoundValue()
-    {
+  public double getWestBoundValue() {
         return westBoundValue;
     }
 
@@ -183,19 +176,16 @@ public class GraphEditorProperties implements GraphEventManager
      * @param pWestBoundValue
      *         the value of the west bound
      */
-    public void setWestBoundValue(final double pWestBoundValue)
-    {
+  public void setWestBoundValue(final double pWestBoundValue) {
         westBoundValue = pWestBoundValue;
     }
 
     /**
      * Checks if the background grid is visible.
      *
-     * @return {@code true} if the background grid is visible, {@code false} if
-     *         not
+   * @return {@code true} if the background grid is visible, {@code false} if not
      */
-    public boolean isGridVisible()
-    {
+  public boolean isGridVisible() {
         return gridVisible.get();
     }
 
@@ -203,22 +193,18 @@ public class GraphEditorProperties implements GraphEventManager
      * Sets whether the background grid should be visible or not.
      *
      * @param pGridVisible
-     *            {@code true} if the background grid should be visible,
-     *            {@code false} if not
+   *          {@code true} if the background grid should be visible, {@code false} if not
      */
-    public void setGridVisible(final boolean pGridVisible)
-    {
+  public void setGridVisible(final boolean pGridVisible) {
         gridVisible.set(pGridVisible);
     }
 
     /**
      * Gets the grid-visible property.
      *
-     * @return a {@link BooleanProperty} tracking whether the grid is visible or
-     *         not
+   * @return a {@link BooleanProperty} tracking whether the grid is visible or not
      */
-    public BooleanProperty gridVisibleProperty()
-    {
+  public BooleanProperty gridVisibleProperty() {
         return gridVisible;
     }
 
@@ -227,8 +213,7 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return {@code true} if snap-to-grid is on, {@code false} if not
      */
-    public boolean isSnapToGridOn()
-    {
+  public boolean isSnapToGridOn() {
         return snapToGrid.get();
     }
 
@@ -236,22 +221,18 @@ public class GraphEditorProperties implements GraphEventManager
      * Sets whether snap-to-grid should be on.
      *
      * @param pSnapToGrid
-     *            {@code true} if snap-to-grid should be on, {@code false} if
-     *            not
+   *          {@code true} if snap-to-grid should be on, {@code false} if not
      */
-    public void setSnapToGrid(final boolean pSnapToGrid)
-    {
+  public void setSnapToGrid(final boolean pSnapToGrid) {
         snapToGrid.set(pSnapToGrid);
     }
 
     /**
      * Gets the snap-to-grid property.
      *
-     * @return a {@link BooleanProperty} tracking whether snap-to-grid is on or
-     *         off
+   * @return a {@link BooleanProperty} tracking whether snap-to-grid is on or off
      */
-    public BooleanProperty snapToGridProperty()
-    {
+  public BooleanProperty snapToGridProperty() {
         return snapToGrid;
     }
 
@@ -260,14 +241,12 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return the current grid spacing
      */
-    public double getGridSpacing()
-    {
+  public double getGridSpacing() {
         return gridSpacing.get();
     }
 
     /**
-     * Sets the grid spacing to be used if the grid is visible and/or
-     * snap-to-grid is enabled.
+   * Sets the grid spacing to be used if the grid is visible and/or snap-to-grid is enabled.
      *
      * <p>
      * Integer values are recommended to avoid sub-pixel positioning effects.
@@ -276,8 +255,7 @@ public class GraphEditorProperties implements GraphEventManager
      * @param pGridSpacing
      *         the grid spacing to be used
      */
-    public void setGridSpacing(final double pGridSpacing)
-    {
+  public void setGridSpacing(final double pGridSpacing) {
         gridSpacing.set(pGridSpacing);
     }
 
@@ -286,8 +264,7 @@ public class GraphEditorProperties implements GraphEventManager
      *
      * @return the grid spacing {@link DoubleProperty}.
      */
-    public DoubleProperty gridSpacingProperty()
-    {
+  public DoubleProperty gridSpacingProperty() {
         return gridSpacing;
     }
 
@@ -298,8 +275,7 @@ public class GraphEditorProperties implements GraphEventManager
      *         {@link EditorElement}
      * @return read only {@link BooleanProperty}
      */
-    public BooleanProperty readOnlyProperty(final EditorElement pType)
-    {
+  public BooleanProperty readOnlyProperty(final EditorElement pType) {
         Objects.requireNonNull(pType, "ElementType may not be null!");
         return readOnly.computeIfAbsent(pType, k -> new SimpleBooleanProperty());
     }
@@ -311,8 +287,7 @@ public class GraphEditorProperties implements GraphEventManager
      *         {@link EditorElement}
      * @return whether or not the graph is in read only state.
      */
-    public boolean isReadOnly(final EditorElement pType)
-    {
+  public boolean isReadOnly(final EditorElement pType) {
         return pType != null && readOnly.computeIfAbsent(pType, k -> new SimpleBooleanProperty()).get();
     }
 
@@ -322,34 +297,28 @@ public class GraphEditorProperties implements GraphEventManager
      * @param pReadOnly
      *         {@code true} to set the graph editor in read only state or {@code false} (default) for edit state.
      */
-    public void setReadOnly(final EditorElement pType, final boolean pReadOnly)
-    {
-        if (pType != null)
-        {
+  public void setReadOnly(final EditorElement pType, final boolean pReadOnly) {
+    if (pType != null) {
             readOnly.computeIfAbsent(pType, k -> new SimpleBooleanProperty()).set(pReadOnly);
         }
     }
 
     /**
-     * Additional properties that may be added and referred to in custom skin
-     * implementations.
+   * Additional properties that may be added and referred to in custom skin implementations.
      *
      * @return a map of custom properties
      */
-    public ObservableMap<String, String> getCustomProperties()
-    {
+  public ObservableMap<String, String> getCustomProperties() {
         return customProperties;
     }
 
     @Override
-    public boolean activateGesture(GraphInputGesture pGesture, Event pEvent, Object pOwner)
-    {
+  public boolean activateGesture(GraphInputGesture pGesture, Event pEvent, Object pOwner) {
         return eventManager.activateGesture(pGesture, pEvent, pOwner);
     }
 
     @Override
-    public boolean finishGesture(GraphInputGesture pExpected, Object pOwner)
-    {
+  public boolean finishGesture(GraphInputGesture pExpected, Object pOwner) {
         return eventManager.finishGesture(pExpected, pOwner);
     }
 }

@@ -6,7 +6,9 @@ package io.github.eckig.grapheditor.core.selections;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
@@ -14,13 +16,12 @@ import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GNode;
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.GraphEditorProperties;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 
 /**
  * Handles how a selection of multiple objects is dragged.
@@ -102,7 +103,7 @@ public class SelectionDragManager {
 
         // store the currently selected elements of interest
         // (the ones we want to move alongside the master):
-        for (final EObject selected : selectionManager.getSelectedItems()) {
+        for (final Selectable selected : selectionManager.getSelectedItems()) {
 
             if (selected instanceof GNode n) {
 

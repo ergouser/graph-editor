@@ -3,7 +3,7 @@ package io.github.eckig.grapheditor.utils;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.eclipse.emf.ecore.EObject;
+import com.ergotech.grapheditor.model.Selectable;
 
 
 /**
@@ -16,7 +16,7 @@ import org.eclipse.emf.ecore.EObject;
 public final class RemoveContext
 {
 
-    private final Collection<EObject> objectsToDelete = new HashSet<>();
+    private final Collection<Selectable> objectsToDelete = new HashSet<>();
 
     /**
      * Constructor
@@ -30,24 +30,24 @@ public final class RemoveContext
 
     /**
      * @param pToCheck
-     *            {@link EObject} to check
+     *            {@link Selectable} to check
      * @return {@code true} if no other involved party has created a delete
      *         command for the given object otherwise {@code false}
      * @since 15.02.2019
      */
-    public boolean canRemove(final EObject pToCheck)
+    public boolean canRemove(final Selectable pToCheck)
     {
         return objectsToDelete.add(pToCheck);
     }
 
     /**
      * @param pToCheck
-     *            {@link EObject} to check
+     *            {@link Selectable} to check
      * @return {@code true} any involved party has created a delete command for
      *         the given object otherwise {@code false}
      * @since 15.02.2019
      */
-    public boolean contains(final EObject pToCheck)
+    public boolean contains(final Selectable pToCheck)
     {
         return objectsToDelete.contains(pToCheck);
     }

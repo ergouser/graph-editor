@@ -8,36 +8,33 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.command.SetCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphPackage;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.AddCommand;
+import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.RemoveCommand;
+import com.ergotech.grapheditor.model.command.SetPropertyCommand;
+
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Region;
 
 /**
- * Provides utility methods for editing a {@link GModel} via EMF commands.
+ * Provides utility methods for editing a {@link GModel} 
  *
  * <p>
  * Example:
  *
  * <pre>
- * <code>GModel model = GraphFactory.eINSTANCE.createGModel();
- * GNode node = GraphFactory.eINSTANCE.createGNode();
+ * <code>GModel model = new GModel();
+ * GNode node = new GNode();
  *
  * node.setX(100);
  * node.setY(50);
@@ -49,394 +46,305 @@ import javafx.scene.layout.Region;
  * Commands.redo(model);</code>
  * </pre>
  */
-public class Commands
-{
+public class Commands {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Commands.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Commands.class);
 
-    private static final EReference NODES = GraphPackage.Literals.GMODEL__NODES;
-    private static final EReference CONNECTIONS = GraphPackage.Literals.GMODEL__CONNECTIONS;
 
-    private static final EAttribute NODE_X = GraphPackage.Literals.GNODE__X;
-    private static final EAttribute NODE_Y = GraphPackage.Literals.GNODE__Y;
-    private static final EAttribute NODE_WIDTH = GraphPackage.Literals.GNODE__WIDTH;
-    private static final EAttribute NODE_HEIGHT = GraphPackage.Literals.GNODE__HEIGHT;
-    private static final EReference NODE_CONNECTORS = GraphPackage.Literals.GNODE__CONNECTORS;
+  /**
+   * Static class, not to be instantiated.
+   */
+  private Commands() {
+  }
 
-    private static final EReference CONNECTOR_CONNECTIONS = GraphPackage.Literals.GCONNECTOR__CONNECTIONS;
+  /**
+   * Adds a node to the model.
+   *
+   * <p>
+   * The node's x, y, width, and height values should be set before calling this method.
+   * </p>
+   *
+   * @param model
+   *          the {@link GModel} to which the node should be added
+   * @param node
+   *          the {@link GNode} to add to the model
+   */
+  public static void addNode(final GModel model, final GNode node) {
 
-    private static final EAttribute JOINT_X = GraphPackage.Literals.GJOINT__X;
-    private static final EAttribute JOINT_Y = GraphPackage.Literals.GJOINT__Y;
+    final Command command = AddCommand.create(model, owner -> model.getNodes(), node);
 
-    /**
-     * Static class, not to be instantiated.
-     */
-    private Commands()
-    {
+    if (command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
     }
 
-    /**
-     * Adds a node to the model.
-     *
-     * <p>
-     * The node's x, y, width, and height values should be set before calling this method.
-     * </p>
-     *
-     * @param model the {@link GModel} to which the node should be added
-     * @param node the {@link GNode} to add to the model
-     */
-    public static void addNode(final GModel model, final GNode node)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
+  }
 
-        if (editingDomain != null)
-        {
-            final Command command = AddCommand.create(editingDomain, model, NODES, node);
+  /**
+   * Removes a node from the model.
+   *
+   * <p>
+   * Also removes any connections that were attached to the node.
+   * </p>
+   *
+   * @param model
+   *          the {@link GModel} from which the node should be removed
+   * @param node
+   *          the {@link GNode} to remove from the model
+   */
+  public static void removeNode(final GModel model, final GNode node) {
 
-            if (command.canExecute())
-            {
-                editingDomain.getCommandStack().execute(command);
-            }
+      final CompoundCommand command = new CompoundCommand();
+      command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+
+      final List<GConnection> connectionsToDelete = new ArrayList<>();
+
+      for (final GConnector connector : node.getConnectors()) {
+        for (final GConnection connection : connector.getConnections()) {
+          if (connection != null && !connectionsToDelete.contains(connection)) {
+            connectionsToDelete.add(connection);
+          }
         }
-    }
+      }
 
-    /**
-     * Removes a node from the model.
-     *
-     * <p>
-     * Also removes any connections that were attached to the node.
-     * </p>
-     *
-     * @param model the {@link GModel} from which the node should be removed
-     * @param node the {@link GNode} to remove from the model
-     */
-    public static void removeNode(final GModel model, final GNode node)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
+      for (final GConnection connection : connectionsToDelete) {
+        command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
 
-        if (editingDomain != null)
-        {
-            final CompoundCommand command = new CompoundCommand();
-            command.append(RemoveCommand.create(editingDomain, model, NODES, node));
+        final GConnector source = connection.getSource();
+        final GConnector target = connection.getTarget();
 
-            final List<GConnection> connectionsToDelete = new ArrayList<>();
-
-            for (final GConnector connector : node.getConnectors())
-            {
-                for (final GConnection connection : connector.getConnections())
-                {
-                    if (connection != null && !connectionsToDelete.contains(connection))
-                    {
-                        connectionsToDelete.add(connection);
-                    }
-                }
-            }
-
-            for (final GConnection connection : connectionsToDelete)
-            {
-                command.append(RemoveCommand.create(editingDomain, model, CONNECTIONS, connection));
-
-                final GConnector source = connection.getSource();
-                final GConnector target = connection.getTarget();
-
-                if (!node.equals(source.getParent()))
-                {
-                    command.append(RemoveCommand.create(editingDomain, source, CONNECTOR_CONNECTIONS, connection));
-                }
-
-                if (!node.equals(target.getParent()))
-                {
-                    command.append(RemoveCommand.create(editingDomain, target, CONNECTOR_CONNECTIONS, connection));
-                }
-            }
-
-            if (command.canExecute())
-            {
-                editingDomain.getCommandStack().execute(command);
-            }
+        if (!node.equals(source.getParent())) {
+          // need to include what the connection is being removed from
+          command.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), connection));
         }
-    }
 
-    /**
-     * Clears everything in the given model.
-     *
-     * @param model the {@link GModel} to be cleared
-     */
-    public static void clear(final GModel model)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
-
-        if (editingDomain != null)
-        {
-            final CompoundCommand command = new CompoundCommand();
-
-            command.append(RemoveCommand.create(editingDomain, model, CONNECTIONS, model.getConnections()));
-            command.append(RemoveCommand.create(editingDomain, model, NODES, model.getNodes()));
-
-            if (command.canExecute())
-            {
-                editingDomain.getCommandStack().execute(command);
-            }
+        if (!node.equals(target.getParent())) {
+          command.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), connection));
         }
+      }
+
+      if (command.canExecute()) {
+        CommandStack.getCommandStack(model).execute(command);
+      }
+  }
+
+  /**
+   * Clears everything in the given model.
+   *
+   * @param model
+   *          the {@link GModel} to be cleared
+   */
+  public static void clear(final GModel model) {
+
+    final CompoundCommand command = new CompoundCommand();
+
+    List<GConnection> existingConnections = new ArrayList<>(model.getConnections());
+    for (final GConnection connection : existingConnections) {
+      command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
+    }
+    List<GNode> existingNodes = new ArrayList<>(model.getNodes());
+    for (final GNode node : existingNodes) {
+      command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+    }
+    if (command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
     }
 
-    /**
-     * Removes all connectors from the given nodes, and all connections attached to them.
-     *
-     * @param model the {@link GModel} being edited
-     * @param nodes a list of {@link GNode} instances whose connectors should be removed
-     */
-    public static void clearConnectors(final GModel model, final List<GNode> nodes)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
+  }
 
-        if (editingDomain != null)
-        {
-            final CompoundCommand command = new CompoundCommand();
+  /**
+   * Removes all connectors from the given nodes, and all connections attached to them.
+   *
+   * @param model
+   *          the {@link GModel} being edited
+   * @param nodes
+   *          a list of {@link GNode} instances whose connectors should be removed
+   */
+  public static void clearConnectors(final GModel model, final List<GNode> nodes) {
 
-            final Set<GConnection> connectionsToRemove = new HashSet<>();
-            final Set<GConnector> connectorsToRemove = new HashSet<>();
+      final CompoundCommand command = new CompoundCommand();
 
-            for (final GNode node : nodes)
-            {
-                command.append(RemoveCommand.create(editingDomain, node, NODE_CONNECTORS, node.getConnectors()));
-                connectorsToRemove.addAll(node.getConnectors());
+      final Set<GConnection> connectionsToRemove = new HashSet<>();
+      final Set<GConnector> connectorsToRemove = new HashSet<>();
 
-                for (final GConnector connector : node.getConnectors())
-                {
-                    connectionsToRemove.addAll(connector.getConnections());
-                }
-            }
-
-            for (final GConnection connection : connectionsToRemove)
-            {
-                final GConnector source = connection.getSource();
-                final GConnector target = connection.getTarget();
-
-                if (!connectorsToRemove.contains(source))
-                {
-                    command.append(RemoveCommand.create(editingDomain, source, CONNECTOR_CONNECTIONS, connection));
-                }
-
-                if (!connectorsToRemove.contains(target))
-                {
-                    command.append(RemoveCommand.create(editingDomain, target, CONNECTOR_CONNECTIONS, connection));
-                }
-            }
-
-            command.append(RemoveCommand.create(editingDomain, model, CONNECTIONS, connectionsToRemove));
-
-            if (command.canExecute())
-            {
-                editingDomain.getCommandStack().execute(command);
-            }
+      List<GNode> existingNodes = new ArrayList<>(nodes);
+      for (final GNode node : existingNodes) {
+        List<GConnector> existingConnectors = new ArrayList<>(node.getConnectors());
+        for (GConnector connector : existingConnectors) {
+          command.append(RemoveCommand.create(node, owner -> ((GNode) owner).getConnectors(), connector));
         }
-    }
 
-    /**
-     * Updates the model's layout values to match those in the skin instances.
-     *
-     * <p>
-     * This method adds set operations to the given compound command but does <b>not</b> execute it.
-     * </p>
-     *
-     * @param command a {@link CompoundCommand} to which the set commands will be added
-     * @param model the {@link GModel} whose layout values should be updated
-     * @param skinLookup the {@link SkinLookup} in use for this graph editor instance
-     */
-    public static void updateLayoutValues(final CompoundCommand command, final GModel model,
-            final SkinLookup skinLookup)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
+        connectorsToRemove.addAll(node.getConnectors());
 
-        if (editingDomain != null)
-        {
-            for (final GNode node : model.getNodes())
-            {
-                final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-                if (nodeSkin != null && checkNodeChanged(node, nodeSkin))
-                {
-                    final Region nodeRegion = nodeSkin.getRoot();
-                    command.append(SetCommand.create(editingDomain, node, NODE_X, nodeRegion.getLayoutX()));
-                    command.append(SetCommand.create(editingDomain, node, NODE_Y, nodeRegion.getLayoutY()));
-                    command.append(SetCommand.create(editingDomain, node, NODE_WIDTH, nodeRegion.getWidth()));
-                    command.append(SetCommand.create(editingDomain, node, NODE_HEIGHT, nodeRegion.getHeight()));
-                }
-            }
-
-            for (final GConnection connection : model.getConnections())
-            {
-                updateConnector(connection.getSource(), command, editingDomain, skinLookup);
-                updateConnector(connection.getTarget(), command, editingDomain, skinLookup);
-
-                for (final GJoint joint : connection.getJoints())
-                {
-                    final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
-                    if (jointSkin != null && checkJointChanged(joint, jointSkin))
-                    {
-                        final Region jointRegion = jointSkin.getRoot();
-                        final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
-                        final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
-
-                        command.append(SetCommand.create(editingDomain, joint, JOINT_X, x));
-                        command.append(SetCommand.create(editingDomain, joint, JOINT_Y, y));
-                    }
-                }
-            }
+        for (final GConnector connector : node.getConnectors()) {
+          connectionsToRemove.addAll(connector.getConnections());
         }
-    }
+      }
 
-    private static void updateConnector(final GConnector connector, final CompoundCommand command,
-            final EditingDomain editingDomain, final SkinLookup skinLookup)
-    {
-        final GNode node = connector.getParent();
-        final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
+      for (final GConnection connection : connectionsToRemove) {
+        final GConnector source = connection.getSource();
+        final GConnector target = connection.getTarget();
+
+        if (!connectorsToRemove.contains(source)) {
+          command.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), connection));
+        }
+
+        if (!connectorsToRemove.contains(target)) {
+          command.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), connection));
+        }
+        command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
+      }
+
+      if (command.canExecute()) {
+        CommandStack.getCommandStack(model).execute(command);
+      
+    }
+  }
+
+  /**
+   * Updates the model's layout values to match those in the skin instances.
+   *
+   * <p>
+   * This method adds set operations to the given compound command but does <b>not</b> execute it.
+   * </p>
+   *
+   * @param command
+   *          a {@link CompoundCommand} to which the set commands will be added
+   * @param model
+   *          the {@link GModel} whose layout values should be updated
+   * @param skinLookup
+   *          the {@link SkinLookup} in use for this graph editor instance
+   */
+  public static void updateLayoutValues(final CompoundCommand command, final GModel model,
+      final SkinLookup skinLookup) {
+      for (final GNode node : model.getNodes()) {
         final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-        if (nodeSkin != null && connectorSkin != null)
-        {
-            final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
-            if (checkConnectorChanged(connector, connectorPosition))
-            {
-                command.append(SetCommand.create(editingDomain, connector, GraphPackage.Literals.GCONNECTOR__X,
-                        connectorPosition.getX()));
-                command.append(SetCommand.create(editingDomain, connector, GraphPackage.Literals.GCONNECTOR__Y,
-                        connectorPosition.getY()));
-            }
+        if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
+          final Region nodeRegion = nodeSkin.getRoot();
+          command.append(SetPropertyCommand.create(node.xProperty(), nodeRegion.getLayoutX()));
+          command.append(SetPropertyCommand.create(node.yProperty(), nodeRegion.getLayoutY()));
+          command.append(SetPropertyCommand.create(node.widthProperty(), nodeRegion.getWidth()));
+          command.append(SetPropertyCommand.create(node.heightProperty(), nodeRegion.getHeight()));
         }
+      }
+
+      for (final GConnection connection : model.getConnections()) {
+        updateConnector(connection.getSource(), command, skinLookup);
+        updateConnector(connection.getTarget(), command, skinLookup);
+
+        for (final GJoint joint : connection.getJoints()) {
+          final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
+          if (jointSkin != null && checkJointChanged(joint, jointSkin)) {
+            final Region jointRegion = jointSkin.getRoot();
+            final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
+            final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
+
+            command.append(SetPropertyCommand.create(joint.xProperty(), x));
+            command.append(SetPropertyCommand.create(joint.yProperty(), y));
+          }
+        }
+      }
     }
 
-    /**
-     * Checks if a connector's JavaFX region has different layout values than those
-     * currently stored in the model.
-     *
-     * @param connector
-     *            the model instance for the connector
-     *
-     * @return {@code true} if any layout value has changed, {@code false if not}
-     */
-    private static boolean checkConnectorChanged(final GConnector connector, final Point2D connectorPosition)
-    {
-        if (connectorPosition.getX() != connector.getX())
-        {
-            return true;
-        }
-        else if (connectorPosition.getY() != connector.getY())
-        {
-            return true;
-        }
-        return false;
+  private static void updateConnector(final GConnector connector, final CompoundCommand command,
+      final SkinLookup skinLookup) {
+    final GNode node = connector.getParent();
+    final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
+    final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+    if (nodeSkin != null && connectorSkin != null) {
+      final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
+      if (checkConnectorChanged(connector, connectorPosition)) {
+        command.append(SetPropertyCommand.create(connector.xProperty(), connectorPosition.getX()));
+        command.append(SetPropertyCommand.create(connector.yProperty(), connectorPosition.getY()));
+      }
     }
+  }
 
-    /**
-     * Checks if a node's JavaFX region has different layout values than those
-     * currently stored in the model.
-     *
-     * @param node
-     *            the model instance for the node
-     *
-     * @return {@code true} if any layout value has changed,
-     *         {@code false if not}
-     */
-    private static boolean checkNodeChanged(final GNode node, final GNodeSkin nodeSkin)
-    {
-        final Region nodeRegion = nodeSkin.getRoot();
-
-        if (nodeRegion.getLayoutX() != node.getX())
-        {
-            return true;
-        }
-        else if (nodeRegion.getLayoutY() != node.getY())
-        {
-            return true;
-        }
-        else if (nodeRegion.getWidth() != node.getWidth())
-        {
-            return true;
-        }
-        else if (nodeRegion.getHeight() != node.getHeight())
-        {
-            return true;
-        }
-        return false;
+  /**
+   * Checks if a connector's JavaFX region has different layout values than those currently stored in the model.
+   *
+   * @param connector
+   *          the model instance for the connector
+   *
+   * @return {@code true} if any layout value has changed, {@code false if not}
+   */
+  private static boolean checkConnectorChanged(final GConnector connector, final Point2D connectorPosition) {
+    if (connectorPosition.getX() != connector.getX()) {
+      return true;
+    } else if (connectorPosition.getY() != connector.getY()) {
+      return true;
     }
+    return false;
+  }
 
-    /**
-     * Checks if a joint's JavaFX region has different layout values than those
-     * currently stored in the model.
-     *
-     * @param joint
-     *            the model instance for the joint
-     *
-     * @return {@code true} if any layout value has changed,
-     *         {@code false if not}
-     */
-    private static boolean checkJointChanged(final GJoint joint, final GJointSkin jointSkin)
-    {
-        final Region jointRegion = jointSkin.getRoot();
+  /**
+   * Checks if a node's JavaFX region has different layout values than those currently stored in the model.
+   *
+   * @param node
+   *          the model instance for the node
+   *
+   * @return {@code true} if any layout value has changed, {@code false if not}
+   */
+  private static boolean checkNodeChanged(final GNode node, final GNodeSkin nodeSkin) {
+    final Region nodeRegion = nodeSkin.getRoot();
 
-        final double jointRegionX = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
-        final double jointRegionY = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
-
-        if (jointRegionX != joint.getX())
-        {
-            return true;
-        }
-        else if (jointRegionY != joint.getY())
-        {
-            return true;
-        }
-        return false;
+    if (nodeRegion.getLayoutX() != node.getX()) {
+      return true;
+    } else if (nodeRegion.getLayoutY() != node.getY()) {
+      return true;
+    } else if (nodeRegion.getWidth() != node.getWidth()) {
+      return true;
+    } else if (nodeRegion.getHeight() != node.getHeight()) {
+      return true;
     }
+    return false;
+  }
 
-    /**
-     * Attempts to undo the given model to its previous state.
-     *
-     * @param model the {@link GModel} to undo
-     */
-    public static void undo(final GModel model)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
+  /**
+   * Checks if a joint's JavaFX region has different layout values than those currently stored in the model.
+   *
+   * @param joint
+   *          the model instance for the joint
+   *
+   * @return {@code true} if any layout value has changed, {@code false if not}
+   */
+  private static boolean checkJointChanged(final GJoint joint, final GJointSkin jointSkin) {
+    final Region jointRegion = jointSkin.getRoot();
 
-        if (editingDomain != null && editingDomain.getCommandStack().canUndo())
-        {
-            editingDomain.getCommandStack().undo();
-        }
+    final double jointRegionX = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
+    final double jointRegionY = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
+
+    if (jointRegionX != joint.getX()) {
+      return true;
+    } else if (jointRegionY != joint.getY()) {
+      return true;
     }
+    return false;
+  }
 
-    /**
-     * Attempts to redo the given model to its next state.
-     *
-     * @param model the {@link GModel} to redo
-     */
-    public static void redo(final GModel model)
-    {
-        final EditingDomain editingDomain = getEditingDomain(model);
+  /**
+   * Attempts to undo the given model to its previous state.
+   *
+   * @param model
+   *          the {@link GModel} to undo
+   */
+  public static void undo(final GModel model) {
 
-        if (editingDomain != null && editingDomain.getCommandStack().canRedo())
-        {
-            editingDomain.getCommandStack().redo();
-        }
+    if (CommandStack.getCommandStack(model).canUndo()) {
+      CommandStack.getCommandStack(model).undo();
     }
+  }
 
-    /**
-     * Gets the editing domain associated to the model.
-     *
-     * <p>
-     * Logs an error if none is found.
-     * </p>
-     *
-     * @param model a {@link GModel} instance
-     * @return the {@link EditingDomain} associated to this model instance
-     */
-    private static EditingDomain getEditingDomain(final GModel model)
-    {
-        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
+  /**
+   * Attempts to redo the given model to its next state.
+   *
+   * @param model
+   *          the {@link GModel} to redo
+   */
+  public static void redo(final GModel model) {
 
-        if (editingDomain == null)
-        {
-            LOGGER.error("No editing domain found for this model. Maybe it hasn't been set inside a graph editor?"); //$NON-NLS-1$
-        }
-
-        return editingDomain;
+    if ( CommandStack.getCommandStack(model).canRedo()) {
+      CommandStack.getCommandStack(model).redo();
     }
+  }
+
 }

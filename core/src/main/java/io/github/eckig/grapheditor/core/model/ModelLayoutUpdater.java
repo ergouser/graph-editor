@@ -3,14 +3,15 @@
  */
 package io.github.eckig.grapheditor.core.model;
 
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.EditorElement;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.ModelEditingManager;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
 import io.github.eckig.grapheditor.utils.GraphEditorProperties;
 import javafx.event.EventHandler;
 import javafx.scene.Node;

@@ -29,23 +29,23 @@ class PanningWindowMinimap extends Pane
      */
     protected static final double MINIMAP_PADDING = 5;
 
-    private static final String STYLE_CLASS = "minimap"; //$NON-NLS-1$
+    protected static final String STYLE_CLASS = "minimap"; //$NON-NLS-1$
 
-    private final MinimapLocator locator = new MinimapLocator(MINIMAP_PADDING);
+    protected final MinimapLocator locator = new MinimapLocator(MINIMAP_PADDING);
 
-    private MinimapNodeGroup contentRepresentation;
+    protected MinimapNodeGroup contentRepresentation;
 
-    private PanningWindow window;
-    private Region content;
+    protected PanningWindow window;
+    protected Region content;
 
-    private final InvalidationListener drawListener = observable -> requestLayout();
+    protected final InvalidationListener drawListener = observable -> requestLayout();
 
-    private boolean locatorPositionListenersMuted;
-    private boolean drawLocatorListenerMuted;
+    protected boolean locatorPositionListenersMuted;
+    protected boolean drawLocatorListenerMuted;
 
-    private final Hyperlink zoomIn = new Hyperlink("++"); //$NON-NLS-1$
-    private final Hyperlink zoomOut = new Hyperlink("--"); //$NON-NLS-1$
-    private final Hyperlink zoomExact = new Hyperlink("1:1"); //$NON-NLS-1$
+    protected final Hyperlink zoomIn = new Hyperlink("++"); //$NON-NLS-1$
+    protected final Hyperlink zoomOut = new Hyperlink("--"); //$NON-NLS-1$
+    protected final Hyperlink zoomExact = new Hyperlink("1:1"); //$NON-NLS-1$
 
     /**
      * Creates a new {@link PanningWindowMinimap} instance.
@@ -72,7 +72,7 @@ class PanningWindowMinimap extends Pane
         getChildren().addAll(zoomIn, zoomOut, zoomExact);
     }
 
-    private void zoomIn(final ActionEvent event)
+    protected void zoomIn(final ActionEvent event)
     {
         if (window != null)
         {
@@ -81,7 +81,7 @@ class PanningWindowMinimap extends Pane
         event.consume();
     }
 
-    private void zoomExact(final ActionEvent event)
+    protected void zoomExact(final ActionEvent event)
     {
         if (window != null)
         {
@@ -90,7 +90,7 @@ class PanningWindowMinimap extends Pane
         event.consume();
     }
 
-    private void zoomOut(final ActionEvent event)
+    protected void zoomOut(final ActionEvent event)
     {
         if (window != null)
         {
@@ -207,7 +207,7 @@ class PanningWindowMinimap extends Pane
      *
      * @return the ratio of the minimap size to the content size
      */
-    private double calculateScaleFactor()
+    protected double calculateScaleFactor()
     {
 
         final double scaleFactorX = (getWidth() - 2 * MINIMAP_PADDING) / content.getWidth();
@@ -271,7 +271,7 @@ class PanningWindowMinimap extends Pane
      * each other.
      * </p>
      */
-    private void createLocatorPositionListeners()
+    protected void createLocatorPositionListeners()
     {
         locator.layoutXProperty().addListener((observable, oldValue, newValue) ->
         {
@@ -307,7 +307,7 @@ class PanningWindowMinimap extends Pane
      * dragged as part of the same gesture.
      * </p>
      */
-    private void createMinimapClickHandlers()
+    protected void createMinimapClickHandlers()
     {
         setOnMousePressed(event ->
         {
@@ -330,7 +330,7 @@ class PanningWindowMinimap extends Pane
      *
      * @return the zoom factor of the content (1 for no zoom)
      */
-    private double calculateZoomFactor()
+    protected double calculateZoomFactor()
     {
         return content == null ? 1 : content.getLocalToSceneTransform().getMxx();
     }
@@ -343,7 +343,7 @@ class PanningWindowMinimap extends Pane
      *            a mouse event
      * @return {@code true} if conditions are right for the drag event
      */
-    private boolean checkReadyForClickEvent(final MouseEvent event)
+    protected boolean checkReadyForClickEvent(final MouseEvent event)
     {
         return event.getButton().equals(MouseButton.PRIMARY) && checkContentExists() && checkWindowExists();
     }
@@ -355,7 +355,7 @@ class PanningWindowMinimap extends Pane
      * @return {@code true} if the content is not null and has a nonzero width &
      *         height
      */
-    private boolean checkContentExists()
+    protected boolean checkContentExists()
     {
         return content != null && content.getWidth() > 0 && content.getHeight() > 0;
     }
@@ -367,7 +367,7 @@ class PanningWindowMinimap extends Pane
      * @return {@code true} if the window is not null and has a nonzero width &
      *         height
      */
-    private boolean checkWindowExists()
+    protected boolean checkWindowExists()
     {
         return window != null && window.getWidth() > 0 && window.getHeight() > 0;
     }

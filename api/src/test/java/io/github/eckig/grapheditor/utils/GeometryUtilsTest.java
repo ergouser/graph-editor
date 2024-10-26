@@ -10,6 +10,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -17,12 +23,6 @@ import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 
@@ -35,9 +35,9 @@ public class GeometryUtilsTest {
     private static final double CONNECTOR_WIDTH = 18;
     private static final double CONNECTOR_HEIGHT = 12;
 
-    private final GModel model = GraphFactory.eINSTANCE.createGModel();
-    private final GNode node = GraphFactory.eINSTANCE.createGNode();
-    private final GConnector connector = GraphFactory.eINSTANCE.createGConnector();
+    private final GModel model = new GModel();
+    private final GNode node = new GNode();
+    private final GConnector connector = new GConnector();
 
     private SkinLookup skinLookup;
 

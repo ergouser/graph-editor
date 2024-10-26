@@ -5,11 +5,11 @@ package io.github.eckig.grapheditor;
 
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
 
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GNode;
 import javafx.collections.ObservableSet;
 
 /**
@@ -21,7 +21,7 @@ public interface SelectionManager {
      * Gets the list of currently selected nodes.
      *
      * <p>
-     * This list is read-only. Nodes should be selected via {@link #select(EObject)}.
+     * This list is read-only. Nodes should be selected via {@link #select(Selectable)}.
      * </p>
      *
      * @return the unmodifiable list of currently selected nodes
@@ -32,7 +32,7 @@ public interface SelectionManager {
      * Gets the list of currently selected connections.
      *
      * <p>
-     * This list is read-only. Connections should be selected via {@link #select(EObject)}.
+     * This list is read-only. Connections should be selected via {@link #select(Selectable)}.
      * </p>
      *
      * @return the unmodifiable list of currently selected connections
@@ -43,7 +43,7 @@ public interface SelectionManager {
      * Gets the list of currently selected joints.
      *
      * <p>
-     * This list is read-only. Joints should be selected via {@link #select(EObject)}.
+     * This list is read-only. Joints should be selected via {@link #select(Selectable)}.
      * </p>
      *
      * @return the unmodifiable list of currently selected joints
@@ -58,25 +58,25 @@ public interface SelectionManager {
      * @param object
      * @return {@code true} if the given index is selected, {@code false} otherwise.
      */
-    boolean isSelected(EObject object);
+    boolean isSelected(Selectable object);
     
     /**
      * Gets the {@link ObservableSet} of currently-selected items.
      *
      * <p>
-     * This set is read-only. Items should be selected via {@link #select(EObject)}.
+     * This set is read-only. Items should be selected via {@link #select(Selectable)}.
      * </p>
      *
      * @return the set of selected items
      */
-    ObservableSet<EObject> getSelectedItems();
+    ObservableSet<Selectable> getSelectedItems();
     
     /**
      * This method will attempt to select the given object.
      *
      * @param object The object to attempt to select in the underlying data model.
      */
-    void select(EObject object);
+    <S extends Selectable> void  select(final S object);
     
     /**
      * Selects all selectable elements (nodes, joints, and connections) in the graph editor.
@@ -89,7 +89,7 @@ public interface SelectionManager {
      *
      * @param object The selected item to deselect.
      */
-    void clearSelection(EObject object);
+    <S extends Selectable> void clearSelection(S object);
 
     /**
      * Clears the selection, i.e. de-selects all elements.

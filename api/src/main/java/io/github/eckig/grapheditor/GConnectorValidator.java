@@ -3,7 +3,7 @@
  */
 package io.github.eckig.grapheditor;
 
-import io.github.eckig.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector;
 
 /**
  * An interface for customising connector validation.

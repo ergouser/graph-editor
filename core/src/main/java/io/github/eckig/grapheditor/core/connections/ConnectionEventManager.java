@@ -3,9 +3,9 @@ package io.github.eckig.grapheditor.core.connections;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.eclipse.emf.common.command.Command;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.command.Command;
 
-import io.github.eckig.grapheditor.model.GConnection;
 import io.github.eckig.grapheditor.utils.RemoveContext;
 
 /**

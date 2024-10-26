@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.core.data.skins;
 
+import com.ergotech.grapheditor.model.GJoint;
+
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultJointSkin;
-import io.github.eckig.grapheditor.model.GJoint;
 
 public class CustomJointSkin extends DefaultJointSkin {
 

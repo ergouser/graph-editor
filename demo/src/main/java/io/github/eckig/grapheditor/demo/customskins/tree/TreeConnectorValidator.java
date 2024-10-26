@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GConnectorValidator;
-import io.github.eckig.grapheditor.model.GConnector;
 
 /**
  * Validation rules for how connectors can be connected for the 'tree-like' graph.

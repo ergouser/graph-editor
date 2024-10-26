@@ -6,8 +6,9 @@ package io.github.eckig.grapheditor.demo.customskins.tree;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GTailSkin;
-import io.github.eckig.grapheditor.model.GConnector;
 import io.github.eckig.grapheditor.utils.Arrow;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;

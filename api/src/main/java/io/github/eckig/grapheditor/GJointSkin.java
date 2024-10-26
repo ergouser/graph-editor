@@ -3,7 +3,8 @@
  */
 package io.github.eckig.grapheditor;
 
-import io.github.eckig.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GJoint;
+
 import io.github.eckig.grapheditor.utils.DraggableBox;
 
 /**

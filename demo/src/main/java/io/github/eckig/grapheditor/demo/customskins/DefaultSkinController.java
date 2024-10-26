@@ -1,23 +1,19 @@
 package io.github.eckig.grapheditor.demo.customskins;
 
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.RemoveCommand;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
+import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
 import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
-import io.github.eckig.grapheditor.model.GraphPackage;
 import javafx.geometry.Side;
 
 /**
@@ -57,13 +53,13 @@ public class DefaultSkinController implements SkinController {
         final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
         final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
 
-        final GNode node = GraphFactory.eINSTANCE.createGNode();
+        final GNode node = new GNode();
         node.setY(NODE_INITIAL_Y + windowYOffset);
 
-        final GConnector rightOutput = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector rightOutput = new GConnector();
         node.getConnectors().add(rightOutput);
 
-        final GConnector leftInput = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector leftInput = new GConnector();
         node.getConnectors().add(leftInput);
 
         node.setX(NODE_INITIAL_X + windowXOffset);
@@ -88,24 +84,23 @@ public class DefaultSkinController implements SkinController {
         final GModel model = graphEditor.getModel();
         final SkinLookup skinLookup = graphEditor.getSkinLookup();
         final CompoundCommand command = new CompoundCommand();
-        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
 
         for (final GNode node : model.getNodes()) {
 
             if (skinLookup.lookupNode(node).isSelected()) {
                 if (countConnectors(node, position) < MAX_CONNECTOR_COUNT) {
 
-                    final GConnector connector = GraphFactory.eINSTANCE.createGConnector();
+                    final GConnector connector = new GConnector();
                     connector.setType(type);
 
-                    final EReference connectors = GraphPackage.Literals.GNODE__CONNECTORS;
-                    command.append(AddCommand.create(editingDomain, node, connectors, connector));
+                    command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+                    //command.append(AddCommand.create(editingDomain, node, connectors, connector));
                 }
             }
         }
 
         if (command.canExecute()) {
-            editingDomain.getCommandStack().execute(command);
+            CommandStack.getCommandStack(model).execute(command);
         }
     }
 

@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GJoint;
+
 import io.github.eckig.grapheditor.EditorElement;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GraphFactory;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -158,7 +158,7 @@ public class JointCreator {
             removeTemporaryJoints();
 
             if (checkForNetChange(oldJointPositions, newJointPositions)) {
-                JointCommands.setNewJoints(newJointPositions, connection);
+                JointCommands.setNewJoints(graphEditor.getModel(), newJointPositions, connection);
             }
         });
     }
@@ -249,8 +249,8 @@ public class JointCreator {
      */
     private void addTemporaryJoints(final int index, final double x, final double y) {
 
-        final GJoint firstNewJoint = GraphFactory.eINSTANCE.createGJoint();
-        final GJoint secondNewJoint = GraphFactory.eINSTANCE.createGJoint();
+        final GJoint firstNewJoint = new GJoint();
+        final GJoint secondNewJoint = new GJoint();
 
         firstNewJoint.setX(x);
         firstNewJoint.setY(y);

@@ -16,8 +16,8 @@ import javafx.scene.input.ZoomEvent;
 public class GraphEventManagerImpl implements GraphEventManager
 {
 
-    private GraphInputGesture gesture;
-    private Object owner;
+    protected GraphInputGesture gesture;
+    protected Object owner;
 
     @Override
     public boolean activateGesture(final GraphInputGesture pGesture, final Event pEvent, final Object pOwner)
@@ -36,7 +36,7 @@ public class GraphEventManagerImpl implements GraphEventManager
         return false;
     }
 
-    private boolean canActivate(final GraphInputGesture pGesture, final Event pEvent)
+    protected boolean canActivate(final GraphInputGesture pGesture, final Event pEvent)
     {
         final GraphInputGesture current = gesture;
         if (current == pGesture)
@@ -83,7 +83,7 @@ public class GraphEventManagerImpl implements GraphEventManager
         return false;
     }
 
-    private static boolean canOverwrite(final Object pExisting, final Object pCandidate)
+    protected static boolean canOverwrite(final Object pExisting, final Object pCandidate)
     {
         if (pExisting == pCandidate)
         {
@@ -96,7 +96,7 @@ public class GraphEventManagerImpl implements GraphEventManager
         return pExisting == null || !isVisible(pExisting);
     }
 
-    private static boolean isVisible(final Object pNode)
+    protected static boolean isVisible(final Object pNode)
     {
         if (pNode != null)
         {

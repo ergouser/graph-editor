@@ -3,9 +3,10 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
-import io.github.eckig.grapheditor.model.GConnector;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;

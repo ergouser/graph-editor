@@ -5,8 +5,11 @@ package io.github.eckig.grapheditor.core.skins.defaults.connection;
 
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.ConnectionSegment;
+import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.HLineTo;
@@ -14,8 +17,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.VLineTo;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.utils.GeometryUtils;
 
 /**
  * Helper class for calculating the offset of the cursor to a default connection skin.

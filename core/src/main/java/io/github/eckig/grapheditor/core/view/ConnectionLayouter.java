@@ -3,10 +3,7 @@
  */
 package io.github.eckig.grapheditor.core.view;
 
-import java.util.Collection;
-
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GModel;
 
 
 /**

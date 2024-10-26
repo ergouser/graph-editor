@@ -2,10 +2,11 @@ package io.github.eckig.grapheditor.core.connections;
 
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
-import io.github.eckig.grapheditor.model.GConnector;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseEvent;

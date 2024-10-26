@@ -5,19 +5,19 @@ package io.github.eckig.grapheditor.core.skins.defaults;
 
 import java.util.List;
 
-import io.github.eckig.grapheditor.core.connections.RectangularConnections;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
+import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.CursorOffsetCalculator;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.JointAlignmentManager;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.JointCleaner;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.JointCreator;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.SimpleConnectionSkin;
-import io.github.eckig.grapheditor.model.GConnection;
 
 /**
  * The default connection skin.

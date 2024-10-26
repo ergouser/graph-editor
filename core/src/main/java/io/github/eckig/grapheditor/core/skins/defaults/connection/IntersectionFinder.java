@@ -6,9 +6,10 @@ package io.github.eckig.grapheditor.core.skins.defaults.connection;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
-import io.github.eckig.grapheditor.model.GConnection;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 

@@ -3,9 +3,10 @@
  */
 package io.github.eckig.grapheditor.core.connections;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import io.github.eckig.grapheditor.GConnectorValidator;
 import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
-import io.github.eckig.grapheditor.model.GConnector;
 
 /**
  * Default validation rules that determine which connectors can be connected to each other.

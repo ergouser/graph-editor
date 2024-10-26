@@ -3,14 +3,14 @@ package io.github.eckig.grapheditor.core.selections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.GSkin;
 import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GNode;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -21,7 +21,7 @@ import javafx.collections.SetChangeListener;
 public class SelectionTracker
 {
 
-    private final ObservableSet<EObject> selectedElements = FXCollections.observableSet(new HashSet<>());
+    private final ObservableSet<Selectable> selectedElements = FXCollections.observableSet(new HashSet<>());
     private final SkinLookup skinLookup;
 
     /**
@@ -36,7 +36,7 @@ public class SelectionTracker
         selectedElements.addListener(this::selectedElementsChanged);
     }
 
-    private void selectedElementsChanged(final SetChangeListener.Change<? extends EObject> change)
+    private void selectedElementsChanged(final SetChangeListener.Change<? extends Selectable> change)
     {
         if (change.wasRemoved())
         {
@@ -48,7 +48,7 @@ public class SelectionTracker
         }
     }
 
-    private void update(final EObject obj)
+    private void update(final Selectable obj)
     {
         GSkin<?> skin = null;
         if (obj instanceof GNode n)
@@ -106,7 +106,7 @@ public class SelectionTracker
         return selectedElements.stream().filter(e -> e instanceof GJoint).map(e -> (GJoint) e).toList();
     }
 
-    public ObservableSet<EObject> getSelectedItems()
+    public ObservableSet<Selectable> getSelectedItems()
     {
         return selectedElements;
     }

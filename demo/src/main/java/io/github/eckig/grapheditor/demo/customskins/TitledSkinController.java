@@ -4,32 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 
-import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectorSkin;
-import io.github.eckig.grapheditor.core.skins.defaults.DefaultNodeSkin;
-import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledConnectorSkin;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledNodeSkin;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledSkinConstants;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledTailSkin;
-
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.edit.command.SetCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.SetPropertyCommand;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.GraphEditor;
+import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectorSkin;
+import io.github.eckig.grapheditor.core.skins.defaults.DefaultNodeSkin;
+import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
 import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
+import io.github.eckig.grapheditor.demo.customskins.titled.TitledConnectorSkin;
+import io.github.eckig.grapheditor.demo.customskins.titled.TitledNodeSkin;
+import io.github.eckig.grapheditor.demo.customskins.titled.TitledSkinConstants;
+import io.github.eckig.grapheditor.demo.customskins.titled.TitledTailSkin;
 import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
-import io.github.eckig.grapheditor.model.GraphPackage;
 
 /**
  * Responsible for grey-skin specific logic in the graph editor demo.
@@ -74,18 +68,18 @@ public class TitledSkinController extends DefaultSkinController {
         final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
         final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
 
-        final GNode node = GraphFactory.eINSTANCE.createGNode();
+        final GNode node = new GNode();
         node.setY(NODE_INITIAL_Y + windowYOffset);
 
         node.setType(TitledSkinConstants.TITLED_NODE);
         node.setX(NODE_INITIAL_X + windowXOffset);
         node.setId(allocateNewId());
 
-        final GConnector input = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector input = new GConnector();
         node.getConnectors().add(input);
         input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
 
-        final GConnector output = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector output = new GConnector();
         node.getConnectors().add(output);
         output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
 
@@ -105,15 +99,13 @@ public class TitledSkinController extends DefaultSkinController {
      */
     private void allocateIds(final List<GNode> nodes, final CompoundCommand command) {
 
-        final EditingDomain domain = AdapterFactoryEditingDomain.getEditingDomainFor(graphEditor.getModel());
-        final EAttribute feature = GraphPackage.Literals.GNODE__ID;
-
         for (final GNode node : nodes) {
 
             if (checkNeedsNewId(node, nodes)) {
 
                 final String id = allocateNewId();
-                final Command setCommand = SetCommand.create(domain, node, feature, id);
+                final Command setCommand = SetPropertyCommand.create(node.idProperty(), id);
+                //final Command setCommand = SetCommand.create(domain, node, feature, id);
 
                 if (setCommand.canExecute()) {
                     command.appendAndExecute(setCommand);

@@ -1,15 +1,13 @@
 module io.github.eckig.grapheditor.core
 {
     requires transitive javafx.controls;
-    requires transitive io.github.eckig.grapheditor.model;
+    requires transitive com.ergotech.grapheditor.model;
     requires transitive io.github.eckig.grapheditor.api;
-    requires org.eclipse.emf.ecore.xmi;
-    requires org.eclipse.emf.edit;
-    requires org.eclipse.emf.ecore;
-    requires transitive org.eclipse.emf.common;
     requires org.slf4j;
+    requires java.desktop;
 
     exports io.github.eckig.grapheditor.core;
+    exports io.github.eckig.grapheditor.core.utils;
     exports io.github.eckig.grapheditor.core.connections;
     exports io.github.eckig.grapheditor.core.connectors;
     exports io.github.eckig.grapheditor.core.skins;

@@ -6,23 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import io.github.eckig.grapheditor.core.connections.ConnectionCopier;
-
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.AddCommand;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
 
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphPackage;
+import io.github.eckig.grapheditor.core.connections.ConnectionCopier;
+import io.github.eckig.grapheditor.core.utils.BeanUtils;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -41,8 +38,8 @@ import javafx.scene.layout.Region;
  */
 public class SelectionCopier {
 
-    private static final EReference NODES = GraphPackage.Literals.GMODEL__NODES;
-    private static final EReference CONNECTIONS = GraphPackage.Literals.GMODEL__CONNECTIONS;
+//    private static final EReference NODES = GraphPackage.Literals.GMODEL__NODES;
+//    private static final EReference CONNECTIONS = GraphPackage.Literals.GMODEL__CONNECTIONS;
 
     private static final double BASE_PASTE_OFFSET = 20;
 
@@ -57,6 +54,8 @@ public class SelectionCopier {
     private double parentSceneYAtTimeOfCopy;
 
     private GModel model;
+    
+    private ObservableList<?> ol;
 
     /**
      * Creates a new {@link SelectionCopier} instance.
@@ -99,7 +98,7 @@ public class SelectionCopier {
         for (final GNode node : model.getNodes()) {
             if (selectionManager.isSelected(node)) {
 
-                final GNode copiedNode = EcoreUtil.copy(node);
+                final GNode copiedNode = BeanUtils.copyBean(node);
                 copiedNodes.add(copiedNode);
                 copyStorage.put(node, copiedNode);
             }
@@ -164,7 +163,7 @@ public class SelectionCopier {
 
         for (final GNode copiedNode : copiedNodes) {
 
-            final GNode pastedNode = EcoreUtil.copy(copiedNode);
+            final GNode pastedNode = BeanUtils.copyBean(copiedNode);
             pastedNodes.add(pastedNode);
 
             pasteStorage.put(copiedNode, pastedNode);
@@ -257,19 +256,20 @@ public class SelectionCopier {
     private void addPastedElements(final List<GNode> pastedNodes, final List<GConnection> pastedConnections,
             final BiConsumer<List<GNode>, CompoundCommand> consumer) {
 
-        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
         final CompoundCommand command = new CompoundCommand();
 
         for (final GNode pastedNode : pastedNodes) {
-            command.append(AddCommand.create(editingDomain, model, NODES, pastedNode));
+            //command.append(AddCommand.create(editingDomain, model, NODES, pastedNode));
+          command.append( AddCommand.create(model, owner -> model.getNodes(), pastedNode));
         }
 
         for (final GConnection pastedConnection : pastedConnections) {
-            command.append(AddCommand.create(editingDomain, model, CONNECTIONS, pastedConnection));
-        }
+            //command.append(AddCommand.create(editingDomain, model, CONNECTIONS, pastedConnection));
+            command.append(AddCommand.create(model, owner -> model.getConnections(), pastedConnection));
+       }
 
         if (command.canExecute()) {
-            editingDomain.getCommandStack().execute(command);
+          CommandStack.getCommandStack(model).execute(command);
         }
 
         if (consumer != null) {

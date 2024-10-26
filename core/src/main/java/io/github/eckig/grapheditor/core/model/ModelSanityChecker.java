@@ -6,11 +6,12 @@ package io.github.eckig.grapheditor.core.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
 
 
 /**

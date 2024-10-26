@@ -6,10 +6,11 @@ package io.github.eckig.grapheditor.demo.customskins.tree;
 import java.util.List;
 import java.util.Map;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
-import io.github.eckig.grapheditor.model.GConnection;
 import io.github.eckig.grapheditor.utils.Arrow;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;

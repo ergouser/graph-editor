@@ -5,8 +5,9 @@ package io.github.eckig.grapheditor;
 
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnector;
+
 import javafx.geometry.Point2D;
-import io.github.eckig.grapheditor.model.GConnector;
 
 /**
  * The tail-skin class for a {@link GConnector}. Responsible for visualizing the tails that extend temporarily from

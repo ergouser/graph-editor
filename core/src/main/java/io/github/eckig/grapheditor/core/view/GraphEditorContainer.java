@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.core.view;
 
+import com.ergotech.grapheditor.model.GModel;
+
 import io.github.eckig.grapheditor.GraphEditor;
-import io.github.eckig.grapheditor.model.GModel;
 import io.github.eckig.grapheditor.window.AutoScrollingWindow;
 import io.github.eckig.grapheditor.window.GraphEditorMinimap;
 import javafx.beans.value.ChangeListener;

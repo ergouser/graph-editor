@@ -12,27 +12,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import io.github.eckig.grapheditor.core.data.DummyDataFactory;
-import io.github.eckig.grapheditor.core.utils.FXTestUtils;
-
-import org.eclipse.emf.common.command.CommandStack;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
+import com.ergotech.grapheditor.model.command.CommandStack;
+
 import io.github.eckig.grapheditor.Commands;
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
+import io.github.eckig.grapheditor.core.data.DummyDataFactory;
 import io.github.eckig.grapheditor.core.skins.defaults.utils.ConnectionCommands;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
+import io.github.eckig.grapheditor.core.utils.FXTestUtils;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 
 /**
  * This test treats the graph editor as a single unit.
@@ -44,164 +43,162 @@ import javafx.application.Platform;
  */
 public class GraphEditorTest {
 
-    private GraphEditor graphEditor;
-    private GModel model;
-    private SkinLookup skinLookup;
+  private GraphEditor graphEditor;
 
-    private EditingDomain editingDomain;
-    private CommandStack commandStack;
+  private GModel model;
 
-    @Before
-    public void setUp() throws InterruptedException
-    {
-        graphEditor = new DefaultGraphEditor();
-        model = DummyDataFactory.createModel();
-        skinLookup = graphEditor.getSkinLookup();
+  private SkinLookup skinLookup;
 
-        graphEditor.setModel(model);
+  private CommandStack commandStack;
 
-        editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
-        if (editingDomain != null) {
-            commandStack = editingDomain.getCommandStack();
-        }
-
-        final CountDownLatch waitInit = new CountDownLatch(1);
-        try
-        {
-            Platform.startup(waitInit::countDown);
-        }
-        catch (Exception e)
-        {
-            waitInit.countDown();
-        }
-        waitInit.await();
-
-        reloadEditor();
-
-        graphEditor.getView().autosize();
-        graphEditor.getView().layout();
+  @Before
+  public void setUp() throws InterruptedException {
+    final CountDownLatch waitInit = new CountDownLatch(1);
+    try {
+      Platform.startup(waitInit::countDown);
+    } catch (Exception e) {
+      waitInit.countDown();
     }
 
-    private void reloadEditor() throws InterruptedException
-    {
-        final CountDownLatch wait = new CountDownLatch(1);
-        Platform.runLater(() ->
-        {
-            graphEditor.reload();
-            wait.countDown();
-        });
-        wait.await();
-    }
+    graphEditor = new DefaultGraphEditor();
+    model = DummyDataFactory.createModel();
+    skinLookup = graphEditor.getSkinLookup();
 
-    @Test
-    public void checkInitializedCorrectly() {
+    graphEditor.setModel(model);
 
-        assertNotNull("Editing domain should exist.", editingDomain);
-        assertNotNull("Command stack should exist.", commandStack);
-        assertNotNull("Skin lookup should exist.", skinLookup);
-    }
+    commandStack = CommandStack.getCommandStack(model);
 
-    @Test
-    public void undoRedoNode() throws InterruptedException
-    {
+    waitInit.await();
 
-        final GNode node = addNodeToModel();
-        reloadEditor();
+    reloadEditor();
 
-        assertNotNull("Node skin instance should exist.", skinLookup.lookupNode(node));
-        assertTrue("Undo should be possible.", commandStack.canUndo());
+    graphEditor.getView().autosize();
+    graphEditor.getView().layout();
+  }
 
-        editingDomain.getCommandStack().undo();
-        reloadEditor();
+  private void reloadEditor() throws InterruptedException {
+    final CountDownLatch wait = new CountDownLatch(1);
+    Platform.runLater(() -> {
+      graphEditor.reload();
+      wait.countDown();
+    });
+    wait.await();
+  }
 
-        assertFalse("Node should have been removed.", model.getNodes().contains(node));
-        assertNull("Node skin instance should no longer exist.", skinLookup.lookupNode(node));
-        assertTrue("Redo should be possible.", commandStack.canRedo());
+  @Test
+  public void checkInitializedCorrectly() {
 
-        editingDomain.getCommandStack().redo();
-        reloadEditor();
+    assertNotNull("Command stack should exist.", commandStack);
+    assertNotNull("Skin lookup should exist.", skinLookup);
+  }
 
-        assertTrue("Node should be back in again.", model.getNodes().contains(node));
-        assertNotNull("Node skin instance should exist again.", skinLookup.lookupNode(node));
-    }
+  @Test
+  public void undoRedoNode() throws InterruptedException {
 
-    @Test
-    public void undoRedoConnection() throws InterruptedException
-    {
+    final GNode node = addNodeToModel();
+    reloadEditor();
 
-        Commands.clear(model);
+    assertNotNull("Node skin instance should exist.", skinLookup.lookupNode(node));
+    assertTrue("Undo should be possible.", commandStack.canUndo());
 
-        final GNode firstNode = addNodeToModel();
-        final GNode secondNode = addNodeToModel();
+    CommandStack.getCommandStack(model).undo();
+    reloadEditor();
 
-        final GConnector firstNodeOutput = firstNode.getConnectors().get(1);
-        final GConnector secondNodeInput = secondNode.getConnectors().get(0);
+    assertFalse("Node should have been removed.", model.getNodes().contains(node));
+    assertNull("Node skin instance should no longer exist.", skinLookup.lookupNode(node));
+    assertTrue("Redo should be possible.", commandStack.canRedo());
 
-        final List<GJoint> joints = new ArrayList<>();
-        joints.add(GraphFactory.eINSTANCE.createGJoint());
-        joints.add(GraphFactory.eINSTANCE.createGJoint());
+    CommandStack.getCommandStack(model).redo();
+    reloadEditor();
 
-        ConnectionCommands.addConnection(model, firstNodeOutput, secondNodeInput, null, joints, null);
-        reloadEditor();
+    assertTrue("Node should be back in again.", model.getNodes().contains(node));
+    assertNotNull("Node skin instance should exist again.", skinLookup.lookupNode(node));
+  }
 
-        assertFalse("A connection should be present.", model.getConnections().isEmpty());
+  @Test
+  public void undoRedoConnection() throws InterruptedException {
 
-        final GConnection connection = model.getConnections().get(0);
+    Commands.clear(model);
 
-        assertNotNull("Connection skin instance should exist.", skinLookup.lookupConnection(connection));
-        assertTrue("Undo should be possible.", commandStack.canUndo());
+    final GNode firstNode = addNodeToModel();
+    final GNode secondNode = addNodeToModel();
 
-        editingDomain.getCommandStack().undo();
-        reloadEditor();
+    final GConnector firstNodeOutput = firstNode.getConnectors().get(1);
+    final GConnector secondNodeInput = secondNode.getConnectors().get(0);
 
-        assertFalse("Connection should have been removed.", model.getConnections().contains(connection));
-        assertNull("Connection skin instance should no longer exist.", skinLookup.lookupConnection(connection));
-        assertTrue("Redo should be possible.", commandStack.canRedo());
+    final List<GJoint> joints = new ArrayList<>();
+    joints.add(new GJoint());
+    joints.add(new GJoint());
 
-        editingDomain.getCommandStack().redo();
-        reloadEditor();
+    ConnectionCommands.addConnection(model, firstNodeOutput, secondNodeInput, null, joints, null);
+    reloadEditor();
 
-        assertTrue("Connection should be back in again.", model.getConnections().contains(connection));
-        assertNotNull("Connection skin instance should exist again.", skinLookup.lookupConnection(connection));
-    }
+    assertFalse("A connection should be present.", model.getConnections().isEmpty());
 
-    @Test
-    public void selectAllAndDelete() {
+    final GConnection connection = model.getConnections().get(0);
 
-        graphEditor.getSelectionManager().selectAll();
-        final List<EObject> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedItems());
-        graphEditor.delete(selection);
+    assertNotNull("Connection skin instance should exist.", skinLookup.lookupConnection(connection));
+    assertTrue("Undo should be possible.", commandStack.canUndo());
 
-        assertTrue("All nodes should have gone.", model.getNodes().isEmpty());
-        assertTrue("All connections should have gone.", model.getConnections().isEmpty());
-    }
+    CommandStack.getCommandStack(model).undo();
+    reloadEditor();
 
-    @Test
-    public void moveJointAndUpdateLayout() {
+    assertFalse("Connection should have been removed.", model.getConnections().contains(connection));
+    assertNull("Connection skin instance should no longer exist.", skinLookup.lookupConnection(connection));
+    assertTrue("Redo should be possible.", commandStack.canRedo());
 
-        final GJoint firstJoint = model.getConnections().get(0).getJoints().get(0);
-        final GJoint secondJoint = model.getConnections().get(0).getJoints().get(1);
+    CommandStack.getCommandStack(model).redo();
+    reloadEditor();
 
-        final double secondJointInitialX = skinLookup.lookupJoint(secondJoint).getRoot().getLayoutX();
+    assertTrue("Connection should be back in again.", model.getConnections().contains(connection));
+    assertNotNull("Connection skin instance should exist again.", skinLookup.lookupConnection(connection));
+  }
 
-        FXTestUtils.dragBy(skinLookup.lookupJoint(firstJoint).getRoot(), 17, 0);
+  @Test
+  public void selectAllAndDelete() {
 
-        // This will call layoutChildren method of view and trigger connection redraw.
-        graphEditor.getView().layout();
+    graphEditor.getSelectionManager().selectAll();
+    final List<Selectable> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedItems());
+    graphEditor.delete(selection);
 
-        final double secondJointFinalX = skinLookup.lookupJoint(secondJoint).getRoot().getLayoutX();
+    assertTrue("All nodes should have gone.", model.getNodes().isEmpty());
+    assertTrue("All connections should have gone.", model.getConnections().isEmpty());
+  }
 
-        assertTrue("Second joint should have moved right by 17 pixels.", secondJointFinalX == secondJointInitialX + 17);
-    }
+  @Test
+  public void moveJointAndUpdateLayout() {
 
-    /**
-     * Adds a node to the model that has an input and output connector.
-     *
-     * @return the newly-added node
-     */
-    private GNode addNodeToModel() {
-        final GNode node = DummyDataFactory.createNode();
-        Commands.addNode(model, node);
-        return node;
-    }
+    ObservableList<GConnection> connections = model.getConnections();
+    //    for (GConnection connection : connections) {
+    //      System.out.println("Connection: " + connection + " Skin " + skinLookup.lookupConnection(connection));
+    //      for (GJoint joint : connection.getJoints()) {
+    //        System.out.println("Joint: " + joint + " Skin " + skinLookup.lookupJoint(joint));
+    //
+    //      }
+    //    }
+    final GJoint firstJoint = connections.get(0).getJoints().get(0);
+    final GJoint secondJoint = connections.get(0).getJoints().get(1);
+
+    final double secondJointInitialX = skinLookup.lookupJoint(secondJoint).getRoot().getLayoutX();
+
+    FXTestUtils.dragBy(skinLookup.lookupJoint(firstJoint).getRoot(), 17, 0);
+
+    // This will call layoutChildren method of view and trigger connection redraw.
+    graphEditor.getView().layout();
+
+    final double secondJointFinalX = skinLookup.lookupJoint(secondJoint).getRoot().getLayoutX();
+
+    assertTrue("Second joint should have moved right by 17 pixels.", secondJointFinalX == secondJointInitialX + 17);
+  }
+
+  /**
+   * Adds a node to the model that has an input and output connector.
+   *
+   * @return the newly-added node
+   */
+  private GNode addNodeToModel() {
+    final GNode node = DummyDataFactory.createNode();
+    Commands.addNode(model, node);
+    return node;
+  }
 }

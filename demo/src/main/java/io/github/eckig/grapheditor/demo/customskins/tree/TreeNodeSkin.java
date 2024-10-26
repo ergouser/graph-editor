@@ -5,21 +5,17 @@ package io.github.eckig.grapheditor.demo.customskins.tree;
 
 import java.util.List;
 
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.RemoveCommand;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.demo.utils.AwesomeIcon;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
-import io.github.eckig.grapheditor.model.GraphPackage;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -50,10 +46,6 @@ public class TreeNodeSkin extends GNodeSkin {
 
     // Child nodes will be added this far below their parent.
     private static final double CHILD_Y_OFFSET = 80;
-
-    private static final EReference NODES = GraphPackage.Literals.GMODEL__NODES;
-    private static final EReference CONNECTIONS = GraphPackage.Literals.GMODEL__CONNECTIONS;
-    private static final EReference CONNECTOR_CONNECTIONS = GraphPackage.Literals.GCONNECTOR__CONNECTIONS;
 
     private static final double VIEW_PADDING = 15;
 
@@ -240,7 +232,7 @@ public class TreeNodeSkin extends GNodeSkin {
      */
     private void addChildNode() {
 
-        final GNode childNode = GraphFactory.eINSTANCE.createGNode();
+        final GNode childNode = new GNode();
 
         childNode.setType(TreeSkinConstants.TREE_NODE);
         childNode.setX(getItem().getX() + (getItem().getWidth() - childNode.getWidth()) / 2);
@@ -253,8 +245,8 @@ public class TreeNodeSkin extends GNodeSkin {
             childNode.setY(maxAllowedY - childNode.getHeight());
         }
 
-        final GConnector input = GraphFactory.eINSTANCE.createGConnector();
-        final GConnector output = GraphFactory.eINSTANCE.createGConnector();
+        final GConnector input = new GConnector();
+        final GConnector output = new GConnector();
 
         input.setType(TreeSkinConstants.TREE_INPUT_CONNECTOR);
         output.setType(TreeSkinConstants.TREE_OUTPUT_CONNECTOR);
@@ -266,7 +258,7 @@ public class TreeNodeSkin extends GNodeSkin {
         output.setConnectionDetachedOnDrag(false);
 
         final GConnector parentOutput = findOutput();
-        final GConnection connection = GraphFactory.eINSTANCE.createGConnection();
+        final GConnection connection = new GConnection();
 
         connection.setType(TreeSkinConstants.TREE_CONNECTION);
         connection.setSource(parentOutput);
@@ -275,15 +267,17 @@ public class TreeNodeSkin extends GNodeSkin {
         input.getConnections().add(connection);
 
         // Set the rest of the values via EMF commands because they touch the currently-edited model.
-        final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(model);
         final CompoundCommand command = new CompoundCommand();
 
-        command.append(AddCommand.create(editingDomain, model, NODES, childNode));
-        command.append(AddCommand.create(editingDomain, model, CONNECTIONS, connection));
-        command.append(AddCommand.create(editingDomain, parentOutput, CONNECTOR_CONNECTIONS, connection));
+        //command.append(AddCommand.create(editingDomain, model, NODES, childNode));
+        command.append(RemoveCommand.create(model, owner -> model.getNodes(), childNode));
+        //command.append(AddCommand.create(editingDomain, model, CONNECTIONS, connection));
+        command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
+        //command.append(AddCommand.create(editingDomain, parentOutput, CONNECTOR_CONNECTIONS, connection));  ??????
+        command.append(RemoveCommand.create(parentOutput, owner -> parentOutput.getConnections(), connection));
 
         if (command.canExecute()) {
-            editingDomain.getCommandStack().execute(command);
+            CommandStack.getCommandStack(model).execute(command);
         }
     }
 

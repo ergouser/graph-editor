@@ -3,16 +3,16 @@ package io.github.eckig.grapheditor.core.view.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.eckig.grapheditor.GConnectionSkin;
-import io.github.eckig.grapheditor.SkinLookup;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GModel;
+
+import io.github.eckig.grapheditor.GConnectionSkin;
+import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.view.ConnectionLayouter;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GModel;
 import javafx.geometry.Point2D;
 
 

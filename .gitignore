@@ -5,4 +5,13 @@
 .checkstyle
 target/
 .idea/
+.gradle/
+**/.gradle/
+**/build/
+**/bin/
+/gradle/
+gradlew
+gradlew.bat
 **.iml
+.build*
+/libs

@@ -6,17 +6,17 @@ package io.github.eckig.grapheditor.core.skins.defaults;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
-import io.github.eckig.grapheditor.utils.GeometryUtils;
-import io.github.eckig.grapheditor.utils.ResizableBox;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GNode;
+import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
+import io.github.eckig.grapheditor.utils.GeometryUtils;
+import io.github.eckig.grapheditor.utils.ResizableBox;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;

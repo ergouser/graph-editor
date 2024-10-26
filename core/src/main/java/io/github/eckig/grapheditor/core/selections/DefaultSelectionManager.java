@@ -5,17 +5,17 @@ package io.github.eckig.grapheditor.core.selections;
 
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
 import javafx.collections.ObservableSet;
 
 
@@ -114,25 +114,25 @@ public class DefaultSelectionManager implements SelectionManager
     }
 
     @Override
-    public ObservableSet<EObject> getSelectedItems()
+    public ObservableSet<Selectable> getSelectedItems()
     {
         return selectionTracker.getSelectedItems();
     }
 
     @Override
-    public void select(final EObject object)
+    public void select(final Selectable object)
     {
         getSelectedItems().add(object);
     }
 
     @Override
-    public void clearSelection(final EObject object)
+    public void clearSelection(final Selectable object)
     {
         getSelectedItems().remove(object);
     }
 
     @Override
-    public boolean isSelected(EObject object)
+    public boolean isSelected(Selectable object)
     {
         return getSelectedItems().contains(object);
     }
@@ -162,8 +162,8 @@ public class DefaultSelectionManager implements SelectionManager
         {
             // copy to prevent ConcurrentModificationException
             // (removal triggers update notification which in turn could modify the selection)
-            final EObject[] selectedItems = getSelectedItems().toArray(new EObject[0]);
-            for (final EObject remove : selectedItems)
+            final Selectable[] selectedItems = getSelectedItems().toArray(new Selectable[0]);
+            for (final Selectable remove : selectedItems)
             {
                 getSelectedItems().remove(remove);
             }

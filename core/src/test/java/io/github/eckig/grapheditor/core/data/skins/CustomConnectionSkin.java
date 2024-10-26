@@ -3,8 +3,9 @@
  */
 package io.github.eckig.grapheditor.core.data.skins;
 
+import com.ergotech.grapheditor.model.GConnection;
+
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectionSkin;
-import io.github.eckig.grapheditor.model.GConnection;
 
 public class CustomConnectionSkin extends DefaultConnectionSkin {
 

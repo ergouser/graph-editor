@@ -10,6 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+
 import io.github.eckig.grapheditor.EditorElement;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -20,12 +26,6 @@ import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.skins.defaults.utils.ConnectionCommands;
 import io.github.eckig.grapheditor.core.utils.EventUtils;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GConnector;
-import io.github.eckig.grapheditor.model.GJoint;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
-import io.github.eckig.grapheditor.model.GraphFactory;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import io.github.eckig.grapheditor.utils.GraphEditorProperties;
 import io.github.eckig.grapheditor.utils.GraphEventManager;
@@ -469,7 +469,7 @@ public class ConnectorDragManager {
      */
     private boolean checkCreatable(final GConnector connector)
     {
-        return connector != null && connector.eContainer() instanceof GNode && checkEditable()
+        return connector != null && checkEditable()
                 && (connector.getConnections().isEmpty() || !connector.isConnectionDetachedOnDrag());
     }
 
@@ -519,7 +519,7 @@ public class ConnectorDragManager {
 
         for (final Point2D position : jointPositions)
         {
-            final GJoint joint = GraphFactory.eINSTANCE.createGJoint();
+            final GJoint joint = new GJoint();
             joint.setX(position.getX());
             joint.setY(position.getY());
             joint.setType(jointType);

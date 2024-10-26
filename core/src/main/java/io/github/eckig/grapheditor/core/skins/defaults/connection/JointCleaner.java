@@ -9,18 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.eckig.grapheditor.core.utils.EventUtils;
-
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GModel;
+import io.github.eckig.grapheditor.core.utils.EventUtils;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -84,7 +82,6 @@ public class JointCleaner {
 
                 if (!jointsToCleanUp.isEmpty())
                 {
-                    final EditingDomain editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(mConnection);
                     final CompoundCommand command = new CompoundCommand();
 
                     final GModel model = mGraphEditor.getModel();
@@ -95,7 +92,7 @@ public class JointCleaner {
 
                     if (command.canExecute())
                     {
-                        editingDomain.getCommandStack().execute(command);
+                      CommandStack.getCommandStack(model).execute(command);
                     }
                 }
 

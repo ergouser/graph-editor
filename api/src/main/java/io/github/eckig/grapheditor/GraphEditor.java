@@ -7,15 +7,14 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GModel;
+import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.Selectable;
+import com.ergotech.grapheditor.model.command.Command;
+
 import io.github.eckig.grapheditor.utils.GraphEditorProperties;
 import io.github.eckig.grapheditor.utils.RemoveContext;
-
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.ecore.EObject;
-
-import io.github.eckig.grapheditor.model.GConnection;
-import io.github.eckig.grapheditor.model.GModel;
-import io.github.eckig.grapheditor.model.GNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.layout.Region;
 
@@ -202,5 +201,5 @@ public interface GraphEditor extends GraphEditorSkins {
      * @param pItems
      *            the items to remove from the graph
      */
-    void delete(Collection<EObject> pItems);
+    void delete(Collection<Selectable> pItems);
 }
