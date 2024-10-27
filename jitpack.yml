@@ -1,6 +1,6 @@
 # jitpack.yml
 jdk:
-  version: openjdk21
+  - openjdk21
 
 install:
   - wget -O corretto.tar.gz https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.tar.gz
