@@ -54,8 +54,8 @@ dependencies {
         publications {
             mavenJava(MavenPublication) {
                 from components.java
-                groupId = 'io.github.eckig.grapheditor'
-                version = '19.0.0'
+                groupId = project.group
+                version = project.version
                 artifactId = "${rootProject.name}-${project.name}"
             }
         }
