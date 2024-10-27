@@ -1,0 +1,18 @@
+# jitpack.yml
+jdk:
+  version: openjdk-21
+
+install:
+  - wget -O corretto.tar.gz https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.tar.gz
+  - mkdir -p /usr/lib/jvm
+  - tar -xzf corretto.tar.gz -C /usr/lib/jvm
+  - export JAVA_HOME=/usr/lib/jvm/$(ls /usr/lib/jvm | grep corretto)
+  - export PATH=$JAVA_HOME/bin:$PATH
+
+before_install:
+  - echo "Using Amazon Corretto JDK from $JAVA_HOME"
+  - java -version
+
+build:
+  commands:
+    - ./gradlew clean build
