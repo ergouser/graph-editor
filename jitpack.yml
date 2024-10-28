@@ -1,26 +1,3 @@
 # jitpack.yml
 jdk:
   - openjdk21
-
-install:
-  - wget -O corretto.tar.gz https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.tar.gz
-  - mkdir -p /usr/lib/jvm
-  - tar -xzf corretto.tar.gz -C /usr/lib/jvm
-  - export JAVA_HOME=/usr/lib/jvm/$(ls /usr/lib/jvm | grep corretto)
-  - export PATH=$JAVA_HOME/bin:$PATH
-    # Install Gradle 8.5
-  - wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
-  - unzip gradle-8.5-bin.zip -d /opt/gradle
-  - export PATH=/opt/gradle/gradle-8.5/bin:$PATH
-
-  # Confirm the correct Gradle version
-  - gradle -v
-
-
-before_install:
-  - echo "Using Amazon Corretto JDK from $JAVA_HOME"
-  - java -version
- 
-build:
-  commands:
-    - ./gradlew clean build
