@@ -63,7 +63,7 @@ public class TreeTailSkin extends GTailSkin {
 
     @Override
     protected void selectionChanged(boolean isSelected) {
-        // Not implemented
+        // Not emented
     }
 
     /**

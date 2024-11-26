@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 - 2014 by TESIS DYNAware GmbH
+ * Copyright (C) 2024 ErgoTech Systems, Inc.
  */
 package io.github.eckig.grapheditor;
 

@@ -48,8 +48,8 @@ import javafx.scene.layout.Region;
  */
 public class Commands {
 
+  @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(Commands.class);
-
 
   /**
    * Static class, not to be instantiated.
@@ -220,10 +220,10 @@ public class Commands {
         final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
         if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
           final Region nodeRegion = nodeSkin.getRoot();
-          command.append(SetPropertyCommand.create(node.xProperty(), nodeRegion.getLayoutX()));
-          command.append(SetPropertyCommand.create(node.yProperty(), nodeRegion.getLayoutY()));
-          command.append(SetPropertyCommand.create(node.widthProperty(), nodeRegion.getWidth()));
-          command.append(SetPropertyCommand.create(node.heightProperty(), nodeRegion.getHeight()));
+          command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
+          command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
+          command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
+          command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
         }
       }
 
@@ -238,8 +238,8 @@ public class Commands {
             final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
             final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
 
-            command.append(SetPropertyCommand.create(joint.xProperty(), x));
-            command.append(SetPropertyCommand.create(joint.yProperty(), y));
+            command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
+            command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
           }
         }
       }
@@ -252,9 +252,9 @@ public class Commands {
     final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
     if (nodeSkin != null && connectorSkin != null) {
       final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
-      if (checkConnectorChanged(connector, connectorPosition)) {
-        command.append(SetPropertyCommand.create(connector.xProperty(), connectorPosition.getX()));
-        command.append(SetPropertyCommand.create(connector.yProperty(), connectorPosition.getY()));
+      if (checkConnectorChanged(connectorSkin, connectorPosition)) {
+        command.append(SetPropertyCommand.create(connectorSkin.xProperty(), connectorPosition.getX()));
+        command.append(SetPropertyCommand.create(connectorSkin.yProperty(), connectorPosition.getY()));
       }
     }
   }
@@ -267,10 +267,10 @@ public class Commands {
    *
    * @return {@code true} if any layout value has changed, {@code false if not}
    */
-  private static boolean checkConnectorChanged(final GConnector connector, final Point2D connectorPosition) {
-    if (connectorPosition.getX() != connector.getX()) {
+  private static boolean checkConnectorChanged(final GConnectorSkin connectorSkin, final Point2D connectorPosition) {
+    if (connectorPosition.getX() != connectorSkin.getX()) {
       return true;
-    } else if (connectorPosition.getY() != connector.getY()) {
+    } else if (connectorPosition.getY() != connectorSkin.getY()) {
       return true;
     }
     return false;
@@ -287,13 +287,13 @@ public class Commands {
   private static boolean checkNodeChanged(final GNode node, final GNodeSkin nodeSkin) {
     final Region nodeRegion = nodeSkin.getRoot();
 
-    if (nodeRegion.getLayoutX() != node.getX()) {
+    if (nodeRegion.getLayoutX() != nodeSkin.getX()) {
       return true;
-    } else if (nodeRegion.getLayoutY() != node.getY()) {
+    } else if (nodeRegion.getLayoutY() != nodeSkin.getY()) {
       return true;
-    } else if (nodeRegion.getWidth() != node.getWidth()) {
+    } else if (nodeRegion.getWidth() != nodeSkin.getWidth()) {
       return true;
-    } else if (nodeRegion.getHeight() != node.getHeight()) {
+    } else if (nodeRegion.getHeight() != nodeSkin.getHeight()) {
       return true;
     }
     return false;
@@ -313,9 +313,9 @@ public class Commands {
     final double jointRegionX = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
     final double jointRegionY = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
 
-    if (jointRegionX != joint.getX()) {
+    if (jointRegionX != jointSkin.getX()) {
       return true;
-    } else if (jointRegionY != joint.getY()) {
+    } else if (jointRegionY != jointSkin.getY()) {
       return true;
     }
     return false;

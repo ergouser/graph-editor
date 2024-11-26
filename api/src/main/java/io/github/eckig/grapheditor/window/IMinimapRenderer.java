@@ -1,6 +1,7 @@
 package io.github.eckig.grapheditor.window;
 
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.impl.GNodeImpl;
 
 import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;

@@ -10,11 +10,11 @@ public class SetPropertyCommand<V> implements Command {
   private V oldValue;
   private boolean executed = false;
 
-  /** Convenience method to create the remove command. */
+  /** Convenience method to create the set property command. */
   public static <S> SetPropertyCommand<S> create(Property<S> property, S newValue) {
     return new SetPropertyCommand<>(property, newValue);
   }
-  public class CommandFactory {
+  //public class CommandFactory {
 
     /**
      * Creates a {@link SetPropertyCommand} for a specified object and attribute.
@@ -50,7 +50,7 @@ public class SetPropertyCommand<V> implements Command {
         throw new RuntimeException("Failed to create SetPropertyCommand: unable to access JavaBean property", e);
       }
     }
-  }
+  //}
 
   public SetPropertyCommand(Property<V> property, V newValue) {
     this.property = property;

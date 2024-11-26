@@ -325,4 +325,11 @@ public class DefaultNodeSkin extends GNodeSkin {
             event.consume();
         }
     }
+
+    @Override
+    public String toString() {
+      return "DefaultNodeSkin [getX()=" + getX() + ", getY()=" + getY() + ", getWidth()=" + getWidth()
+          + ", getHeight()=" + getHeight() + ", isSelected()=" + isSelected() + ", getItem()=" + getItem() + "]";
+    }
+    
 }

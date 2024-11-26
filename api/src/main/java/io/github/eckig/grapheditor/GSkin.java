@@ -47,8 +47,8 @@ public abstract class GSkin<T extends Selectable>
 
     };
 
-    private GraphEditor graphEditor;
-    private final T item;
+    protected GraphEditor graphEditor;
+    protected final T item;
     private Consumer<GSkin<?>> onPositionMoved;
 
     /**

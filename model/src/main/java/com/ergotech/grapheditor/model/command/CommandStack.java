@@ -4,7 +4,6 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ergotech.grapheditor.model.CommandStackListener;
 import com.ergotech.grapheditor.model.GModel;
 
 import javafx.beans.property.BooleanProperty;

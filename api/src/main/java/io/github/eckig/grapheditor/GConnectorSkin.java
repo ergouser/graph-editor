@@ -4,13 +4,17 @@
 package io.github.eckig.grapheditor;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.impl.GConnectorImpl;
+
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 /**
- * The skin class for a {@link GConnector}. Responsible for visualizing connectors in the graph editor.
+ * The skin class for a {@link GConnectorImpl}. Responsible for visualizing connectors in the graph editor.
  *
  * <p>
  * A custom connector skin must extend this class. It <b>must</b> also provide a constructor taking exactly one
- * {@link GConnector} parameter.
+ * {@link GConnectorImpl} parameter.
  * </p>
  *
  * <p>
@@ -19,28 +23,129 @@ import com.ergotech.grapheditor.model.GConnector;
  */
 public abstract class GConnectorSkin extends GSkin<GConnector> {
 
+  protected final DoubleProperty x = new SimpleDoubleProperty(this, "x", 0);
+  protected final DoubleProperty y = new SimpleDoubleProperty(this, "y", 0);
+  protected final DoubleProperty width = new SimpleDoubleProperty(this, "width", 151);
+  protected final DoubleProperty height = new SimpleDoubleProperty(this, "height", 101);
+
     /**
      * Creates a new {@link GConnectorSkin}.
      *
-     * @param connector the {@link GConnector} represented by the skin
+     * @param connector the {@link GConnectorImpl} represented by the skin
      */
     public GConnectorSkin(final GConnector connector) {
         super(connector);
     }
 
     /**
-     * Gets the width of the connector skin.
+     * Gets the x-coordinate of the joint.
      *
-     * @return the width of the connector skin
+     * @return the x-coordinate as a DoubleProperty.
      */
-    public abstract double getWidth();
+    public DoubleProperty xProperty() {
+        return x;
+    }
 
     /**
-     * Gets the height of the connector skin.
+     * Returns the x-coordinate of the joint.
      *
-     * @return the height of the connector skin
+     * @return the x-coordinate of the joint.
      */
-    public abstract double getHeight();
+    public double getX() {
+        return x.get();
+    }
+
+    /**
+     * Sets the x-coordinate of the joint.
+     *
+     * @param value the new value of the x-coordinate.
+     */
+    public void setX(double value) {
+        x.set(value);
+    }
+
+    /**
+     * Gets the y-coordinate of the joint.
+     *
+     * @return the y-coordinate as a DoubleProperty.
+     */
+    public DoubleProperty yProperty() {
+        return y;
+    }
+
+    /**
+     * Returns the y-coordinate of the joint.
+     *
+     * @return the y-coordinate of the joint.
+     */
+    public double getY() {
+        return y.get();
+    }
+
+    /**
+     * Sets the y-coordinate of the joint.
+     *
+     * @param value the new value of the y-coordinate.
+     */
+    public void setY(double value) {
+        y.set(value);
+    }
+    
+    /**
+     * Returns the {@code DoubleProperty} representing the width.
+     * This property can be used to observe changes to the width or bind it to another property.
+     *
+     * @return the {@code DoubleProperty} for the width.
+     */
+    public DoubleProperty widthProperty() {
+        return width;
+    }
+
+    /**
+     * Gets the current value of the width.
+     *
+     * @return the current width value.
+     */
+    public double getWidth() {
+        return width.get();
+    }
+
+    /**
+     * Sets the value of the width.
+     *
+     * @param value the new width value.
+     */
+    public void setWidth(double value) {
+        width.set(value);
+    }
+
+    /**
+     * Returns the {@code DoubleProperty} representing the height.
+     * This property can be used to observe changes to the height or bind it to another property.
+     *
+     * @return the {@code DoubleProperty} for the height.
+     */
+    public DoubleProperty heightProperty() {
+        return height;
+    }
+
+    /**
+     * Gets the current value of the height.
+     *
+     * @return the current height value.
+     */
+    public double getHeight() {
+        return height.get();
+    }
+
+    /**
+     * Sets the value of the height.
+     *
+     * @param value the new height value.
+     */
+    public void setHeight(double value) {
+        height.set(value);
+    }
 
     /**
      * Applys the specified style to the connector.

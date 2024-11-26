@@ -9,6 +9,8 @@ import com.ergotech.grapheditor.model.GNode;
 
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.ResizableBox;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 
 /**
@@ -29,7 +31,12 @@ import javafx.geometry.Point2D;
  */
 public abstract class GNodeSkin extends GSkin<GNode> {
 
-    private final DraggableBox root;
+    protected final DraggableBox root;
+
+    protected final DoubleProperty x = new SimpleDoubleProperty(this, "x", 0);
+    protected final DoubleProperty y = new SimpleDoubleProperty(this, "y", 0);
+    protected final DoubleProperty width = new SimpleDoubleProperty(this, "width", 151);
+    protected final DoubleProperty height = new SimpleDoubleProperty(this, "height", 101);
 
     /**
      * Creates a new {@link GNodeSkin}.
@@ -61,10 +68,10 @@ public abstract class GNodeSkin extends GSkin<GNode> {
      */
     public void initialize() {
 
-        getRoot().setLayoutX(getItem().getX());
-        getRoot().setLayoutY(getItem().getY());
+        getRoot().setLayoutX(getX());
+        getRoot().setLayoutY(getY());
 
-        getRoot().resize(getItem().getWidth(), getItem().getHeight());
+        getRoot().resize(getWidth(), getHeight());
     }
 
     /**
@@ -125,4 +132,115 @@ public abstract class GNodeSkin extends GSkin<GNode> {
             }
         };
     }
+    
+    /**
+     * Gets the x-coordinate of the joint.
+     *
+     * @return the x-coordinate as a DoubleProperty.
+     */
+    public DoubleProperty xProperty() {
+        return x;
+    }
+
+    /**
+     * Returns the x-coordinate of the joint.
+     *
+     * @return the x-coordinate of the joint.
+     */
+    public double getX() {
+        return x.get();
+    }
+
+    /**
+     * Sets the x-coordinate of the joint.
+     *
+     * @param value the new value of the x-coordinate.
+     */
+    public void setX(double value) {
+        x.set(value);
+    }
+
+    /**
+     * Gets the y-coordinate of the joint.
+     *
+     * @return the y-coordinate as a DoubleProperty.
+     */
+    public DoubleProperty yProperty() {
+        return y;
+    }
+
+    /**
+     * Returns the y-coordinate of the joint.
+     *
+     * @return the y-coordinate of the joint.
+     */
+    public double getY() {
+        return y.get();
+    }
+
+    /**
+     * Sets the y-coordinate of the joint.
+     *
+     * @param value the new value of the y-coordinate.
+     */
+    public void setY(double value) {
+        y.set(value);
+    }
+    
+    /**
+     * Returns the {@code DoubleProperty} representing the width.
+     * This property can be used to observe changes to the width or bind it to another property.
+     *
+     * @return the {@code DoubleProperty} for the width.
+     */
+    public DoubleProperty widthProperty() {
+        return width;
+    }
+
+    /**
+     * Gets the current value of the width.
+     *
+     * @return the current width value.
+     */
+    public double getWidth() {
+        return width.get();
+    }
+
+    /**
+     * Sets the value of the width.
+     *
+     * @param value the new width value.
+     */
+    public void setWidth(double value) {
+        width.set(value);
+    }
+
+    /**
+     * Returns the {@code DoubleProperty} representing the height.
+     * This property can be used to observe changes to the height or bind it to another property.
+     *
+     * @return the {@code DoubleProperty} for the height.
+     */
+    public DoubleProperty heightProperty() {
+        return height;
+    }
+
+    /**
+     * Gets the current value of the height.
+     *
+     * @return the current height value.
+     */
+    public double getHeight() {
+        return height.get();
+    }
+
+    /**
+     * Sets the value of the height.
+     *
+     * @param value the new height value.
+     */
+    public void setHeight(double value) {
+        height.set(value);
+    }
+
 }

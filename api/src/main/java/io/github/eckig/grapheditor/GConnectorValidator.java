@@ -9,7 +9,7 @@ import com.ergotech.grapheditor.model.GConnector;
  * An interface for customising connector validation.
  *
  * <p>
- * A custom connector validator must implement this interface. It <b>must</b> also provide a no-argument constructor.
+ * A custom connector validator must ement this interface. It <b>must</b> also provide a no-argument constructor.
  * </p>
  */
 public interface GConnectorValidator {

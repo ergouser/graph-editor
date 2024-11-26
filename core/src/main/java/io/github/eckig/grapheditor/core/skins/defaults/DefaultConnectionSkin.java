@@ -84,4 +84,10 @@ public class DefaultConnectionSkin extends SimpleConnectionSkin {
             LOGGER.error("Joint count not compatible with source and target connector types.");
         }
     }
+
+    @Override
+    public String toString() {
+      return "DefaultConnectionSkin [isSelected()=" + isSelected() + ", getItem()=" + getItem() + "]";
+    }
+    
 }

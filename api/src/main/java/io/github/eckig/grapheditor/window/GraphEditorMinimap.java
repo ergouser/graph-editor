@@ -5,11 +5,12 @@ package io.github.eckig.grapheditor.window;
 
 import java.util.function.Predicate;
 
-import com.ergotech.grapheditor.model.CommandStackListener;
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CommandStackListener;
 
+import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SelectionManager;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -116,7 +117,7 @@ public class GraphEditorMinimap extends PanningWindowMinimap {
    * @param pModel
    *          a {@link GModel} to be displayed
    */
-  public void setModel(final GModel pModel) {
+  public void setModelAndGraphEditor(final GModel pModel, final GraphEditor graphEditor) {
     // First remove the listener from old model's command stack, if it exists.
     if (model != null) {
       CommandStack.getCommandStack(model).removeCommandStackListener(modelChangeListener);
@@ -124,6 +125,7 @@ public class GraphEditorMinimap extends PanningWindowMinimap {
 
     model = pModel;
     minimapNodeGroup.setModel(pModel);
+    minimapNodeGroup.setGraphEditor(graphEditor);
     minimapNodeGroup.draw();
 
     // Now add the listener to the new model's command stack.

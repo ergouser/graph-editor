@@ -48,7 +48,7 @@ public class ConnectionCommands {
     final CompoundCommand command = new CompoundCommand();
 
     // prepare new connection:
-    final GConnection connection = new GConnection();
+    final GConnection connection =model.getGraphFactory().create(GConnection.class);
     connection.setType(type);
     connection.setSource(source);
     connection.setTarget(target);

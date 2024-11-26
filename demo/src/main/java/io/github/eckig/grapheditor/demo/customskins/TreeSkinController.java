@@ -5,6 +5,7 @@ import java.util.List;
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.GraphFactory;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectionSkin;
@@ -81,14 +82,16 @@ public class TreeSkinController implements SkinController {
         final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
         final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
 
-        final GNode node = new GNode();
-        node.setY(TREE_NODE_INITIAL_Y + windowYOffset);
+        final GraphFactory factory = graphEditor.getModel().getGraphFactory();
 
-        final GConnector output = new GConnector();
+        final GNode node = factory.create(GNode.class);
+        //node.setY(TREE_NODE_INITIAL_Y + windowYOffset);
+
+        final GConnector output = factory.create(GConnector.class);
         node.getConnectors().add(output);
 
-        final double initialX = graphEditorContainer.getWidth() / (2 * currentZoomFactor) - node.getWidth() / 2;
-        node.setX(Math.floor(initialX) + windowXOffset);
+        //final double initialX = graphEditorContainer.getWidth() / (2 * currentZoomFactor) - node.getWidth() / 2;
+        //node.setX(Math.floor(initialX) + windowXOffset);
 
         node.setType(TreeSkinConstants.TREE_NODE);
         output.setType(TreeSkinConstants.TREE_OUTPUT_CONNECTOR);
@@ -101,12 +104,12 @@ public class TreeSkinController implements SkinController {
 
     @Override
     public void addConnector(final Side position, final boolean input) {
-        // Not implemented for tree nodes.
+        // Not emented for tree nodes.
     }
 
     @Override
     public void clearConnectors() {
-        // Not implemented for tree nodes.
+        // Not emented for tree nodes.
     }
 
     @Override

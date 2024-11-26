@@ -204,4 +204,11 @@ public class DefaultConnectorSkin extends GConnectorSkin {
     protected void selectionChanged(boolean isSelected) {
         // Not implemented
     }
+
+    @Override
+    public String toString() {
+      return "DefaultConnectorSkin [polygon=" + polygon + ", isSelected()=" + isSelected() + ", getItem()=" + getItem()
+          + "]";
+    }
+    
 }

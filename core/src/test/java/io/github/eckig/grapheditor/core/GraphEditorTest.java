@@ -15,16 +15,15 @@ import java.util.concurrent.CountDownLatch;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
-import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.impl.GConnectionImpl;
+import com.ergotech.grapheditor.model.impl.GConnectorImpl;
+import com.ergotech.grapheditor.model.impl.GJointImpl;
+import com.ergotech.grapheditor.model.impl.GNodeImpl;
 
 import io.github.eckig.grapheditor.Commands;
-import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.data.DummyDataFactory;
@@ -95,7 +94,7 @@ public class GraphEditorTest {
   @Test
   public void undoRedoNode() throws InterruptedException {
 
-    final GNode node = addNodeToModel();
+    final GNodeImpl node = addNodeToModel();
     reloadEditor();
 
     assertNotNull("Node skin instance should exist.", skinLookup.lookupNode(node));
@@ -120,22 +119,22 @@ public class GraphEditorTest {
 
     Commands.clear(model);
 
-    final GNode firstNode = addNodeToModel();
-    final GNode secondNode = addNodeToModel();
+    final GNodeImpl firstNode = addNodeToModel();
+    final GNodeImpl secondNode = addNodeToModel();
 
-    final GConnector firstNodeOutput = firstNode.getConnectors().get(1);
-    final GConnector secondNodeInput = secondNode.getConnectors().get(0);
+    final GConnectorImpl firstNodeOutput = firstNode.getConnectors().get(1);
+    final GConnectorImpl secondNodeInput = secondNode.getConnectors().get(0);
 
-    final List<GJoint> joints = new ArrayList<>();
-    joints.add(new GJoint());
-    joints.add(new GJoint());
+    final List<GJointImpl> joints = new ArrayList<>();
+    joints.add(new GJointImpl());
+    joints.add(new GJointImpl());
 
     ConnectionCommands.addConnection(model, firstNodeOutput, secondNodeInput, null, joints, null);
     reloadEditor();
 
     assertFalse("A connection should be present.", model.getConnections().isEmpty());
 
-    final GConnection connection = model.getConnections().get(0);
+    final GConnectionImpl connection = model.getConnections().get(0);
 
     assertNotNull("Connection skin instance should exist.", skinLookup.lookupConnection(connection));
     assertTrue("Undo should be possible.", commandStack.canUndo());
@@ -168,7 +167,7 @@ public class GraphEditorTest {
   @Test
   public void moveJointAndUpdateLayout() {
 
-    ObservableList<GConnection> connections = model.getConnections();
+    ObservableList<GConnectionImpl> connections = model.getConnections();
     //    for (GConnection connection : connections) {
     //      System.out.println("Connection: " + connection + " Skin " + skinLookup.lookupConnection(connection));
     //      for (GJoint joint : connection.getJoints()) {
@@ -176,8 +175,8 @@ public class GraphEditorTest {
     //
     //      }
     //    }
-    final GJoint firstJoint = connections.get(0).getJoints().get(0);
-    final GJoint secondJoint = connections.get(0).getJoints().get(1);
+    final GJointImpl firstJoint = connections.get(0).getJoints().get(0);
+    final GJointImpl secondJoint = connections.get(0).getJoints().get(1);
 
     final double secondJointInitialX = skinLookup.lookupJoint(secondJoint).getRoot().getLayoutX();
 
@@ -196,8 +195,8 @@ public class GraphEditorTest {
    *
    * @return the newly-added node
    */
-  private GNode addNodeToModel() {
-    final GNode node = DummyDataFactory.createNode();
+  private GNodeImpl addNodeToModel() {
+    final GNodeImpl node = DummyDataFactory.createNode();
     Commands.addNode(model, node);
     return node;
   }

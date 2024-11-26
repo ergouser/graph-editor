@@ -106,4 +106,12 @@ public class DetouredConnectionSegment extends ConnectionSegment {
 
         getPathElements().add(arcTo);
     }
+
+    @Override
+    public String toString() {
+      return "DetouredConnectionSegment [getPathElements()=" + getPathElements() + ", getStart()=" + getStart()
+          + ", getEnd()=" + getEnd() + "]";
+    }
+    
+    
 }

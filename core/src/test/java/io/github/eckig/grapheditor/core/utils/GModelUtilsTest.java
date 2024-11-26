@@ -10,9 +10,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.impl.GConnectionImpl;
+import com.ergotech.grapheditor.model.impl.GConnectorImpl;
+import com.ergotech.grapheditor.model.impl.GNodeImpl;
 
 import io.github.eckig.grapheditor.core.connections.ConnectionCopier;
 
@@ -21,23 +21,23 @@ public class GModelUtilsTest {
     @Test
     public void copyConnections() {
 
-        final List<GNode> nodes = createNodes();
-        final List<GNode> copies = createNodes();
+        final List<GNodeImpl> nodes = createNodes();
+        final List<GNodeImpl> copies = createNodes();
 
         connect(nodes.get(0).getConnectors().get(1), nodes.get(1).getConnectors().get(0));
 
-        final Map<GNode, GNode> map = new HashMap<>();
+        final Map<GNodeImpl, GNodeImpl> map = new HashMap<>();
 
         for (int i = 0; i < 3; i++) {
             map.put(nodes.get(i), copies.get(i));
         }
 
-        final List<GConnection> connections = ConnectionCopier.copyConnections(map);
+        final List<GConnectionImpl> connections = ConnectionCopier.copyConnections(map);
 
         assertTrue(connections.size() == 1);
         assertTrue(copies.get(0).getConnectors().get(1).getConnections().size() == 1);
 
-        final GConnection newConnection = copies.get(0).getConnectors().get(1).getConnections().get(0);
+        final GConnectionImpl newConnection = copies.get(0).getConnectors().get(1).getConnections().get(0);
 
         assertTrue(copies.get(1).getConnectors().get(0).getConnections().size() == 1);
         assertEquals(copies.get(1).getConnectors().get(0).getConnections().get(0), newConnection);
@@ -52,13 +52,13 @@ public class GModelUtilsTest {
         assertTrue(copies.get(2).getConnectors().get(1).getConnections().isEmpty());
     }
 
-    private static List<GNode> createNodes() {
+    private static List<GNodeImpl> createNodes() {
 
-        final List<GNode> nodes = new ArrayList<>();
+        final List<GNodeImpl> nodes = new ArrayList<>();
 
-        final GNode firstNode = createNode();
-        final GNode secondNode = createNode();
-        final GNode thirdNode = createNode();
+        final GNodeImpl firstNode = createNode();
+        final GNodeImpl secondNode = createNode();
+        final GNodeImpl thirdNode = createNode();
 
         nodes.add(firstNode);
         nodes.add(secondNode);
@@ -67,12 +67,12 @@ public class GModelUtilsTest {
         return nodes;
     }
 
-    private static final GNode createNode() {
+    private static final GNodeImpl createNode() {
 
-        final GNode node = new GNode();
+        final GNodeImpl node = new GNodeImpl();
 
-        final GConnector firstConnector = new GConnector();
-        final GConnector secondConnector = new GConnector();
+        final GConnectorImpl firstConnector = new GConnectorImpl();
+        final GConnectorImpl secondConnector = new GConnectorImpl();
 
         node.getConnectors().add(firstConnector);
         node.getConnectors().add(secondConnector);
@@ -80,9 +80,9 @@ public class GModelUtilsTest {
         return node;
     }
 
-    private static final void connect(final GConnector source, final GConnector target) {
+    private static final void connect(final GConnectorImpl source, final GConnectorImpl target) {
 
-        final GConnection connection = new GConnection();
+        final GConnectionImpl connection = new GConnectionImpl();
 
         source.getConnections().add(connection);
         target.getConnections().add(connection);

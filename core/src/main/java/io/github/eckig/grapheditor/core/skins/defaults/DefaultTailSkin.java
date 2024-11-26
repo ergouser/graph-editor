@@ -135,7 +135,7 @@ public class DefaultTailSkin extends GTailSkin {
     }
 
     /**
-     * Draws the tail simply from the start position to the end.
+     * Draws the tail sy from the start position to the end.
      *
      * @param start the start position of the tail
      * @param end the end position of the tail
@@ -205,7 +205,7 @@ public class DefaultTailSkin extends GTailSkin {
 
     @Override
     protected void selectionChanged(boolean isSelected) {
-        // Not implemented
+        // Not emented
     }
 
 }

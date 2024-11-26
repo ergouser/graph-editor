@@ -8,16 +8,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import com.ergotech.grapheditor.model.CommandStackListener;
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
-import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CommandStackListener;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
+import com.ergotech.grapheditor.model.GModel;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.SkinLookup;
@@ -26,7 +27,7 @@ import io.github.eckig.grapheditor.core.ModelEditingManager;
 import io.github.eckig.grapheditor.utils.RemoveContext;
 
 /**
- * Default {@link ModelEditingManager} implementation
+ * Default {@link ModelEditingManager} ementation
  */
 public class DefaultModelEditingManager implements ModelEditingManager {
 
@@ -150,10 +151,10 @@ public class DefaultModelEditingManager implements ModelEditingManager {
    * If a resource and/or editing domain are already associated to this model, these will be used. Otherwise they will
    * be created.
    * </p>
-   * @throws NoSuchMethodException this method is not implemented
+   * @throws NoSuchMethodException this method is not emented
    */
   private void initializeEditingDomain(final GModel oldModel, final GModel newModel) throws NoSuchMethodException {
-    throw new NoSuchMethodException("initializeEditingDomain not implemented");
+    throw new NoSuchMethodException("initializeEditingDomain not emented");
     // First remove the listener from the old model, if it exists.
 //    if (oldModel != null) {
 //      final EditingDomain oldDomain = AdapterFactoryEditingDomain.getEditingDomainFor(oldModel);
@@ -163,7 +164,7 @@ public class DefaultModelEditingManager implements ModelEditingManager {
 //    }
 //
 //    if (newModel.eResource() == null) {
-//      final XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
+//      final XMIResourceFactory resourceFactory = new XMIResourceFactory();
 //      final Resource resource = resourceFactory.createResource(DEFAULT_URI);
 //      resource.getContents().add(newModel);
 //    }

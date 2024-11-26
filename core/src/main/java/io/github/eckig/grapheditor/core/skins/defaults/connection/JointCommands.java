@@ -15,6 +15,9 @@ import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
 
+import io.github.eckig.grapheditor.GJointSkin;
+import io.github.eckig.grapheditor.GraphEditor;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 import javafx.geometry.Point2D;
 
 /**
@@ -40,7 +43,8 @@ public class JointCommands {
    * @param connection
    *          the connection in which the joints will be set
    */
-  public static void setNewJoints(final GModel model, final List<Point2D> positions, final GConnection connection) {
+  public static void setNewJoints(final GraphEditor graphEditor, final List<Point2D> positions, final GConnection connection) {
+    final GModel model = graphEditor.getModel();
     // Create a compound command to group all operations
     final CompoundCommand command = new CompoundCommand();
 
@@ -50,11 +54,13 @@ public class JointCommands {
       command.append(RemoveCommand.create(connection, owner -> ((GConnection) owner).getJoints(), joint));
     }
 
+    final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
     // Create and add new joints
     for (final Point2D position : positions) {
-      final GJoint newJoint = new GJoint();
-      newJoint.setX(position.getX());
-      newJoint.setY(position.getY());
+      final GJoint newJoint = model.getGraphFactory().create(GJoint.class);
+      final GJointSkin newJointSkin = skinManager.lookupOrCreateJoint(newJoint);
+      newJointSkin.setX(position.getX());
+      newJointSkin.setY(position.getY());
 
       command.append(AddCommand.create(connection, owner -> ((GConnection) owner).getJoints(), newJoint));
     }

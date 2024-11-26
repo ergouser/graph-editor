@@ -4,6 +4,7 @@ package io.github.eckig.grapheditor.demo.customskins;
 import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.GraphFactory;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
@@ -52,17 +53,20 @@ public class DefaultSkinController implements SkinController {
 
         final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
         final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
+        final GraphFactory factory = graphEditor.getModel().getGraphFactory();
 
-        final GNode node = new GNode();
-        node.setY(NODE_INITIAL_Y + windowYOffset);
+        final GNode node = factory.create(GNode.class);
+        //node.setY(NODE_INITIAL_Y + windowYOffset);
 
-        final GConnector rightOutput = new GConnector();
+        final GConnector rightOutput = factory.create(GConnector.class);
+
         node.getConnectors().add(rightOutput);
 
-        final GConnector leftInput = new GConnector();
+        final GConnector leftInput = factory.create(GConnector.class);
+
         node.getConnectors().add(leftInput);
 
-        node.setX(NODE_INITIAL_X + windowXOffset);
+        //node.setX(NODE_INITIAL_X + windowXOffset);
 
         rightOutput.setType(DefaultConnectorTypes.RIGHT_OUTPUT);
         leftInput.setType(DefaultConnectorTypes.LEFT_INPUT);
@@ -82,6 +86,7 @@ public class DefaultSkinController implements SkinController {
         final String type = getType(position, input);
 
         final GModel model = graphEditor.getModel();
+        final GraphFactory factory = model.getGraphFactory();
         final SkinLookup skinLookup = graphEditor.getSkinLookup();
         final CompoundCommand command = new CompoundCommand();
 
@@ -90,7 +95,8 @@ public class DefaultSkinController implements SkinController {
             if (skinLookup.lookupNode(node).isSelected()) {
                 if (countConnectors(node, position) < MAX_CONNECTOR_COUNT) {
 
-                    final GConnector connector = new GConnector();
+                    final GConnector connector = factory.create(GConnector.class);
+;
                     connector.setType(type);
 
                     command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));

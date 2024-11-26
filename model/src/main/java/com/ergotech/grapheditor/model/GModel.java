@@ -1,97 +1,109 @@
 package com.ergotech.grapheditor.model;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.List;
 
-public class GModel {
-    // Observable Lists for nodes and connections
-    private final ObservableList<GNode> nodes = FXCollections.observableArrayList();
-    private final ObservableList<GConnection> connections = FXCollections.observableArrayList();
+import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GNode;
 
-    // Properties
-    private final StringProperty type = new SimpleStringProperty(this, "type");
-    private final DoubleProperty contentWidth = new SimpleDoubleProperty(this, "contentWidth", 3000);
-    private final DoubleProperty contentHeight = new SimpleDoubleProperty(this, "contentHeight", 2250);
-
-    // Constructor
-    public GModel() {
-        // Optionally, add listeners to the nodes and connections lists
-    }
+/**
+ * Represents the model of a graph in the graph editor.
+ * <p>
+ * This interface provides methods to manage the nodes and connections
+ * within the graph model, as well as properties related to the model's
+ * type and content dimensions.
+ * </p>
+ */
+public interface GModel {
 
     // Nodes
-    public ObservableList<GNode> getNodes() {
-        return nodes;
-    }
 
-    public void addNode(GNode node) {
-        nodes.add(node);
-        // If bidirectional, set the parent model in the node
-        // node.setParentModel(this);
-    }
+    /**
+     * Gets the list of nodes in the model.
+     *
+     * @return a list of {@link GNode} instances contained in the model.
+     */
+    List<GNode> getNodes();
 
-    public void removeNode(GNode node) {
-        nodes.remove(node);
-        // If bidirectional, remove the parent model reference
-        // node.setParentModel(null);
-    }
+    /**
+     * Adds a node to the model.
+     *
+     * @param node the {@link GNode} instance to add.
+     */
+    void addNode(GNode node);
+
+    /**
+     * Removes a node from the model.
+     *
+     * @param node the {@link GNode} instance to remove.
+     */
+    void removeNode(GNode node);
 
     // Connections
-    public ObservableList<GConnection> getConnections() {
-        return connections;
-    }
 
-    public void addConnection(GConnection connection) {
-        connections.add(connection);
-        // If bidirectional, set the parent model in the connection
-        // connection.setParentModel(this);
-    }
+    /**
+     * Gets the list of connections in the model.
+     *
+     * @return a list of {@link GConnection} instances contained in the model.
+     */
+    List<GConnection> getConnections();
 
-    public void removeConnection(GConnection connection) {
-        connections.remove(connection);
-        // If bidirectional, remove the parent model reference
-        // connection.setParentModel(null);
-    }
+    /**
+     * Adds a connection to the model.
+     *
+     * @param connection the {@link GConnection} instance to add.
+     */
+    void addConnection(GConnection connection);
 
-    // Type Property
-    public StringProperty typeProperty() {
-        return type;
-    }
+    /**
+     * Removes a connection from the model.
+     *
+     * @param connection the {@link GConnection} instance to remove.
+     */
+    void removeConnection(GConnection connection);
 
-    public String getType() {
-        return type.get();
-    }
+    /**
+     * Gets the type of the model.
+     *
+     * @return the type of the model as a {@link String}.
+     */
+    String getType();
 
-    public void setType(String value) {
-        type.set(value);
-    }
+    /**
+     * Sets the type of the model.
+     *
+     * @param value the type to set for the model.
+     */
+    void setType(String value);
 
-    // Content Width Property
-    public DoubleProperty contentWidthProperty() {
-        return contentWidth;
-    }
+    /**
+     * Gets the content width of the model.
+     *
+     * @return the content width as a double.
+     */
+    double getContentWidth();
 
-    public double getContentWidth() {
-        return contentWidth.get();
-    }
+    /**
+     * Sets the content width of the model.
+     *
+     * @param value the content width to set.
+     */
+    void setContentWidth(double value);
 
-    public void setContentWidth(double value) {
-        contentWidth.set(value);
-    }
+    /**
+     * Gets the content height of the model.
+     *
+     * @return the content height as a double.
+     */
+    double getContentHeight();
 
-    // Content Height Property
-    public DoubleProperty contentHeightProperty() {
-        return contentHeight;
-    }
+    /**
+     * Sets the content height of the model.
+     *
+     * @param value the content height to set.
+     */
+    void setContentHeight(double value);
 
-    public double getContentHeight() {
-        return contentHeight.get();
-    }
+    /** Return the graph factory. */
+    GraphFactory getGraphFactory();
 
-    public void setContentHeight(double value) {
-        contentHeight.set(value);
-    }
 }

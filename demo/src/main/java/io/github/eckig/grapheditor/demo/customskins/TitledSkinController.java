@@ -6,6 +6,7 @@ import java.util.OptionalInt;
 
 import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.GraphFactory;
 import com.ergotech.grapheditor.model.command.Command;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.SetPropertyCommand;
@@ -67,19 +68,20 @@ public class TitledSkinController extends DefaultSkinController {
 
         final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
         final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
+        final GraphFactory factory = graphEditor.getModel().getGraphFactory();
 
-        final GNode node = new GNode();
-        node.setY(NODE_INITIAL_Y + windowYOffset);
+        final GNode node = factory.create(GNode.class);
+        //node.setY(NODE_INITIAL_Y + windowYOffset);
 
         node.setType(TitledSkinConstants.TITLED_NODE);
-        node.setX(NODE_INITIAL_X + windowXOffset);
+        //node.setX(NODE_INITIAL_X + windowXOffset);
         node.setId(allocateNewId());
 
-        final GConnector input = new GConnector();
+        final GConnector input = factory.create(GConnector.class);
         node.getConnectors().add(input);
         input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
 
-        final GConnector output = new GConnector();
+        final GConnector output = factory.create(GConnector.class);
         node.getConnectors().add(output);
         output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
 
@@ -104,7 +106,7 @@ public class TitledSkinController extends DefaultSkinController {
             if (checkNeedsNewId(node, nodes)) {
 
                 final String id = allocateNewId();
-                final Command setCommand = SetPropertyCommand.create(node.idProperty(), id);
+                final Command setCommand = SetPropertyCommand.create(node, "id", id);
                 //final Command setCommand = SetCommand.create(domain, node, feature, id);
 
                 if (setCommand.canExecute()) {

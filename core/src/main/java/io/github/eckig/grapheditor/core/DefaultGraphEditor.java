@@ -14,6 +14,7 @@ import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.impl.GModelImpl;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -76,7 +77,7 @@ public class DefaultGraphEditor implements GraphEditor {
    */
   public DefaultGraphEditor(final GraphEditorProperties pProperties) {
     mProperties = pProperties == null ? new GraphEditorProperties() : pProperties;
-    mModelProperty.set(new GModel());
+    mModelProperty.set(new GModelImpl());
     mView = new GraphEditorView(mProperties);
     mSkinManager = new GraphEditorSkinManager(this, mView);
     mController = new com.ergotech.grapheditor.core.GraphEditorController<>(this, mSkinManager, mView,

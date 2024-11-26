@@ -1,4 +1,3 @@
-Thank you for pointing that out. Here’s the revised version with the `commandStackChanged` code included.
 
 ```markdown
 # Branch Overview: Replacing EMF Framework with JFX Notifications
@@ -52,7 +51,7 @@ In the existing EMF-based setup, the `AddCommand` execution includes the followi
      ```
 
 3. **Queueing Notifications**: Generated notifications are added to a queue for subsequent processing.  The queue is created in EContentAdapter from the notification objects
-   ```java
+   ```javafile:///home/jim/Development/git/workspacejava17/graph-editor/WHYREMOVEEMF.md
    public final void notifyChanged(Notification pNotification) {
      if (pNotification.getEventType() != Notification.REMOVING_ADAPTER) {
        imQueue.add(pNotification);

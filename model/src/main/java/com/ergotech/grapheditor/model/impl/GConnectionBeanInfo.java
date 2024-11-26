@@ -1,4 +1,4 @@
-package com.ergotech.grapheditor.model;
+package com.ergotech.grapheditor.model.impl;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -6,7 +6,7 @@ import java.beans.SimpleBeanInfo;
 
 public class GConnectionBeanInfo extends SimpleBeanInfo {
 
-    private final static Class<GConnection> beanClass = GConnection.class;
+    private final static Class<GConnectionImpl> beanClass = GConnectionImpl.class;
 
     @Override
     public PropertyDescriptor[] getPropertyDescriptors() {

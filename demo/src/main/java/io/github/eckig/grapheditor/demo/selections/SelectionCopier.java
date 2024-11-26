@@ -14,6 +14,7 @@ import com.ergotech.grapheditor.model.command.AddCommand;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 
+import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
@@ -183,14 +184,16 @@ public class SelectionCopier {
         final Point2D pasteOffset = determinePasteOffset();
 
         for (final GNode node : pastedNodes) {
-            node.setX(node.getX() + pasteOffset.getX());
-            node.setY(node.getY() + pasteOffset.getY());
+          final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+          nodeSkin.setX(nodeSkin.getX() + pasteOffset.getX());
+          nodeSkin.setY(nodeSkin.getY() + pasteOffset.getY());
         }
 
         for (final GConnection connection : pastedConnections) {
             for (final GJoint joint : connection.getJoints()) {
-                joint.setX(joint.getX() + pasteOffset.getX());
-                joint.setY(joint.getY() + pasteOffset.getY());
+              final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
+              jointSkin.setX(jointSkin.getX() + pasteOffset.getX());
+              jointSkin.setY(jointSkin.getY() + pasteOffset.getY());
             }
         }
     }
@@ -232,14 +235,16 @@ public class SelectionCopier {
             if (xCorrection != 0 || yCorrection != 0) {
 
                 for (final GNode node : pastedNodes) {
-                    node.setX(node.getX() + xCorrection);
-                    node.setY(node.getY() + yCorrection);
+                  final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+                  nodeSkin.setX(nodeSkin.getX() + xCorrection);
+                   nodeSkin.setY(nodeSkin.getY() + yCorrection);
                 }
 
                 for (final GConnection connection : pastedConnections) {
                     for (final GJoint joint : connection.getJoints()) {
-                        joint.setX(joint.getX() + xCorrection);
-                        joint.setY(joint.getY() + yCorrection);
+                      final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
+                      jointSkin.setX(jointSkin.getX() + xCorrection);
+                      jointSkin.setY(jointSkin.getY() + yCorrection);
                     }
                 }
             }
@@ -370,35 +375,37 @@ public class SelectionCopier {
         contentBounds.endY = 0;
 
         for (final GNode node : nodes) {
+          final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
 
-            if (node.getX() < contentBounds.startX) {
-                contentBounds.startX = node.getX();
+            if (nodeSkin.getX() < contentBounds.startX) {
+                contentBounds.startX = nodeSkin.getX();
             }
-            if (node.getY() < contentBounds.startY) {
-                contentBounds.startY = node.getY();
+            if (nodeSkin.getY() < contentBounds.startY) {
+                contentBounds.startY = nodeSkin.getY();
             }
-            if (node.getX() + node.getWidth() > contentBounds.endX) {
-                contentBounds.endX = node.getX() + node.getWidth();
+            if (nodeSkin.getX() + nodeSkin.getWidth() > contentBounds.endX) {
+                contentBounds.endX = nodeSkin.getX() + nodeSkin.getWidth();
             }
-            if (node.getY() + node.getHeight() > contentBounds.endY) {
-                contentBounds.endY = node.getY() + node.getHeight();
+            if (nodeSkin.getY() + nodeSkin.getHeight() > contentBounds.endY) {
+                contentBounds.endY = nodeSkin.getY() + nodeSkin.getHeight();
             }
         }
 
         for (final GConnection connection : connections) {
             for (final GJoint joint : connection.getJoints()) {
+              final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
 
-                if (joint.getX() < contentBounds.startX) {
-                    contentBounds.startX = joint.getX();
+                if (jointSkin.getX() < contentBounds.startX) {
+                    contentBounds.startX = jointSkin.getX();
                 }
-                if (joint.getY() < contentBounds.startY) {
-                    contentBounds.startY = joint.getY();
+                if (jointSkin.getY() < contentBounds.startY) {
+                    contentBounds.startY = jointSkin.getY();
                 }
-                if (joint.getX() > contentBounds.endX) {
-                    contentBounds.endX = joint.getX();
+                if (jointSkin.getX() > contentBounds.endX) {
+                    contentBounds.endX = jointSkin.getX();
                 }
-                if (joint.getY() > contentBounds.endY) {
-                    contentBounds.endY = joint.getY();
+                if (jointSkin.getY() > contentBounds.endY) {
+                    contentBounds.endY = jointSkin.getY();
                 }
             }
         }

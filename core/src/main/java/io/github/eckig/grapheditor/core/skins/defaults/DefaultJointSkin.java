@@ -66,4 +66,11 @@ public class DefaultJointSkin extends GJointSkin
     {
         return SIZE;
     }
+
+    @Override
+    public String toString() {
+      return "DefaultJointSkin [getX()=" + getX() + ", getY()=" + getY() + ", isSelected()=" + isSelected()
+          + ", getItem()=" + getItem() + "]";
+    }
+
 }

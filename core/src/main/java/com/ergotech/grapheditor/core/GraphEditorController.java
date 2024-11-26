@@ -13,6 +13,8 @@ import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.impl.GConnectionImpl;
+import com.ergotech.grapheditor.model.impl.GNodeImpl;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectorValidator;
@@ -40,6 +42,7 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 /**
  * The central controller class for the default graph editor implementation.
@@ -153,17 +156,17 @@ public class GraphEditorController<E extends GraphEditor> {
 
   private void addModelListeners(GModel model) {
     // Set up listeners on the model's nodes list
-    model.getNodes().addListener(nodesChangeListener);
+    ((ObservableList<GNode>) model.getNodes()).addListener(nodesChangeListener);
     // Set up listeners on the model's connections list
-    model.getConnections().addListener(connectionsChangeListener);
+    ((ObservableList<GConnection>)model.getConnections()).addListener(connectionsChangeListener);
   }
 
   private void removeModelListeners(GModel model) {
     // Remove listeners on the model's nodes list
-    model.getNodes().removeListener(nodesChangeListener);
+    ((ObservableList<GNode>) model.getNodes()).removeListener(nodesChangeListener);
 
     // Remove listeners on the model's connections list
-    model.getConnections().removeListener(connectionsChangeListener);
+    ((ObservableList<GConnection>) model.getConnections()).removeListener(connectionsChangeListener);
 
   }
 
@@ -186,7 +189,7 @@ public class GraphEditorController<E extends GraphEditor> {
       while (change.next()) {
         if (change.wasAdded()) {
           for (GJoint joint : change.getAddedSubList()) {
-            addJoint(joint);
+            addJoint(joint, connection);
           }
         }
         if (change.wasRemoved()) {
@@ -198,11 +201,11 @@ public class GraphEditorController<E extends GraphEditor> {
     };
 
     // Use the GConnection's method to add listeners
-    connection.addListeners(sourceListener, targetListener, typeListener, bidirectionalListener, jointsListener);
+    ((GConnectionImpl)connection).addListeners(sourceListener, targetListener, typeListener, bidirectionalListener, jointsListener);
 
     // Process existing joints
     for (GJoint joint : connection.getJoints()) {
-      addJoint(joint);
+      addJoint(joint,connection);
     }
   }
 
@@ -241,7 +244,7 @@ public class GraphEditorController<E extends GraphEditor> {
     };
 
     // Use the GNode's method to add listeners
-    node.addListeners(xListener, yListener, widthListener, heightListener, typeListener, connectorsListener);
+    ((GNodeImpl)node).addListeners(typeListener, connectorsListener);
 
     // Process existing connectors
     for (GConnector connector : node.getConnectors()) {
@@ -276,7 +279,7 @@ public class GraphEditorController<E extends GraphEditor> {
 
     if (pNewModel != null) {
       // Validate the new model
-      ModelSanityChecker.validate(pNewModel);
+      ModelSanityChecker.validate(pNewModel,mSkinManager);
 
       // Initialize the model editing manager
       mModelEditingManager.initialize(pNewModel);
@@ -329,10 +332,12 @@ public class GraphEditorController<E extends GraphEditor> {
     });
   }
 
-  private void addJoint(GJoint joint) {
+  private void addJoint(GJoint joint,GConnection connection) {
+    joint.setConnection(connection);
     addJointListeners(joint);
     mSkinManager.lookupOrCreateJoint(joint);
     mSelectionManager.addJoint(joint);
+    jointPositionChanged(joint);
 
   }
   private void addJointListeners(GJoint joint) {
@@ -341,13 +346,14 @@ public class GraphEditorController<E extends GraphEditor> {
     ChangeListener<Number> yListener = (observable, oldValue, newValue) -> jointPositionChanged(joint);
 
     // Use GJoint's method to add listeners
-    joint.addListeners(xListener, yListener);
+    //joint.addListeners(xListener, yListener);
   }
 
   private void removeJoint(GJoint joint) {
+    joint.setConnection(null);
     mSelectionManager.removeJoint(joint);
     mSkinManager.removeJoint(joint);
-    joint.removeListeners();
+    //joint.removeListeners();
   }
 
   private void addConnector(GConnector connector) {
@@ -369,20 +375,20 @@ public class GraphEditorController<E extends GraphEditor> {
     for (GJoint joint : connection.getJoints()) {
       removeJoint(joint);
     }
-    connection.removeListeners();
+    ((GConnectionImpl)connection).removeListeners();
   }
 
   private void removeNode(GNode node) {
     mSelectionManager.removeNode(node);
     mSkinManager.removeNode(node);
-    node.removeListeners();
+    ((GNodeImpl)node).removeListeners();
   }
 
   private void nodePositionChanged(GNode node) {
     Platform.runLater(() -> {
       GNodeSkin skin = mSkinManager.lookupNode(node);
       if (skin != null) {
-        skin.getRoot().relocate(node.getX(), node.getY());
+        skin.getRoot().relocate(skin.getX(), skin.getY());
       }
     });
   }
@@ -391,7 +397,7 @@ public class GraphEditorController<E extends GraphEditor> {
     Platform.runLater(() -> {
       GNodeSkin skin = mSkinManager.lookupNode(node);
       if (skin != null) {
-        skin.getRoot().resize(node.getWidth(), node.getHeight());
+        skin.getRoot().resize(skin.getWidth(), skin.getHeight());
       }
     });
   }

@@ -11,100 +11,85 @@ import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 
+import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
-
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 
 /**
- * Provides a static validation method to check a {@link GModel} instance for
- * errors.
+ * Provides a static validation method to check a {@link GModel} instance for errors.
  */
-public final class ModelSanityChecker
-{
+public final class ModelSanityChecker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGraphEditor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultGraphEditor.class);
 
-    /**
-     * Static class, private constructor.
-     */
-    private ModelSanityChecker()
-    {
+  /**
+   * Static class, private constructor.
+   */
+  private ModelSanityChecker() {
+  }
+
+  /**
+   * Validates the given {@link GModel}.
+   *
+   * @param model
+   *          the {@link GModel} to be validated
+   * @return {@code true} if the model is valid
+   */
+  public static boolean validate(final GModel pModel, final SkinManager pSkinManager) {
+    return validateSizes(pModel,pSkinManager) && validateReferences(pModel);
+  }
+
+  /**
+   * Performs a basic sanity check that width and height parameters are non-negative.
+   *
+   * @param model
+   *          the {@link GModel} to be validated
+   * @return {@code true} if the model width and height parameters are valid
+   */
+  private static boolean validateSizes(final GModel pModel, final SkinManager pSkinManager) {
+    if (pModel.getContentWidth() < 0 || pModel.getContentHeight() < 0) {
+      LOGGER.error("Model contains negative width / height values.");
+      return false;
     }
 
-    /**
-     * Validates the given {@link GModel}.
-     *
-     * @param model
-     *            the {@link GModel} to be validated
-     * @return {@code true} if the model is valid
-     */
-    public static boolean validate(final GModel model)
-    {
-        return validateSizes(model) && validateReferences(model);
+    for (final GNode node : pModel.getNodes()) {
+      GNodeSkin nodeSkin = pSkinManager.lookupNode(node);
+      if (nodeSkin.getWidth() < 0 || nodeSkin.getHeight() < 0) {
+        LOGGER.error("Model contains negative width / height values.");
+        return false;
+      }
     }
 
-    /**
-     * Performs a basic sanity check that width and height parameters are
-     * non-negative.
-     *
-     * @param model
-     *            the {@link GModel} to be validated
-     * @return {@code true} if the model width and height parameters are valid
-     */
-    private static boolean validateSizes(final GModel model)
-    {
-        if (model.getContentWidth() < 0 || model.getContentHeight() < 0)
-        {
-            LOGGER.error("Model contains negative width / height values.");
-            return false;
-        }
+    return true;
+  }
 
-        for (final GNode node : model.getNodes())
-        {
-            if (node.getWidth() < 0 || node.getHeight() < 0)
-            {
-                LOGGER.error("Model contains negative width / height values.");
-                return false;
-            }
-        }
+  /**
+   * Validates that the references between connectors and their connections make sense.
+   *
+   * @param model
+   *          the {@link GModel} to be validated
+   * @return {@code true} if the model references are valid
+   */
+  private static boolean validateReferences(final GModel model) {
+    boolean valid = true;
 
-        return true;
+    for (final GConnection connection : model.getConnections()) {
+
+      final GConnector source = connection.getSource();
+      final GConnector target = connection.getTarget();
+
+      if (source == null || target == null) {
+        LOGGER.error("Connection must have non-null source and target connectors.");
+        valid = false;
+      } else if (source != null && !source.getConnections().contains(connection)) {
+        LOGGER.error("A connector is missing a reference to its connection.");
+        valid = false;
+      } else if (target != null && !target.getConnections().contains(connection)) {
+        LOGGER.error("A connector is missing a reference to its connection.");
+        valid = false;
+      }
     }
 
-    /**
-     * Validates that the references between connectors and their connections
-     * make sense.
-     *
-     * @param model
-     *            the {@link GModel} to be validated
-     * @return {@code true} if the model references are valid
-     */
-    private static boolean validateReferences(final GModel model)
-    {
-        boolean valid = true;
-
-        for (final GConnection connection : model.getConnections())
-        {
-
-            final GConnector source = connection.getSource();
-            final GConnector target = connection.getTarget();
-
-            if (source == null || target == null)
-            {
-                LOGGER.error("Connection must have non-null source and target connectors.");
-                valid = false;
-            }
-            else if (source != null && !source.getConnections().contains(connection))
-            {
-                LOGGER.error("A connector is missing a reference to its connection.");
-                valid = false;
-            }
-            else if (target != null && !target.getConnections().contains(connection))
-            {
-                LOGGER.error("A connector is missing a reference to its connection.");
-                valid = false;
-            }
-        }
-
-        return valid;
-    }
+    return valid;
+  }
 }

@@ -1,15 +1,6 @@
 package com.ergotech.grapheditor.model;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import java.util.List;
 
 /**
  * A representation of the model object '<em><b>GConnection</b></em>'.
@@ -29,109 +20,15 @@ import javafx.collections.ObservableList;
  * <li>{@link #bidirectionalProperty()} - Indicates whether the connection is bidirectional</li>
  * </ul>
  */
-public class GConnection extends SelectableType {
+public interface GConnection extends Selectable {
 
-  // Properties
-  private final StringProperty id = new SimpleStringProperty(this, "id");
-
-  private final ObjectProperty<GConnector> source = new SimpleObjectProperty<>(this, "source");
-
-  private final ObjectProperty<GConnector> target = new SimpleObjectProperty<>(this, "target");
-
-  private final ObservableList<GJoint> joints = FXCollections.observableArrayList();
-
-  private final BooleanProperty bidirectional = new SimpleBooleanProperty(this, "bidirectional", false);
-
-  // Listener references
-  private ChangeListener<GConnector> sourceListener;
-
-  private ChangeListener<GConnector> targetListener;
-
-  private ChangeListener<String> typeListener;
-
-  private ChangeListener<Boolean> bidirectionalListener;
-
-  private ListChangeListener<GJoint> jointsListener;
-
-  public GConnection() {
-    super();
-  }
-
-  // Listener management methods
-  public void addListeners(ChangeListener<GConnector> sourceListener, ChangeListener<GConnector> targetListener,
-      ChangeListener<String> typeListener, ChangeListener<Boolean> bidirectionalListener,
-      ListChangeListener<GJoint> jointsListener) {
-    removeListeners(); // if there are any.
-    // Store strong references
-    this.sourceListener = sourceListener;
-    this.targetListener = targetListener;
-    this.typeListener = typeListener;
-    this.bidirectionalListener = bidirectionalListener;
-    this.jointsListener = jointsListener;
-
-    // Attach listeners using WeakListeners
-    sourceProperty().addListener(sourceListener);
-    targetProperty().addListener(targetListener);
-    typeProperty().addListener(typeListener);
-    bidirectionalProperty().addListener(bidirectionalListener);
-    getJoints().addListener(jointsListener);
-  }
-
-  public void removeListeners() {
-    if ( sourceListener != null ) { // assume that all are null or none are null...
-      sourceProperty().removeListener(sourceListener);
-      targetProperty().removeListener(targetListener);
-      typeProperty().removeListener(typeListener);
-      bidirectionalProperty().removeListener(bidirectionalListener);
-      getJoints().removeListener(jointsListener);
-    }
-  }
-
-  /**
-   * Gets the unique identifier of the connection.
-   *
-   * @return the id of the connection as a StringProperty.
-   */
-  public StringProperty idProperty() {
-    return id;
-  }
-
-  /**
-   * Returns the value of the 'Id' attribute.
-   *
-   * @return the id of the connection.
-   */
-  public String getId() {
-    return id.get();
-  }
-
-  /**
-   * Sets the value of the 'Id' attribute.
-   *
-   * @param value
-   *          the new value of the id.
-   */
-  public void setId(String value) {
-    id.set(value);
-  }
-
-  /**
-   * Gets the source of the connection. The source is the starting node for the connection.
-   *
-   * @return the source of the connection as an ObjectProperty.
-   */
-  public ObjectProperty<GConnector> sourceProperty() {
-    return source;
-  }
 
   /**
    * Returns the value of the 'Source' attribute.
    *
    * @return the source node of the connection.
    */
-  public GConnector getSource() {
-    return source.get();
-  }
+  public GConnector getSource();
 
   /**
    * Sets the value of the 'Source' attribute.
@@ -139,27 +36,14 @@ public class GConnection extends SelectableType {
    * @param source
    *          the source node to set.
    */
-  public void setSource(GConnector source) {
-    this.source.set(source);
-  }
-
-  /**
-   * Gets the target of the connection. The target is the ending node for the connection.
-   *
-   * @return the target of the connection as an ObjectProperty.
-   */
-  public ObjectProperty<GConnector> targetProperty() {
-    return target;
-  }
+  public void setSource(GConnector source);
 
   /**
    * Returns the value of the 'Target' attribute.
    *
    * @return the target node of the connection.
    */
-  public GConnector getTarget() {
-    return target.get();
-  }
+  public GConnector getTarget();
 
   /**
    * Sets the value of the 'Target' attribute.
@@ -167,64 +51,38 @@ public class GConnection extends SelectableType {
    * @param target
    *          the target node to set.
    */
-  public void setTarget(GConnector target) {
-    this.target.set(target);
-  }
+  public void setTarget(GConnector target);
 
   /**
    * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
-   * that define the path of the connection.
+   * that define the path of the connection.  IS THIS AN ATTRIBUTE OF THE CONNECTION OR THE SKIN?????
    *
    * @return the list of joints as an ObservableList.
    */
-  public ObservableList<GJoint> getJoints() {
-    return joints;
-  }
+  public List<GJoint> getJoints();
 
-  /**
-   * Adds a joint to the connection. This method also sets the connection property of the joint to this connection.
-   *
-   * @param joint
-   *          the joint to add.
-   */
-  public void addJoint(GJoint joint) {
-    if (!joints.contains(joint)) {
-      joints.add(joint);
-      joint.setConnection(this);
-    }
-  }
-
-  /**
-   * Removes a joint from the connection. This method also clears the connection property of the joint.
-   *
-   * @param joint
-   *          the joint to remove.
-   */
-  public void removeJoint(GJoint joint) {
-    if (joints.contains(joint)) {
-      joints.remove(joint);
-      joint.setConnection(null);
-    }
-  }
-
-  /**
-   * Gets the bidirectional property. A bidirectional connection means that the relationship can flow in both
-   * directions.
-   *
-   * @return the bidirectional property as a BooleanProperty.
-   */
-  public BooleanProperty bidirectionalProperty() {
-    return bidirectional;
-  }
-
+  //  /**
+  //   * Adds a joint to the connection. This method also sets the connection property of the joint to this connection.
+  //   *
+  //   * @param joint
+  //   *          the joint to add.
+  //   */
+  //  public void addJoint(GJoint joint);
+  //
+  //  /**
+  //   * Removes a joint from the connection. This method also clears the connection property of the joint.
+  //   *
+  //   * @param joint
+  //   *          the joint to remove.
+  //   */
+  //  public void removeJoint(GJoint joint);
+  //
   /**
    * Returns whether the connection is bidirectional.
    *
    * @return true if the connection is bidirectional, false otherwise.
    */
-  public boolean isBidirectional() {
-    return bidirectional.get();
-  }
+  public boolean isBidirectional();
 
   /**
    * Sets whether the connection is bidirectional.
@@ -232,14 +90,6 @@ public class GConnection extends SelectableType {
    * @param bidirectional
    *          true if the connection is bidirectional, false otherwise.
    */
-  public void setBidirectional(boolean bidirectional) {
-    this.bidirectional.set(bidirectional);
-  }
+  public void setBidirectional(boolean bidirectional);
 
-  @Override
-  public String toString() {
-    return "GConnection [id=" + id.get() + ", source=" + source.getName() + ", target=" + target.getName() + ", joints=" + joints.size()
-        + ", bidirectional=" + bidirectional.get() + "]";
-  }
-  
 }

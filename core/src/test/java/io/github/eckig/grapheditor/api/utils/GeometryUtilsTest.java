@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005 - 2014 by TESIS DYNAware GmbH
  */
-package io.github.eckig.grapheditor.utils;
+package io.github.eckig.grapheditor.api.utils;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,6 +15,7 @@ import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.impl.GModelImpl;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -23,6 +24,9 @@ import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.SkinLookup;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
+import io.github.eckig.grapheditor.core.skins.defaults.DefaultNodeSkin;
+import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 
@@ -35,23 +39,26 @@ public class GeometryUtilsTest {
     private static final double CONNECTOR_WIDTH = 18;
     private static final double CONNECTOR_HEIGHT = 12;
 
-    private final GModel model = new GModel();
-    private final GNode node = new GNode();
-    private final GConnector connector = new GConnector();
+    private final GModel model = new GModelImpl();
+    private final GNode node = model.getGraphFactory().create(GNode.class);
+    private final GConnector connector = model.getGraphFactory().create(GConnector.class);
 
     private SkinLookup skinLookup;
 
     @Before
     public void setUp() {
 
+      skinLookup = new MockSkinLoop();
+      GNodeSkin skin = new DefaultNodeSkin(node);
+
+      final GNodeSkin nodeSkin = ((SkinManager)skinLookup).lookupOrCreateNode(node);
         // Assign some arbitrary position to the node.
-        node.setX(NODE_X);
-        node.setY(NODE_Y);
+      nodeSkin.setX(NODE_X);
+      nodeSkin.setY(NODE_Y);
 
         model.getNodes().add(node);
         node.getConnectors().add(connector);
 
-        skinLookup = new MockSkinLoop();
     }
 
     @Test

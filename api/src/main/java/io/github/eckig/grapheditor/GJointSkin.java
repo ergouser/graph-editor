@@ -6,6 +6,8 @@ package io.github.eckig.grapheditor;
 import com.ergotech.grapheditor.model.GJoint;
 
 import io.github.eckig.grapheditor.utils.DraggableBox;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 /**
  * The skin class for a {@link GJoint}. Responsible for visualizing joints in the graph editor.
@@ -21,69 +23,188 @@ import io.github.eckig.grapheditor.utils.DraggableBox;
  */
 public abstract class GJointSkin extends GSkin<GJoint> {
 
-    private final DraggableBox root = new DraggableBox(EditorElement.JOINT)
-    {
+  protected final DoubleProperty x = new SimpleDoubleProperty(this, "x", 0);
 
-        @Override
-        public final void positionMoved()
-        {
-            super.positionMoved();
-            GJointSkin.this.impl_positionMoved();
-        }
-    };
+  protected final DoubleProperty y = new SimpleDoubleProperty(this, "y", 0);
 
-    /**
-     * Creates a new {@link GJointSkin}.
-     *
-     * @param joint the {@link GJoint} represented by the skin
-     */
-    public GJointSkin(final GJoint joint) {
-        super(joint);
-    }
+  protected final DoubleProperty width = new SimpleDoubleProperty(this, "width", 12);
 
-    /**
-     * Gets the root JavaFX node of the skin.
-     *
-     * @return a {@link DraggableBox} containing the skin's root JavaFX node
-     */
+  protected final DoubleProperty height = new SimpleDoubleProperty(this, "height", 12);
+
+  private final DraggableBox root = new DraggableBox(EditorElement.JOINT) {
+
     @Override
-    public DraggableBox getRoot() {
-        return root;
+    public final void positionMoved() {
+      super.positionMoved();
+      GJointSkin.this.impl_positionMoved();
     }
+  };
 
-    /**
-     * Initializes the joint skin.
-     *
-     * <p>
-     * The skin's layout values are loaded from the {@link GJoint} at this point.
-     * </p>
-     */
-    public void initialize() {
-        getRoot().setLayoutX(getItem().getX() - getWidth() / 2);
-        getRoot().setLayoutY(getItem().getY() - getHeight() / 2);
-    }
+  /**
+   * Creates a new {@link GJointSkin}.
+   *
+   * @param joint
+   *          the {@link GJoint} represented by the skin
+   */
+  public GJointSkin(final GJoint joint) {
+    super(joint);
 
-    /**
-     * Gets the width of the joint.
-     *
-     * <p>
-     * For robust behaviour this should return the correct width at all times. Note that getRoot().getWidth() does not
-     * meet this condition as it will return 0 until the joint's node is added to the scene graph and layed out.
-     * </p>
-     *
-     * @return the width of the joint
-     */
-    public abstract double getWidth();
+    // add listeners to the properties so that that root (DraggableBox) will be updated
+    // whenever any of the properties change.
+    x.addListener((observable, oldValue, newValue) -> updateLayout());
+    y.addListener((observable, oldValue, newValue) -> updateLayout());
+    width.addListener((observable, oldValue, newValue) -> updateLayout());
+    height.addListener((observable, oldValue, newValue) -> updateLayout());
 
-    /**
-     * Gets the height of the joint.
-     *
-     * <p>
-     * For robust behaviour this should return the correct height at all times. Note that getRoot().getHeight() does not
-     * meet this condition as it will return 0 until the joint's node is added to the scene graph and layed out.
-     * </p>
-     *
-     * @return the height of the joint
-     */
-    public abstract double getHeight();
+    updateLayout();
+
+  }
+
+  /**
+   * Gets the root JavaFX node of the skin.
+   *
+   * @return a {@link DraggableBox} containing the skin's root JavaFX node
+   */
+  @Override
+  public DraggableBox getRoot() {
+    return root;
+  }
+
+  /**
+   * Initializes the joint skin.
+   *
+   * <p>
+   * The skin's layout values are loaded from the {@link GJoint} at this point.
+   * </p>
+   */
+  public void initialize() {
+    // managed by the listener - updateLayout();
+  }
+
+  /**
+   * Initializes the joint skin.
+   *
+   * <p>
+   * The skin's layout values are loaded from the {@link GJoint} at this point.
+   * </p>
+   */
+  public void updateLayout() {
+    getRoot().setLayoutX(getX() - getWidth() / 2);
+    getRoot().setLayoutY(getY() - getHeight() / 2);
+  }
+
+  /**
+   * Gets the x-coordinate of the joint.
+   *
+   * @return the x-coordinate as a DoubleProperty.
+   */
+  public DoubleProperty xProperty() {
+    return x;
+  }
+
+  /**
+   * Returns the x-coordinate of the joint.
+   *
+   * @return the x-coordinate of the joint.
+   */
+  public double getX() {
+    return x.get();
+  }
+
+  /**
+   * Sets the x-coordinate of the joint.
+   *
+   * @param value
+   *          the new value of the x-coordinate.
+   */
+  public void setX(double value) {
+    x.set(value);
+  }
+
+  /**
+   * Gets the y-coordinate of the joint.
+   *
+   * @return the y-coordinate as a DoubleProperty.
+   */
+  public DoubleProperty yProperty() {
+    return y;
+  }
+
+  /**
+   * Returns the y-coordinate of the joint.
+   *
+   * @return the y-coordinate of the joint.
+   */
+  public double getY() {
+    return y.get();
+  }
+
+  /**
+   * Sets the y-coordinate of the joint.
+   *
+   * @param value
+   *          the new value of the y-coordinate.
+   */
+  public void setY(double value) {
+    y.set(value);
+  }
+
+  /**
+   * Returns the {@code DoubleProperty} representing the width. This property can be used to observe changes to the
+   * width or bind it to another property.
+   *
+   * @return the {@code DoubleProperty} for the width.
+   */
+  public DoubleProperty widthProperty() {
+    return width;
+  }
+
+  /**
+   * Gets the current value of the width.
+   *
+   * @return the current width value.
+   */
+  public double getWidth() {
+    return width.get();
+  }
+
+  /**
+   * Sets the value of the width.
+   *
+   * @param value
+   *          the new width value.
+   */
+  public void setWidth(double value) {
+    width.set(value);
+  }
+
+  /**
+   * Returns the {@code DoubleProperty} representing the height. This property can be used to observe changes to the
+   * height or bind it to another property.
+   *
+   * @return the {@code DoubleProperty} for the height.
+   */
+  public DoubleProperty heightProperty() {
+    return height;
+  }
+
+  /**
+   * Gets the current value of the height.
+   *
+   * @return the current height value.
+   */
+  public double getHeight() {
+    return height.get();
+  }
+
+  /**
+   * Sets the value of the height.
+   *
+   * @param value
+   *          the new height value.
+   */
+  public void setHeight(double value) {
+    height.set(value);
+  }
+
 }

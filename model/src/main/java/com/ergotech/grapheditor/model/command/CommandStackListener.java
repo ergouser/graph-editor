@@ -1,4 +1,4 @@
-package com.ergotech.grapheditor.model;
+package com.ergotech.grapheditor.model.command;
 
 import java.util.EventObject;
 

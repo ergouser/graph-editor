@@ -4,6 +4,20 @@ package com.ergotech.grapheditor.model;
 public interface Selectable {
 
   /**
+   * Gets the unique identifier of the connection.
+   *
+   * @return the id of the connection as a String.
+   */
+  public void setId(String value);
+
+  /**
+   * Returns the value of the 'Id' attribute.
+   *
+   * @return the id of the connection.
+   */
+  public String getId();
+
+  /**
    * Returns the value of the 'Type' attribute.
    *
    * @return the type of the connection.
