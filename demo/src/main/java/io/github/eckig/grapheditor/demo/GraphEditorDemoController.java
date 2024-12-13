@@ -394,7 +394,7 @@ public class GraphEditorDemoController {
 
     if (!graphEditor.getModel().getNodes().isEmpty()) {
 
-      final GNode firstNode = graphEditor.getModel().getNodes().get(0);
+      final GNode firstNode = new ArrayList<>(graphEditor.getModel().getNodes()).get(0);
       final String type = firstNode.getType();
 
       if (TreeSkinConstants.TREE_NODE.equals(type)) {

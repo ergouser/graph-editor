@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 import com.ergotech.grapheditor.model.GNode;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -57,11 +58,8 @@ public class DefaultNodeSkin extends GNodeSkin {
 
     private final Rectangle selectionHalo = new Rectangle();
 
-    private final List<GConnectorSkin> topConnectorSkins = new ArrayList<>();
-    private final List<GConnectorSkin> rightConnectorSkins = new ArrayList<>();
-    private final List<GConnectorSkin> bottomConnectorSkins = new ArrayList<>();
-    private final List<GConnectorSkin> leftConnectorSkins = new ArrayList<>();
-
+    private final List<GConnectorSkin> connectorSkins = new ArrayList<>();
+    
     // Border and background are separated into 2 rectangles so they can have different effects applied to them.
     private final Rectangle border = new Rectangle();
     private final Rectangle background = new Rectangle();
@@ -95,30 +93,17 @@ public class DefaultNodeSkin extends GNodeSkin {
     }
 
     @Override
-    public void setConnectorSkins(final List<GConnectorSkin> connectorSkins) {
+    public void setConnectorSkins(final List<GConnectorSkin> newConnectorSkins) {
 
         removeAllConnectors();
 
-        topConnectorSkins.clear();
-        rightConnectorSkins.clear();
-        bottomConnectorSkins.clear();
-        leftConnectorSkins.clear();
+        connectorSkins.clear();
 
-        if (connectorSkins != null) {
-            for (final GConnectorSkin connectorSkin : connectorSkins) {
+        if (newConnectorSkins != null) {
+            for (final GConnectorSkin connectorSkin : newConnectorSkins) {
+                connectorSkins.add(connectorSkin);
 
-                final String type = connectorSkin.getItem().getType();
-
-                if (DefaultConnectorTypes.isTop(type)) {
-                    topConnectorSkins.add(connectorSkin);
-                } else if (DefaultConnectorTypes.isRight(type)) {
-                    rightConnectorSkins.add(connectorSkin);
-                } else if (DefaultConnectorTypes.isBottom(type)) {
-                    bottomConnectorSkins.add(connectorSkin);
-                } else if (DefaultConnectorTypes.isLeft(type)) {
-                    leftConnectorSkins.add(connectorSkin);
-                }
-
+                // Add the connectorSkin's root to the scene graph
                 getRoot().getChildren().add(connectorSkin.getRoot());
             }
         }
@@ -137,7 +122,7 @@ public class DefaultNodeSkin extends GNodeSkin {
 
         final Node connectorRoot = connectorSkin.getRoot();
 
-        final Side side = DefaultConnectorTypes.getSide(connectorSkin.getItem().getType());
+        final Side side = connectorSkin.getSide();
 
         // The following logic is required because the connectors are offset slightly from the node edges.
         final double x, y;
@@ -161,27 +146,24 @@ public class DefaultNodeSkin extends GNodeSkin {
     /**
      * Checks that the node and its connectors have the correct values to be displayed using this skin.
      */
-    private void performChecks()
-    {
-        for (final GConnector connector : getItem().getConnectors())
-        {
-            if (!DefaultConnectorTypes.isValid(connector.getType()))
-            {
-                LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", connector.getType());
-                connector.setType(DefaultConnectorTypes.LEFT_INPUT);
-            }
-        }
+    private void performChecks() {
+      // the "types" (direction and side) are no enums so cannot be invalid
+//      for (final GConnector connector : getItem().getConnectors()) {
+//        if (!DefaultConnectorTypes.isValid(connector.getType())) {
+//          LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", connector.getType());
+//          connector.setType(DefaultConnectorTypes.LEFT_INPUT);
+//        }
+//      }
     }
 
     /**
      * Lays out the node's connectors.
      */
     private void layoutAllConnectors() {
-
-        layoutConnectors(topConnectorSkins, false, 0);
-        layoutConnectors(rightConnectorSkins, true, getRoot().getWidth());
-        layoutConnectors(bottomConnectorSkins, false, getRoot().getHeight());
-        layoutConnectors(leftConnectorSkins, true, 0);
+        layoutConnectors(getTopConnectorSkins(), false, 0);
+        layoutConnectors(getRightConnectorSkins(), true, getRoot().getWidth());
+        layoutConnectors(getBottomConnectorSkins(), false, getRoot().getHeight());
+        layoutConnectors(getLeftConnectorSkins(), true, 0);
     }
 
     /**
@@ -273,10 +255,7 @@ public class DefaultNodeSkin extends GNodeSkin {
      */
     private void removeAllConnectors() {
 
-        topConnectorSkins.stream().forEach(skin -> getRoot().getChildren().remove(skin.getRoot()));
-        rightConnectorSkins.stream().forEach(skin -> getRoot().getChildren().remove(skin.getRoot()));
-        bottomConnectorSkins.stream().forEach(skin -> getRoot().getChildren().remove(skin.getRoot()));
-        leftConnectorSkins.stream().forEach(skin -> getRoot().getChildren().remove(skin.getRoot()));
+        connectorSkins.stream().forEach(skin -> getRoot().getChildren().remove(skin.getRoot()));
     }
 
     /**
@@ -288,13 +267,23 @@ public class DefaultNodeSkin extends GNodeSkin {
      */
     private double getMinorOffsetX(final GConnector connector) {
 
-        final String type = connector.getType();
+      GConnectorSkin connectorSkin = connectorSkins.stream()
+          .filter(skin -> skin.getItem() == connector)
+          .findFirst()
+          .orElse(null); // null if no match is found
 
-        if (type.equals(DefaultConnectorTypes.LEFT_INPUT) || type.equals(DefaultConnectorTypes.RIGHT_OUTPUT)) {
-            return MINOR_POSITIVE_OFFSET;
+      if ( connectorSkin != null ) { // the connector should always have a corresponding skin so this should never be the case.
+        final Side side = connectorSkin.getSide();
+        final Direction direction = connector.getDirection();
+
+        if ((side == Side.LEFT && direction == Direction.INPUT)
+            || (side == Side.RIGHT && direction == Direction.OUTPUT)) {
+          return MINOR_POSITIVE_OFFSET;
         } else {
-            return MINOR_NEGATIVE_OFFSET;
+          return MINOR_NEGATIVE_OFFSET;
         }
+      }
+      return 0;
     }
 
     /**
@@ -306,13 +295,23 @@ public class DefaultNodeSkin extends GNodeSkin {
      */
     private double getMinorOffsetY(final GConnector connector) {
 
-        final String type = connector.getType();
+      GConnectorSkin connectorSkin = connectorSkins.stream()
+          .filter(skin -> skin.getItem() == connector)
+          .findFirst()
+          .orElse(null); // null if no match is found
 
-        if (type.equals(DefaultConnectorTypes.TOP_INPUT) || type.equals(DefaultConnectorTypes.BOTTOM_OUTPUT)) {
-            return MINOR_POSITIVE_OFFSET;
+      if ( connectorSkin != null ) { // the connector should always have a corresponding skin so this should never be the case.
+        final Side side = connectorSkin.getSide();
+        final Direction direction = connector.getDirection();
+
+        if ((side == Side.TOP && direction == Direction.INPUT)
+            || (side == Side.BOTTOM && direction == Direction.OUTPUT)) {
+          return MINOR_POSITIVE_OFFSET;
         } else {
-            return MINOR_NEGATIVE_OFFSET;
+          return MINOR_NEGATIVE_OFFSET;
         }
+      }
+      return 0;
     }
 
     /**
@@ -331,5 +330,28 @@ public class DefaultNodeSkin extends GNodeSkin {
       return "DefaultNodeSkin [getX()=" + getX() + ", getY()=" + getY() + ", getWidth()=" + getWidth()
           + ", getHeight()=" + getHeight() + ", isSelected()=" + isSelected() + ", getItem()=" + getItem() + "]";
     }
-    
+ 
+    public List<GConnectorSkin> getTopConnectorSkins() {
+      return connectorSkins.stream()
+          .filter(skin -> skin.getSide() == Side.TOP)
+          .toList();
+  }
+
+  public List<GConnectorSkin> getRightConnectorSkins() {
+      return connectorSkins.stream()
+          .filter(skin -> skin.getSide() == Side.RIGHT)
+          .toList();
+  }
+
+  public List<GConnectorSkin> getBottomConnectorSkins() {
+      return connectorSkins.stream()
+          .filter(skin -> skin.getSide() == Side.BOTTOM)
+          .toList();
+  }
+
+  public List<GConnectorSkin> getLeftConnectorSkins() {
+      return connectorSkins.stream()
+          .filter(skin -> skin.getSide() == Side.LEFT)
+          .toList();
+  }
 }

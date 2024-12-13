@@ -90,6 +90,14 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   }
 
   @Override
+  public List<GJointSkin> getJointSkins() {
+    if ( jointSkins == null ) {
+      jointSkins = new ArrayList<>();
+    }
+    return jointSkins;
+  }
+
+  @Override
   public void setJointSkins(final List<GJointSkin> jointSkins) {
 
     if (this.jointSkins != null) {
@@ -265,4 +273,5 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   protected void selectionChanged(boolean isSelected) {
     // Not implemented
   }
+
 }

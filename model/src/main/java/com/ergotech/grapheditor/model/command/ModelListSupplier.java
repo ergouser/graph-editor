@@ -1,8 +1,8 @@
 package com.ergotech.grapheditor.model.command;
 
-import java.util.List;
+import java.util.Collection;
 
 @FunctionalInterface
 public interface ModelListSupplier<T> {
-    List<T> getList(Object owner);
+    Collection<T> getList(Object owner);
 }

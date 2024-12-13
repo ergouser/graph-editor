@@ -9,6 +9,8 @@ import java.util.Map;
 import com.ergotech.grapheditor.model.GConnection;
 
 import io.github.eckig.grapheditor.utils.GeometryUtils;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Line;
 
@@ -28,6 +30,8 @@ import javafx.scene.shape.Line;
  */
 public abstract class GConnectionSkin extends GSkin<GConnection> {
 
+  protected final StringProperty type = new SimpleStringProperty(this, "type");
+
   /**
    * Cache the index of this connection skin inside the list of children of the connection layer. As the graph editor
    * grows the indexOf() lookup calls take up a considerable amount of time.
@@ -43,6 +47,14 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
   public GConnectionSkin(final GConnection connection) {
     super(connection);
   }
+
+  /**
+   * Gets the skin objects for all joints inside the connection.
+   *
+   *
+   * @return the list of all {@link GJointSkin} instances associated to the connection
+   */
+  public abstract List<GJointSkin> getJointSkins();
 
   /**
    * Sets the skin objects for all joints inside the connection.
@@ -110,7 +122,7 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     if (item == null || skinLookup == null) {
       return null;
-    } else if (item.getJoints().isEmpty()) {
+    } else if (getJointSkins().isEmpty()) {
       final Point2D[] points = new Point2D[2];
 
       // Start: Source position
@@ -121,11 +133,11 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
 
       return points;
     } else {
-      final int len = item.getJoints().size() + 2;
+      final int len = getJointSkins().size() + 2;
       final Point2D[] points = new Point2D[len];
 
       // Middle: joint positions
-      GeometryUtils.fillJointPositions(item, skinLookup, points);
+      GeometryUtils.fillJointPositions(this, points);
 
       // Start: Source position
       points[0] = GeometryUtils.getConnectorPosition(item.getSource(), skinLookup);
@@ -143,4 +155,32 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
   public int getParentIndex() {
     return mConnectionIndex;
   }
+  
+  /**
+   * Gets the type of the connection.
+   *
+   * @return the type of the connection as a StringProperty.
+   */
+  public StringProperty typeProperty() {
+      return type;
+  }
+
+  /**
+   * Returns the value of the 'Type' attribute.
+   *
+   * @return the type of the connection.
+   */
+  public String getType() {
+      return type.get();
+  }
+
+  /**
+   * Sets the value of the 'Type' attribute.
+   *
+   * @param value the new value of the type.
+   */
+  public void setType(String value) {
+      type.set(value);
+  }
+
 }

@@ -3,13 +3,13 @@
  */
 package io.github.eckig.grapheditor.core.data.skins;
 
-import com.ergotech.grapheditor.model.impl.GConnectorImpl;
+import com.ergotech.grapheditor.model.GConnector;
 
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
 
 public class CustomTailSkin extends DefaultTailSkin {
 
-    public CustomTailSkin(final GConnectorImpl gConnector) {
+    public CustomTailSkin(final GConnector gConnector) {
         super(gConnector);
     }
 }

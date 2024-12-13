@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +67,11 @@ public class TreeConnectionSkin extends GConnectionSkin {
     @Override
     public Node getRoot() {
         return root;
+    }
+
+    @Override
+    public List<GJointSkin> getJointSkins() {
+      return new ArrayList<GJointSkin>();
     }
 
     @Override

@@ -5,12 +5,13 @@ package io.github.eckig.grapheditor.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
@@ -122,11 +123,10 @@ public class GeometryUtils {
    * @param pTarget
    *          the array where to write the points to
    */
-  public static void fillJointPositions(final GConnection connection, final SkinLookup skinLookup,
-      final Point2D[] pTarget) {
-    for (int i = 0; i < connection.getJoints().size(); i++) {
-      final GJoint joint = connection.getJoints().get(i);
-      pTarget[i + 1] = getJointPosition(joint, skinLookup);
+  public static void fillJointPositions(final GConnectionSkin connectionSkin, final Point2D[] pTarget) {
+    List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+    for (int i = 0; i < jointSkins.size(); i++) {
+      pTarget[i + 1] = getJointPosition(jointSkins.get(i));
     }
   }
 
@@ -140,19 +140,15 @@ public class GeometryUtils {
    *
    * @param connection
    *          the {@link GConnection} for which the positions are desired
-   * @param skinLookup
-   *          the {@link SkinLookup} instance for this graph editor
    *
    * @return a {@link List} of {@link Point2D} objects containing joint x and y values
    */
-  public static List<Point2D> getJointPositions(final GConnection connection, final SkinLookup skinLookup) {
-    final List<Point2D> jointPositions = new ArrayList<>(connection.getJoints().size());
-    for (final GJoint joint : connection.getJoints()) {
-      jointPositions.add(getJointPosition(joint, skinLookup));
-    }
-    return jointPositions;
+  public static List<Point2D> getJointPositions(final GConnectionSkin connectionSkin) {
+    return connectionSkin.getJointSkins().stream()
+        .map(jointSkin -> getJointPosition(jointSkin))
+        .collect(Collectors.toList());
   }
-
+  
   /**
    * Gets the layout x and y values from all joints within a connection.
    *
@@ -161,14 +157,13 @@ public class GeometryUtils {
    * gesture where the model is not necessarily updated.
    * <p>
    *
-   * @param joint
-   *          the {@link GJoint} for which the position is desired
+   * @param jointSkin
+   *          the {@link GJointSkin} for which the position is desired
    * @param skinLookup
    *          the {@link SkinLookup} instance for this graph editor
    * @return {@link Point2D} object containing joint x and y values
    */
-  public static Point2D getJointPosition(final GJoint joint, final SkinLookup skinLookup) {
-    final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
+  public static Point2D getJointPosition(final GJointSkin jointSkin) {
     final Region region = jointSkin.getRoot();
 
     final double x = region.getLayoutX() + jointSkin.getWidth() / 2;

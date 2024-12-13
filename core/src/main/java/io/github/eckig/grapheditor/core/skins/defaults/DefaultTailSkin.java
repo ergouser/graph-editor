@@ -54,9 +54,21 @@ public class DefaultTailSkin extends GTailSkin {
 
         performChecks();
 
-        DefaultConnectorSkin.drawTriangleConnector(connector.getType(), endpoint);
+        // by default, if the connector is an output, it's on the right side, an input on the left.
+        switch (connector.getDirection()) {
+          case INPUT: 
+            setSide(Side.LEFT);
+            break;
+          case OUTPUT:
+          case BIDIRECTIONAL:
+            setSide(Side.RIGHT);
+            break;
+        }
 
-        endpoint.getStyleClass().addAll(STYLE_CLASS_ENDPOINT, connector.getType());
+        String connectorStyleClass = getSide().name() + "-" + connector.getDirection().name();
+        endpoint.getStyleClass().addAll(STYLE_CLASS_ENDPOINT, connectorStyleClass);
+        
+        DefaultConnectorSkin.drawTriangleConnector(connector.getDirection(), endpoint);
         line.getStyleClass().setAll(STYLE_CLASS);
         group.setManaged(false);
     }

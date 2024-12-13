@@ -1,10 +1,8 @@
 package com.ergotech.grapheditor.model.impl;
 
-import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GJoint;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import com.ergotech.grapheditor.model.GJoint;
 
 /**
  * A representation of the model object '<em><b>GJoint</b></em>'.
@@ -23,44 +21,48 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public class GJointImpl extends SelectableType implements GJoint {
 
-  private final ObjectProperty<GConnection> connection = new SimpleObjectProperty<>(this, "connection");
+  //private final ObjectProperty<GConnection> connection = new SimpleObjectProperty<>(this, "connection");
+  private static AtomicInteger uniqueId = new AtomicInteger(100);
 
   public GJointImpl() {
     super();
+    setId("Joint" + uniqueId.incrementAndGet());
   }
 
-  /**
-   * Gets the connection to which this joint belongs.
-   *
-   * @return the connection as an ObjectProperty.
-   */
-  public ObjectProperty<GConnection> connectionProperty() {
-    return connection;
-  }
-
-  /**
-   * Returns the connection to which this joint belongs.
-   *
-   * @return the GConnection this joint is part of.
-   */
-  public GConnection getConnection() {
-    return connection.get();
-  }
-
-  /**
-   * Sets the connection to which this joint belongs.
-   *
-   * @param connection
-   *          the GConnection to set.
-   */
-  @Override
-  public void setConnection(GConnection connection) {
-    this.connection.set(connection);
-  }
+//  /**
+//   * Gets the connection to which this joint belongs.
+//   *
+//   * @return the connection as an ObjectProperty.
+//   */
+//  public ObjectProperty<GConnection> connectionProperty() {
+//    return connection;
+//  }
+//
+//  /**
+//   * Returns the connection to which this joint belongs.
+//   *
+//   * @return the GConnection this joint is part of.
+//   */
+//  @Override
+//  public GConnection getConnection() {
+//    return connection.get();
+//  }
+//
+//  /**
+//   * Sets the connection to which this joint belongs.
+//   *
+//   * @param connection
+//   *          the GConnection to set.
+//   */
+//  @Override
+//  public void setConnection(GConnection connection) {
+//    this.connection.set(connection);
+//  }
 
   @Override
   public String toString() {
-    return "GJoint [id=" + getId() + ", connection=" + getConnection() + "]";
+    //return "GJoint [id=" + getId() + ", connection=" + getConnection() + "]";
+    return "GJoint [id=" + getId() + "]";
   }
 
 }

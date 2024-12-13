@@ -17,18 +17,4 @@ public interface Selectable {
    */
   public String getId();
 
-  /**
-   * Returns the value of the 'Type' attribute.
-   *
-   * @return the type of the connection.
-   */
-  public String getType();
-  
-  /**
-   * Sets the value of the 'Type' attribute.
-   *
-   * @param value the new value of the type.
-   */
-  public void setType(String value);
-
 }

@@ -207,10 +207,10 @@ public class SelectionCreator {
   }
 
   public void addConnection(final GConnection connection) {
-    final GConnectionSkin connSkin = skinLookup.lookupConnection(connection);
-    if (connSkin != null) {
+    final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+    if (connectionSkin != null) {
 
-      final Node skinRoot = connSkin.getRoot();
+      final Node skinRoot = connectionSkin.getRoot();
       if (!mousePressedHandlers.containsKey(skinRoot)) {
         final EventHandler<MouseEvent> connectionPressedHandler = event -> handleConnectionPressed(event, connection);
         skinRoot.addEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
@@ -218,23 +218,23 @@ public class SelectionCreator {
       }
     }
 
-    for (final GJoint joint : connection.getJoints()) {
-      addJoint(joint);
+    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+      addJoint(jointSkin.getItem());
     }
   }
 
   public void removeConnection(final GConnection connection) {
-    final GConnectionSkin connSkin = skinLookup.lookupConnection(connection);
-    if (connSkin != null) {
+    final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+    if (connectionSkin != null) {
 
-      final EventHandler<MouseEvent> connectionPressedHandler = mousePressedHandlers.remove(connSkin.getRoot());
+      final EventHandler<MouseEvent> connectionPressedHandler = mousePressedHandlers.remove(connectionSkin.getRoot());
       if (connectionPressedHandler != null) {
-        connSkin.getRoot().removeEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
+        connectionSkin.getRoot().removeEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
       }
     }
 
-    for (final GJoint joint : connection.getJoints()) {
-      removeJoint(joint);
+    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+      removeJoint(jointSkin.getItem());
     }
   }
 
@@ -426,9 +426,7 @@ public class SelectionCreator {
    * Updates the selection according to what nodes & joints are inside / outside the selection box.
    */
   private void updateSelection(final boolean isShortcutDown) {
-    for (int i = 0; i < model.getNodes().size(); i++) {
-      final GNode node = model.getNodes().get(i);
-
+    for (GNode node : model.getNodes()) {
       if (isNodeSelected(node, isShortcutDown)) {
         selectionManager.select(node);
       } else {
@@ -436,8 +434,8 @@ public class SelectionCreator {
       }
     }
 
-    for (int i = 0; i < model.getConnections().size(); i++) {
-      final GConnection connection = model.getConnections().get(i);
+    for (GConnection connection: model.getConnections() ) {
+      final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
 
       if (isConnectionSelected(connection, isShortcutDown)) {
         selectionManager.select(connection);
@@ -445,9 +443,8 @@ public class SelectionCreator {
         selectionManager.clearSelection(connection);
       }
 
-      for (int j = 0; j < connection.getJoints().size(); j++) {
-        final GJoint joint = connection.getJoints().get(j);
-
+      for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+        GJoint joint = jointSkin.getItem();
         if (isJointSelected(joint, isShortcutDown)) {
           selectionManager.select(joint);
         } else {

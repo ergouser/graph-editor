@@ -5,6 +5,7 @@ package io.github.eckig.grapheditor.core.connections;
 
 import com.ergotech.grapheditor.model.GConnection;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 import javafx.geometry.Side;
 
@@ -54,21 +55,21 @@ public final class RectangularConnections
      *            a {@link GConnection} that should be rectangular
      * @return {@code true} if the joint count is correct
      */
-    public static boolean checkJointCount(final GConnection connection)
+    public static boolean checkJointCount(final GConnectionSkin connectionSkin)
     {
-        final Side sourceSide = DefaultConnectorTypes.getSide(connection.getSource().getType());
-        final Side targetSide = DefaultConnectorTypes.getSide(connection.getTarget().getType());
+        final Side sourceSide = DefaultConnectorTypes.getSide(connectionSkin.getItem().getSource().getType());
+        final Side targetSide = DefaultConnectorTypes.getSide(connectionSkin.getItem().getTarget().getType());
 
         final boolean bothHorizontal = sourceSide.isHorizontal() && targetSide.isHorizontal();
         final boolean bothVertical = sourceSide.isVertical() && targetSide.isVertical();
 
         if (bothHorizontal || bothVertical)
         {
-            return (connection.getJoints().size() & 1) == 0;
+            return (connectionSkin.getJointSkins().size() & 1) == 0;
         }
         else
         {
-            return (connection.getJoints().size() & 1) == 1;
+            return (connectionSkin.getJointSkins().size() & 1) == 1;
         }
     }
 }

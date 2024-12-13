@@ -79,14 +79,14 @@ public class DraggableBox extends StackPane {
     // To ensure that the dependencyX and dependencyY boxes are always aligned
     // add listeners to layoutXProperty and layoutYProperty
     layoutXProperty().addListener((observable, oldValue, newValue) -> {
-      System.out.println ("JMoveX " + oldValue + " " + newValue + " " + dependencyX);
+      //System.out.println ("JMoveX " + oldValue + " " + newValue + " " + dependencyX);
       if (dependencyX != null) {
         dependencyX.setLayoutX(newValue.doubleValue());
       }
     });
 
     layoutYProperty().addListener((observable, oldValue, newValue) -> {
-      System.out.println ("JMoveY" + oldValue + " " + newValue + " " + dependencyX);
+      //System.out.println ("JMoveY" + oldValue + " " + newValue + " " + dependencyX);
       if (dependencyY != null) {
         dependencyY.setLayoutY(newValue.doubleValue());
       }

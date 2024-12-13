@@ -47,8 +47,8 @@ public class DefaultConnectionSkin extends SimpleConnectionSkin {
         performChecks();
 
         cursorOffsetCalculator = new CursorOffsetCalculator(connection, path, backgroundPath, connectionSegments);
-        jointCreator = new JointCreator(connection, cursorOffsetCalculator);
-        jointCleaner = new JointCleaner(connection);
+        jointCreator = new JointCreator(this, cursorOffsetCalculator);
+        jointCleaner = new JointCleaner(this);
         jointAlignmentManager = new JointAlignmentManager(connection);
 
         jointCreator.addJointCreationHandler(root);
@@ -79,7 +79,7 @@ public class DefaultConnectionSkin extends SimpleConnectionSkin {
      */
     private void performChecks()
     {
-        if (!RectangularConnections.checkJointCount(getItem()))
+        if (!RectangularConnections.checkJointCount(this))
         {
             LOGGER.error("Joint count not compatible with source and target connector types.");
         }

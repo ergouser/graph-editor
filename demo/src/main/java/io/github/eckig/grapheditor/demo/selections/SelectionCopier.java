@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.command.AddCommand;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SelectionManager;
@@ -39,388 +39,393 @@ import javafx.scene.layout.Region;
  */
 public class SelectionCopier {
 
-//    private static final EReference NODES = GraphPackage.Literals.GMODEL__NODES;
-//    private static final EReference CONNECTIONS = GraphPackage.Literals.GMODEL__CONNECTIONS;
+  //    private static final EReference NODES = GraphPackage.Literals.GMODEL__NODES;
+  //    private static final EReference CONNECTIONS = GraphPackage.Literals.GMODEL__CONNECTIONS;
 
-    private static final double BASE_PASTE_OFFSET = 20;
+  private static final double BASE_PASTE_OFFSET = 20;
 
-    private final SkinLookup skinLookup;
-    private final SelectionManager selectionManager;
+  private final SkinLookup skinLookup;
+  private final SelectionManager selectionManager;
 
-    private final List<GNode> copiedNodes = new ArrayList<>();
-    private final List<GConnection> copiedConnections = new ArrayList<>();
+  private final List<GNode> copiedNodes = new ArrayList<>();
+  private final List<GConnection> copiedConnections = new ArrayList<>();
 
-    private Parent parentAtTimeOfCopy;
-    private double parentSceneXAtTimeOfCopy;
-    private double parentSceneYAtTimeOfCopy;
+  private Parent parentAtTimeOfCopy;
+  private double parentSceneXAtTimeOfCopy;
+  private double parentSceneYAtTimeOfCopy;
 
-    private GModel model;
-    
-    private ObservableList<?> ol;
+  private GModel model;
 
-    /**
-     * Creates a new {@link SelectionCopier} instance.
-     *
-     * @param skinLookup
-     *            the {@link SkinLookup} instance for the graph editor
-     * @param selectionManager
-     *            the {@link SelectionManager} instance for the graph editor
-     */
-	public SelectionCopier(final SkinLookup skinLookup, final SelectionManager selectionManager) {
+  private ObservableList<?> ol;
 
-        this.skinLookup = skinLookup;
-        this.selectionManager = selectionManager;
+  /**
+   * Creates a new {@link SelectionCopier} instance.
+   *
+   * @param skinLookup
+   *            the {@link SkinLookup} instance for the graph editor
+   * @param selectionManager
+   *            the {@link SelectionManager} instance for the graph editor
+   */
+  public SelectionCopier(final SkinLookup skinLookup, final SelectionManager selectionManager) {
+
+    this.skinLookup = skinLookup;
+    this.selectionManager = selectionManager;
+  }
+
+  /**
+   * Initializes the selection copier for the current model.
+   *
+   * @param model the {@link GModel} currently being edited
+   */
+  public void initialize(final GModel model) {
+    this.model = model;
+  }
+
+  /**
+   * Copies the current selection and stores it in memory.
+   */
+  public void copy() {
+
+    if (selectionManager.getSelectedItems().isEmpty()) {
+      return;
     }
 
-    /**
-     * Initializes the selection copier for the current model.
-     *
-     * @param model the {@link GModel} currently being edited
-     */
-    public void initialize(final GModel model) {
-        this.model = model;
+    copiedNodes.clear();
+    copiedConnections.clear();
+
+    final Map<GNode, GNode> copyStorage = new HashMap<>();
+
+    // Don't iterate directly over selectionTracker.getSelectedNodes() because that will not preserve ordering.
+    for (final GNode node : model.getNodes()) {
+      if (selectionManager.isSelected(node)) {
+
+        final GNode copiedNode = BeanUtils.copyBean(node);
+        copiedNodes.add(copiedNode);
+        copyStorage.put(node, copiedNode);
+      }
     }
 
-    /**
-     * Copies the current selection and stores it in memory.
-     */
-    public void copy() {
+    copiedConnections.addAll(ConnectionCopier.copyConnections(copyStorage));
+    saveParentPositionInScene();
+  }
 
-        if (selectionManager.getSelectedItems().isEmpty()) {
-            return;
-        }
+  /**
+   * Pastes the most-recently-copied selection.
+   *
+   * <p>
+   * After the paste operation, the newly-pasted elements will be selected.
+   * </p>
+   *
+   * @param consumer a consumer to allow custom commands to be appended to the paste command
+   * @return the list of new {@link GNode} instances created by the paste operation
+   */
+  public List<GNode> paste(final BiConsumer<List<GNode>, CompoundCommand> consumer) {
 
-        copiedNodes.clear();
-        copiedConnections.clear();
+    selectionManager.clearSelection();
 
-        final Map<GNode, GNode> copyStorage = new HashMap<>();
+    final List<GNode> pastedNodes = new ArrayList<>();
+    final List<GConnection> pastedConnections = new ArrayList<>();
 
-        // Don't iterate directly over selectionTracker.getSelectedNodes() because that will not preserve ordering.
-        for (final GNode node : model.getNodes()) {
-            if (selectionManager.isSelected(node)) {
+    preparePastedElements(pastedNodes, pastedConnections);
+    addPasteOffset(pastedNodes, pastedConnections);
+    checkWithinBounds(pastedNodes, pastedConnections);
+    addPastedElements(pastedNodes, pastedConnections, consumer);
 
-                final GNode copiedNode = BeanUtils.copyBean(node);
-                copiedNodes.add(copiedNode);
-                copyStorage.put(node, copiedNode);
-            }
-        }
-
-        copiedConnections.addAll(ConnectionCopier.copyConnections(copyStorage));
-        saveParentPositionInScene();
+    for (final GNode pastedNode : pastedNodes) {
+      selectionManager.select(pastedNode);
     }
 
-    /**
-     * Pastes the most-recently-copied selection.
-     *
-     * <p>
-     * After the paste operation, the newly-pasted elements will be selected.
-     * </p>
-     *
-     * @param consumer a consumer to allow custom commands to be appended to the paste command
-     * @return the list of new {@link GNode} instances created by the paste operation
-     */
-    public List<GNode> paste(final BiConsumer<List<GNode>, CompoundCommand> consumer) {
-
-    	selectionManager.clearSelection();
-
-        final List<GNode> pastedNodes = new ArrayList<>();
-        final List<GConnection> pastedConnections = new ArrayList<>();
-
-        preparePastedElements(pastedNodes, pastedConnections);
-        addPasteOffset(pastedNodes, pastedConnections);
-        checkWithinBounds(pastedNodes, pastedConnections);
-        addPastedElements(pastedNodes, pastedConnections, consumer);
-
-        for (final GNode pastedNode : pastedNodes) {
-        	selectionManager.select(pastedNode);
-        }
-
-        for (final GConnection pastedConnection : pastedConnections) {
-            for (final GJoint pastedJoint : pastedConnection.getJoints()) {
-            	selectionManager.select(pastedJoint);
-            }
-        }
-
-        return pastedNodes;
+    for (final GConnection pastedConnection : pastedConnections) {
+      final GConnectionSkin connectionSkin = skinLookup.lookupConnection(pastedConnection);
+      final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+      for (final GJointSkin jointSkin : jointSkins) {
+        selectionManager.select(jointSkin.getItem());
+      }
     }
 
-    /**
-     * Clears the memory of what was cut / copied. Future paste operations will do nothing.
-     */
-    public void clearMemory() {
-        copiedNodes.clear();
-        copiedConnections.clear();
+    return pastedNodes;
+  }
+
+  /**
+   * Clears the memory of what was cut / copied. Future paste operations will do nothing.
+   */
+  public void clearMemory() {
+    copiedNodes.clear();
+    copiedConnections.clear();
+  }
+
+  /**
+   * Prepares the lists of pasted nodes and connections.
+   *
+   * @param pastedNodes an empty list to be filled with pasted nodes
+   * @param pastedConnections an empty list to be filled with pasted connections
+   */
+  private void preparePastedElements(final List<GNode> pastedNodes, final List<GConnection> pastedConnections) {
+
+    final Map<GNode, GNode> pasteStorage = new HashMap<>();
+
+    for (final GNode copiedNode : copiedNodes) {
+
+      final GNode pastedNode = BeanUtils.copyBean(copiedNode);
+      pastedNodes.add(pastedNode);
+
+      pasteStorage.put(copiedNode, pastedNode);
     }
 
-    /**
-     * Prepares the lists of pasted nodes and connections.
-     *
-     * @param pastedNodes an empty list to be filled with pasted nodes
-     * @param pastedConnections an empty list to be filled with pasted connections
-     */
-    private void preparePastedElements(final List<GNode> pastedNodes, final List<GConnection> pastedConnections) {
+    pastedConnections.addAll(ConnectionCopier.copyConnections(pasteStorage));
+  }
 
-        final Map<GNode, GNode> pasteStorage = new HashMap<>();
+  /**
+   * Adds an x and y offset to all nodes and connections that are about to be pasted.
+   *
+   * @param pastedNodes the nodes that are going to be pasted
+   * @param pastedConnections the connections that are going to be pasted
+   */
+  private void addPasteOffset(final List<GNode> pastedNodes, final List<GConnection> pastedConnections) {
 
-        for (final GNode copiedNode : copiedNodes) {
+    final Point2D pasteOffset = determinePasteOffset();
 
-            final GNode pastedNode = BeanUtils.copyBean(copiedNode);
-            pastedNodes.add(pastedNode);
-
-            pasteStorage.put(copiedNode, pastedNode);
-        }
-
-        pastedConnections.addAll(ConnectionCopier.copyConnections(pasteStorage));
+    for (final GNode node : pastedNodes) {
+      final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+      nodeSkin.setX(nodeSkin.getX() + pasteOffset.getX());
+      nodeSkin.setY(nodeSkin.getY() + pasteOffset.getY());
     }
 
-    /**
-     * Adds an x and y offset to all nodes and connections that are about to be pasted.
-     *
-     * @param pastedNodes the nodes that are going to be pasted
-     * @param pastedConnections the connections that are going to be pasted
-     */
-    private void addPasteOffset(final List<GNode> pastedNodes, final List<GConnection> pastedConnections) {
+    for (final GConnection connection : pastedConnections) {
+      final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+      final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+      for (final GJointSkin jointSkin : jointSkins) {
+        jointSkin.setX(jointSkin.getX() + pasteOffset.getX());
+        jointSkin.setY(jointSkin.getY() + pasteOffset.getY());
+      }
+    }
+  }
 
-        final Point2D pasteOffset = determinePasteOffset();
+  /**
+   * Checks that the pasted node and joints will be inside the bounds of their parent.
+   *
+   * <p>
+   * Corrects the x and y positions accordingly if they will be outside the bounds.
+   * </p>
+   *
+   * @param pastedNodes the nodes that are going to be pasted
+   * @param pastedConnections the connections that are going to be pasted
+   */
+  private void checkWithinBounds(final List<GNode> pastedNodes, final List<GConnection> pastedConnections) {
+
+    if (parentAtTimeOfCopy instanceof Region) {
+
+      final Region parentRegion = (Region) parentAtTimeOfCopy;
+
+      final Bounds parentBounds = getBounds(parentRegion);
+      final Bounds contentBounds = getContentBounds(pastedNodes, pastedConnections);
+
+      double xCorrection = 0;
+      double yCorrection = 0;
+
+      if (contentBounds.startX < parentBounds.startX) {
+        xCorrection = parentBounds.startX - contentBounds.startX;
+      } else if (contentBounds.endX > parentBounds.endX) {
+        xCorrection = parentBounds.endX - contentBounds.endX;
+      }
+
+      if (contentBounds.startY < parentBounds.startY) {
+        yCorrection = parentBounds.startY - contentBounds.startY;
+      } else if (contentBounds.endY > parentBounds.endY) {
+        yCorrection = parentBounds.endY - contentBounds.endY;
+      }
+
+      if (xCorrection != 0 || yCorrection != 0) {
 
         for (final GNode node : pastedNodes) {
           final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-          nodeSkin.setX(nodeSkin.getX() + pasteOffset.getX());
-          nodeSkin.setY(nodeSkin.getY() + pasteOffset.getY());
+          nodeSkin.setX(nodeSkin.getX() + xCorrection);
+          nodeSkin.setY(nodeSkin.getY() + yCorrection);
         }
 
         for (final GConnection connection : pastedConnections) {
-            for (final GJoint joint : connection.getJoints()) {
-              final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
-              jointSkin.setX(jointSkin.getX() + pasteOffset.getX());
-              jointSkin.setY(jointSkin.getY() + pasteOffset.getY());
-            }
+          final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+          final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+          for (final GJointSkin jointSkin : jointSkins) {
+            jointSkin.setX(jointSkin.getX() + xCorrection);
+            jointSkin.setY(jointSkin.getY() + yCorrection);
+          }
         }
+      }
+    }
+  }
+
+  /**
+   * Adds the pasted elements to the graph editor via a single EMF command.
+   *
+   * @param pastedNodes the pasted nodes to be added
+   * @param pastedConnections the pasted connections to be added
+   * @param consumer a consumer to allow custom commands to be appended to the paste command
+   */
+  private void addPastedElements(final List<GNode> pastedNodes, final List<GConnection> pastedConnections,
+      final BiConsumer<List<GNode>, CompoundCommand> consumer) {
+
+    final CompoundCommand command = new CompoundCommand();
+
+    for (final GNode pastedNode : pastedNodes) {
+      //command.append(AddCommand.create(editingDomain, model, NODES, pastedNode));
+      command.append( AddCommand.create(model, owner -> model.getNodes(), pastedNode));
     }
 
-    /**
-     * Checks that the pasted node and joints will be inside the bounds of their parent.
-     *
-     * <p>
-     * Corrects the x and y positions accordingly if they will be outside the bounds.
-     * </p>
-     *
-     * @param pastedNodes the nodes that are going to be pasted
-     * @param pastedConnections the connections that are going to be pasted
-     */
-    private void checkWithinBounds(final List<GNode> pastedNodes, final List<GConnection> pastedConnections) {
-
-        if (parentAtTimeOfCopy instanceof Region) {
-
-            final Region parentRegion = (Region) parentAtTimeOfCopy;
-
-            final Bounds parentBounds = getBounds(parentRegion);
-            final Bounds contentBounds = getContentBounds(pastedNodes, pastedConnections);
-
-            double xCorrection = 0;
-            double yCorrection = 0;
-
-            if (contentBounds.startX < parentBounds.startX) {
-                xCorrection = parentBounds.startX - contentBounds.startX;
-            } else if (contentBounds.endX > parentBounds.endX) {
-                xCorrection = parentBounds.endX - contentBounds.endX;
-            }
-
-            if (contentBounds.startY < parentBounds.startY) {
-                yCorrection = parentBounds.startY - contentBounds.startY;
-            } else if (contentBounds.endY > parentBounds.endY) {
-                yCorrection = parentBounds.endY - contentBounds.endY;
-            }
-
-            if (xCorrection != 0 || yCorrection != 0) {
-
-                for (final GNode node : pastedNodes) {
-                  final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-                  nodeSkin.setX(nodeSkin.getX() + xCorrection);
-                   nodeSkin.setY(nodeSkin.getY() + yCorrection);
-                }
-
-                for (final GConnection connection : pastedConnections) {
-                    for (final GJoint joint : connection.getJoints()) {
-                      final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
-                      jointSkin.setX(jointSkin.getX() + xCorrection);
-                      jointSkin.setY(jointSkin.getY() + yCorrection);
-                    }
-                }
-            }
-        }
+    for (final GConnection pastedConnection : pastedConnections) {
+      //command.append(AddCommand.create(editingDomain, model, CONNECTIONS, pastedConnection));
+      command.append(AddCommand.create(model, owner -> model.getConnections(), pastedConnection));
     }
 
-    /**
-     * Adds the pasted elements to the graph editor via a single EMF command.
-     *
-     * @param pastedNodes the pasted nodes to be added
-     * @param pastedConnections the pasted connections to be added
-     * @param consumer a consumer to allow custom commands to be appended to the paste command
-     */
-    private void addPastedElements(final List<GNode> pastedNodes, final List<GConnection> pastedConnections,
-            final BiConsumer<List<GNode>, CompoundCommand> consumer) {
-
-        final CompoundCommand command = new CompoundCommand();
-
-        for (final GNode pastedNode : pastedNodes) {
-            //command.append(AddCommand.create(editingDomain, model, NODES, pastedNode));
-          command.append( AddCommand.create(model, owner -> model.getNodes(), pastedNode));
-        }
-
-        for (final GConnection pastedConnection : pastedConnections) {
-            //command.append(AddCommand.create(editingDomain, model, CONNECTIONS, pastedConnection));
-            command.append(AddCommand.create(model, owner -> model.getConnections(), pastedConnection));
-       }
-
-        if (command.canExecute()) {
-          CommandStack.getCommandStack(model).execute(command);
-        }
-
-        if (consumer != null) {
-            consumer.accept(pastedNodes, command);
-        }
-
+    if (command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
     }
 
-    /**
-     * Saves the position in the scene of the JavaFX {@link Parent} of the node skins.
-     */
-    private void saveParentPositionInScene() {
+    if (consumer != null) {
+      consumer.accept(pastedNodes, command);
+    }
 
-        if (!selectionManager.getSelectedItems().isEmpty()) {
+  }
 
-            final GNode firstSelectedNode = selectionManager.getSelectedNodes().get(0);
-            final GNodeSkin firstSelectedNodeSkin = skinLookup.lookupNode(firstSelectedNode);
+  /**
+   * Saves the position in the scene of the JavaFX {@link Parent} of the node skins.
+   */
+  private void saveParentPositionInScene() {
 
-            final Node root = firstSelectedNodeSkin.getRoot();
-            final Parent parent = root.getParent();
+    if (!selectionManager.getSelectedItems().isEmpty()) {
 
-            if (parent != null) {
+      final GNode firstSelectedNode = selectionManager.getSelectedNodes().get(0);
+      final GNodeSkin firstSelectedNodeSkin = skinLookup.lookupNode(firstSelectedNode);
 
-                parentAtTimeOfCopy = parent;
+      final Node root = firstSelectedNodeSkin.getRoot();
+      final Parent parent = root.getParent();
 
-                final Point2D localToScene = parent.localToScene(0, 0);
+      if (parent != null) {
 
-                parentSceneXAtTimeOfCopy = localToScene.getX();
-                parentSceneYAtTimeOfCopy = localToScene.getY();
-            }
+        parentAtTimeOfCopy = parent;
+
+        final Point2D localToScene = parent.localToScene(0, 0);
+
+        parentSceneXAtTimeOfCopy = localToScene.getX();
+        parentSceneYAtTimeOfCopy = localToScene.getY();
+      }
+    }
+  }
+
+  /**
+   * Determines the offset by which the new nodes and joints should be positioned relative to the nodes and joints
+   * they were copied from.
+   *
+   * <p>
+   * The aim here is to paste the new nodes and joints into a <b>visible</b> area on the screen, even if the user has
+   * panned around in the graph editor container since the copy-action took place.
+   * </p>
+   *
+   * @return a {@link Point2D} containing the x and y offsets
+   */
+  private Point2D determinePasteOffset() {
+
+    double offsetX = BASE_PASTE_OFFSET;
+    double offsetY = BASE_PASTE_OFFSET;
+
+    if (parentAtTimeOfCopy != null) {
+
+      final Point2D localToScene = parentAtTimeOfCopy.localToScene(0, 0);
+
+      final double parentSceneXAtTimeOfPaste = localToScene.getX();
+      final double parentSceneYAtTimeOfPaste = localToScene.getY();
+
+      offsetX += parentSceneXAtTimeOfCopy - parentSceneXAtTimeOfPaste;
+      offsetY += parentSceneYAtTimeOfCopy - parentSceneYAtTimeOfPaste;
+    }
+
+    return new Point2D(offsetX, offsetY);
+  }
+
+  /**
+   * Gets the start and end x- and y-positions of the given region (including insets).
+   *
+   * @param region a {@link Region}
+   * @return the bounds of the given region
+   */
+  private Bounds getBounds(final Region region) {
+
+    final Bounds bounds = new Bounds();
+
+    bounds.startX = region.getInsets().getLeft();
+    bounds.startY = region.getInsets().getTop();
+
+    bounds.endX = region.getWidth() - region.getInsets().getRight();
+    bounds.endY = region.getHeight() - region.getInsets().getBottom();
+
+    return bounds;
+  }
+
+  /**
+   * Gets the start and end x- and y-positions of the given group of nodes and joints.
+   *
+   * @param nodes a list of nodes
+   * @param connections a list of connections
+   * @return the start and end x- and y-positions of the given nodes and joints.
+   */
+  private Bounds getContentBounds(final List<GNode> nodes, final List<GConnection> connections) {
+
+    final Bounds contentBounds = new Bounds();
+
+    contentBounds.startX = Double.MAX_VALUE;
+    contentBounds.startY = Double.MAX_VALUE;
+
+    contentBounds.endX = 0;
+    contentBounds.endY = 0;
+
+    for (final GNode node : nodes) {
+      final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+
+      if (nodeSkin.getX() < contentBounds.startX) {
+        contentBounds.startX = nodeSkin.getX();
+      }
+      if (nodeSkin.getY() < contentBounds.startY) {
+        contentBounds.startY = nodeSkin.getY();
+      }
+      if (nodeSkin.getX() + nodeSkin.getWidth() > contentBounds.endX) {
+        contentBounds.endX = nodeSkin.getX() + nodeSkin.getWidth();
+      }
+      if (nodeSkin.getY() + nodeSkin.getHeight() > contentBounds.endY) {
+        contentBounds.endY = nodeSkin.getY() + nodeSkin.getHeight();
+      }
+    }
+
+    for (final GConnection connection : connections) {
+      final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+      final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+      for (final GJointSkin jointSkin : jointSkins) {
+
+        if (jointSkin.getX() < contentBounds.startX) {
+          contentBounds.startX = jointSkin.getX();
         }
-    }
-
-    /**
-     * Determines the offset by which the new nodes and joints should be positioned relative to the nodes and joints
-     * they were copied from.
-     *
-     * <p>
-     * The aim here is to paste the new nodes and joints into a <b>visible</b> area on the screen, even if the user has
-     * panned around in the graph editor container since the copy-action took place.
-     * </p>
-     *
-     * @return a {@link Point2D} containing the x and y offsets
-     */
-    private Point2D determinePasteOffset() {
-
-        double offsetX = BASE_PASTE_OFFSET;
-        double offsetY = BASE_PASTE_OFFSET;
-
-        if (parentAtTimeOfCopy != null) {
-
-            final Point2D localToScene = parentAtTimeOfCopy.localToScene(0, 0);
-
-            final double parentSceneXAtTimeOfPaste = localToScene.getX();
-            final double parentSceneYAtTimeOfPaste = localToScene.getY();
-
-            offsetX += parentSceneXAtTimeOfCopy - parentSceneXAtTimeOfPaste;
-            offsetY += parentSceneYAtTimeOfCopy - parentSceneYAtTimeOfPaste;
+        if (jointSkin.getY() < contentBounds.startY) {
+          contentBounds.startY = jointSkin.getY();
         }
-
-        return new Point2D(offsetX, offsetY);
-    }
-
-    /**
-     * Gets the start and end x- and y-positions of the given region (including insets).
-     *
-     * @param region a {@link Region}
-     * @return the bounds of the given region
-     */
-    private Bounds getBounds(final Region region) {
-
-        final Bounds bounds = new Bounds();
-
-        bounds.startX = region.getInsets().getLeft();
-        bounds.startY = region.getInsets().getTop();
-
-        bounds.endX = region.getWidth() - region.getInsets().getRight();
-        bounds.endY = region.getHeight() - region.getInsets().getBottom();
-
-        return bounds;
-    }
-
-    /**
-     * Gets the start and end x- and y-positions of the given group of nodes and joints.
-     *
-     * @param nodes a list of nodes
-     * @param connections a list of connections
-     * @return the start and end x- and y-positions of the given nodes and joints.
-     */
-    private Bounds getContentBounds(final List<GNode> nodes, final List<GConnection> connections) {
-
-        final Bounds contentBounds = new Bounds();
-
-        contentBounds.startX = Double.MAX_VALUE;
-        contentBounds.startY = Double.MAX_VALUE;
-
-        contentBounds.endX = 0;
-        contentBounds.endY = 0;
-
-        for (final GNode node : nodes) {
-          final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-
-            if (nodeSkin.getX() < contentBounds.startX) {
-                contentBounds.startX = nodeSkin.getX();
-            }
-            if (nodeSkin.getY() < contentBounds.startY) {
-                contentBounds.startY = nodeSkin.getY();
-            }
-            if (nodeSkin.getX() + nodeSkin.getWidth() > contentBounds.endX) {
-                contentBounds.endX = nodeSkin.getX() + nodeSkin.getWidth();
-            }
-            if (nodeSkin.getY() + nodeSkin.getHeight() > contentBounds.endY) {
-                contentBounds.endY = nodeSkin.getY() + nodeSkin.getHeight();
-            }
+        if (jointSkin.getX() > contentBounds.endX) {
+          contentBounds.endX = jointSkin.getX();
         }
-
-        for (final GConnection connection : connections) {
-            for (final GJoint joint : connection.getJoints()) {
-              final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
-
-                if (jointSkin.getX() < contentBounds.startX) {
-                    contentBounds.startX = jointSkin.getX();
-                }
-                if (jointSkin.getY() < contentBounds.startY) {
-                    contentBounds.startY = jointSkin.getY();
-                }
-                if (jointSkin.getX() > contentBounds.endX) {
-                    contentBounds.endX = jointSkin.getX();
-                }
-                if (jointSkin.getY() > contentBounds.endY) {
-                    contentBounds.endY = jointSkin.getY();
-                }
-            }
+        if (jointSkin.getY() > contentBounds.endY) {
+          contentBounds.endY = jointSkin.getY();
         }
-
-        return contentBounds;
+      }
     }
 
-    /**
-     * Stores start and end x- and y-positions of a rectangular object.
-     */
-    private class Bounds {
+    return contentBounds;
+  }
 
-        public double startX;
-        public double startY;
-        public double endX;
-        public double endY;
-    }
+  /**
+   * Stores start and end x- and y-positions of a rectangular object.
+   */
+  private class Bounds {
+
+    public double startX;
+    public double startY;
+    public double endX;
+    public double endY;
+  }
 }

@@ -4,6 +4,7 @@
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -46,11 +47,16 @@ public class TreeConnectorSkin extends GConnectorSkin {
         circle.setManaged(false);
         circle.resizeRelocate(0, 0, 2 * RADIUS, 2 * RADIUS);
 
-        if (TreeSkinConstants.TREE_INPUT_CONNECTOR.equals(connector.getType())) {
-            circle.getStyleClass().setAll(STYLE_CLASS_INPUT);
-        } else {
-            circle.getStyleClass().setAll(STYLE_CLASS_OUTPUT);
-        }
+//        if (TreeSkinConstants.TREE_INPUT_CONNECTOR.equals(connector.getType())) {
+//          circle.getStyleClass().setAll(STYLE_CLASS_INPUT);
+//      } else {
+//          circle.getStyleClass().setAll(STYLE_CLASS_OUTPUT);
+//      }
+        if (Direction.INPUT.equals(connector.getDirection())) {
+          circle.getStyleClass().setAll(STYLE_CLASS_INPUT);
+      } else {
+          circle.getStyleClass().setAll(STYLE_CLASS_OUTPUT);
+      }
 
         root.getChildren().add(circle);
     }

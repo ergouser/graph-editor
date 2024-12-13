@@ -7,7 +7,10 @@ import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnector;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
+import javafx.geometry.Side;
 
 /**
  * The tail-skin class for a {@link GConnector}. Responsible for visualizing the tails that extend temporarily from
@@ -24,7 +27,9 @@ import javafx.geometry.Point2D;
  */
 public abstract class GTailSkin extends GSkin<GConnector> {
 
-    /**
+  ObjectProperty<Side> side  = new SimpleObjectProperty<>(this, "side");
+
+  /**
      * Creates a new {@link GTailSkin}.
      *
      * @param connector the {@link GConnector} that the tail will extend from
@@ -100,4 +105,35 @@ public abstract class GTailSkin extends GSkin<GConnector> {
      * @return a list of {@code Point2D} objects containing x and y values for a newly-created connection
      */
     public abstract List<Point2D> allocateJointPositions();
+    
+    /**
+     * Gets the side property of this skin.
+     *
+     * @return the side property of the skin.
+     */
+    public ObjectProperty<Side> sideProperty() {
+      return side;
+    }
+
+    /**
+     * Gets the side property of this skin.
+     * This is a convenience method for accessing the value of the side property.
+     *
+     * @return the side of the skin.
+     */
+    public Side getSide() {
+      return sideProperty().get();
+    }
+
+    /**
+     * Sets the side of this skin.
+     * This is a convenience method for setting the value of the side property.
+     *
+     * @param side the new side of the skin.
+     */
+    public void setSide(Side side) {
+      sideProperty().set(side);
+    }
+
+
 }

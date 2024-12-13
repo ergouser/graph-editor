@@ -15,6 +15,7 @@ import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.core.skins.SkinManager;
@@ -43,15 +44,15 @@ public class JointCommands {
    * @param connection
    *          the connection in which the joints will be set
    */
-  public static void setNewJoints(final GraphEditor graphEditor, final List<Point2D> positions, final GConnection connection) {
+  public static void setNewJoints(final GraphEditor graphEditor, final List<Point2D> positions, final GConnectionSkin connectionSkin) {
     final GModel model = graphEditor.getModel();
     // Create a compound command to group all operations
     final CompoundCommand command = new CompoundCommand();
 
     // Remove existing joints
-    List<GJoint> existingJoints = new ArrayList<>(connection.getJoints());
-    for (GJoint joint : existingJoints) {
-      command.append(RemoveCommand.create(connection, owner -> ((GConnection) owner).getJoints(), joint));
+    List<GJointSkin> existingJointSkins = new ArrayList<>(connectionSkin.getJointSkins());
+    for (GJointSkin jointSkin : existingJointSkins) {
+      command.append(RemoveCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), jointSkin));
     }
 
     final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
@@ -62,7 +63,7 @@ public class JointCommands {
       newJointSkin.setX(position.getX());
       newJointSkin.setY(position.getY());
 
-      command.append(AddCommand.create(connection, owner -> ((GConnection) owner).getJoints(), newJoint));
+      command.append(AddCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), newJointSkin));
     }
 
     // Execute the command and add it to the command stack
@@ -85,11 +86,11 @@ public class JointCommands {
    * @param connection
    *          the connection whose joints are to be removed
    */
-  public static void removeJoints(final CompoundCommand command, final BitSet indices, final GConnection connection) {
-    for (int i = 0; i < connection.getJoints().size(); i++) {
+  public static void removeJoints(final CompoundCommand command, final BitSet indices, final GConnectionSkin connectionSkin) {
+    for (int i = 0; i < connectionSkin.getJointSkins().size(); i++) {
       if (indices.get(i)) {
-        final GJoint joint = connection.getJoints().get(i);
-        command.append(RemoveCommand.create(connection, owner -> ((GConnection) owner).getJoints(), joint));
+        final GJointSkin jointSkin = connectionSkin.getJointSkins().get(i);
+        command.append(RemoveCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), jointSkin));
       }
     }
     // not executed, presumably after the return...

@@ -154,7 +154,7 @@ public class DefaultModelEditingManager implements ModelEditingManager {
    * @throws NoSuchMethodException this method is not emented
    */
   private void initializeEditingDomain(final GModel oldModel, final GModel newModel) throws NoSuchMethodException {
-    throw new NoSuchMethodException("initializeEditingDomain not emented");
+    throw new NoSuchMethodException("initializeEditingDomain not implemented");
     // First remove the listener from the old model, if it exists.
 //    if (oldModel != null) {
 //      final EditingDomain oldDomain = AdapterFactoryEditingDomain.getEditingDomainFor(oldModel);

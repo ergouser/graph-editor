@@ -1,6 +1,7 @@
 package io.github.eckig.grapheditor.demo.customskins;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.OptionalInt;
 
@@ -139,7 +140,7 @@ public class TitledSkinController extends DefaultSkinController {
      */
     private String allocateNewId() {
 
-        final List<GNode> nodes = graphEditor.getModel().getNodes();
+        final Collection<GNode> nodes = graphEditor.getModel().getNodes();
         final OptionalInt max = nodes.stream().mapToInt(node -> Integer.parseInt(node.getId())).max();
 
         if (max.isPresent()) {

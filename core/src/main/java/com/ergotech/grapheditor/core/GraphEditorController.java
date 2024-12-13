@@ -17,6 +17,7 @@ import com.ergotech.grapheditor.model.impl.GConnectionImpl;
 import com.ergotech.grapheditor.model.impl.GNodeImpl;
 
 import io.github.eckig.grapheditor.Commands;
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorValidator;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
@@ -203,9 +204,10 @@ public class GraphEditorController<E extends GraphEditor> {
     // Use the GConnection's method to add listeners
     ((GConnectionImpl)connection).addListeners(sourceListener, targetListener, typeListener, bidirectionalListener, jointsListener);
 
+    GConnectionSkin connectionSkin = mSkinManager.lookupConnection(connection);
     // Process existing joints
-    for (GJoint joint : connection.getJoints()) {
-      addJoint(joint,connection);
+    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+      addJoint(jointSkin.getItem(),connection);
     }
   }
 
@@ -333,7 +335,7 @@ public class GraphEditorController<E extends GraphEditor> {
   }
 
   private void addJoint(GJoint joint,GConnection connection) {
-    joint.setConnection(connection);
+    //joint.setConnection(connection);
     addJointListeners(joint);
     mSkinManager.lookupOrCreateJoint(joint);
     mSelectionManager.addJoint(joint);
@@ -350,7 +352,7 @@ public class GraphEditorController<E extends GraphEditor> {
   }
 
   private void removeJoint(GJoint joint) {
-    joint.setConnection(null);
+    //joint.setConnection(null);
     mSelectionManager.removeJoint(joint);
     mSkinManager.removeJoint(joint);
     //joint.removeListeners();
@@ -370,10 +372,11 @@ public class GraphEditorController<E extends GraphEditor> {
   }
 
   private void removeConnection(GConnection connection) {
+    GConnectionSkin connectionSkin = mSkinManager.lookupConnection(connection);
     mSelectionManager.removeConnection(connection);
     mSkinManager.removeConnection(connection);
-    for (GJoint joint : connection.getJoints()) {
-      removeJoint(joint);
+    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+      removeJoint(jointSkin.getItem());
     }
     ((GConnectionImpl)connection).removeListeners();
   }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnector;
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -41,7 +42,8 @@ public class GConnectorImpl extends SelectableType implements GConnector {
     private final ObjectProperty<GNode> parent = new SimpleObjectProperty<>(this, "parent");
     private final ObservableList<GConnection> connections = FXCollections.observableArrayList();
     private final BooleanProperty connectionDetachedOnDrag = new SimpleBooleanProperty(this, "connectionDetachedOnDrag", true);
-
+    ObjectProperty<Direction> direction  = new SimpleObjectProperty<>(this, "direction");
+    
     /**
      * Gets the parent node to which this connector belongs.
      *
@@ -130,9 +132,14 @@ public class GConnectorImpl extends SelectableType implements GConnector {
     public String toString() {
         return "GConnector{" +
                 "id=" + getId() +
-                ", type=" + getType() +
+                ", Direction=" + getDirection().name() +
                 ", parent=" + getParent() +
                  ", connectionDetachedOnDrag=" + isConnectionDetachedOnDrag() +
                 '}';
+    }
+
+    @Override
+    public ObjectProperty<Direction> directionProperty() {
+      return direction;
     }
 }

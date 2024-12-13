@@ -14,8 +14,10 @@ import com.ergotech.grapheditor.model.command.AddCommand;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 import io.github.eckig.grapheditor.demo.utils.AwesomeIcon;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
@@ -97,10 +99,10 @@ public class TreeNodeSkin extends GNodeSkin {
     }
 
     for (final GConnectorSkin skin : connectorSkins) {
-      if (TreeSkinConstants.TREE_OUTPUT_CONNECTOR.equals(skin.getItem().getType())) {
+      if (TreeSkinConstants.TREE_OUTPUT_CONNECTOR.equals(skin.getType())) {
         outputConnectorSkin = skin;
         getRoot().getChildren().add(skin.getRoot());
-      } else if (TreeSkinConstants.TREE_INPUT_CONNECTOR.equals(skin.getItem().getType())) {
+      } else if (TreeSkinConstants.TREE_INPUT_CONNECTOR.equals(skin.getType())) {
         inputConnectorSkin = skin;
         getRoot().getChildren().add(skin.getRoot());
       }
@@ -234,10 +236,11 @@ public class TreeNodeSkin extends GNodeSkin {
   private void addChildNode() {
 
     final GraphFactory factory = graphEditor.getModel().getGraphFactory();
+    final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
 
     final GNode childNode = factory.create(GNode.class);
-    final GNodeSkin childNodeSkin = graphEditor.getSkinLookup().lookupNode(childNode);
-    childNode.setType(TreeSkinConstants.TREE_NODE);
+    final GNodeSkin childNodeSkin = skinManager.lookupOrCreateNode(childNode);
+    childNodeSkin.setType(TreeSkinConstants.TREE_NODE);
     childNodeSkin.setX(getX() + (getWidth() - childNodeSkin.getWidth()) / 2);
     childNodeSkin.setY(getY() + getHeight() + CHILD_Y_OFFSET);
 
@@ -250,20 +253,23 @@ public class TreeNodeSkin extends GNodeSkin {
 
     final GConnector input = factory.create(GConnector.class);
     final GConnector output = factory.create(GConnector.class);
+    final GConnectorSkin inputConnectorSkin = skinManager.lookupOrCreateConnector(input);
+    final GConnectorSkin outputConnectorSkin = skinManager.lookupOrCreateConnector(output);
 
-    input.setType(TreeSkinConstants.TREE_INPUT_CONNECTOR);
-    output.setType(TreeSkinConstants.TREE_OUTPUT_CONNECTOR);
+    inputConnectorSkin.setType(TreeSkinConstants.TREE_INPUT_CONNECTOR);
+    outputConnectorSkin.setType(TreeSkinConstants.TREE_OUTPUT_CONNECTOR);
 
     childNode.getConnectors().add(input);
     childNode.getConnectors().add(output);
 
     // This allows multiple connections to be created from the output.
-    output.setConnectionDetachedOnDrag(false);
+    outputConnectorSkin.setConnectionDetachedOnDrag(false);
 
     final GConnector parentOutput = findOutput();
     final GConnection connection = factory.create(GConnection.class);
+    final GConnectionSkin connectionSkin = skinManager.lookupOrCreateConnection(connection);
 
-    connection.setType(TreeSkinConstants.TREE_CONNECTION);
+    connectionSkin.setType(TreeSkinConstants.TREE_CONNECTION);
     connection.setSource(parentOutput);
     connection.setTarget(input);
 

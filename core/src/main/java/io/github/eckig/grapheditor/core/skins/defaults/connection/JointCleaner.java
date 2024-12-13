@@ -15,6 +15,7 @@ import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 
 import io.github.eckig.grapheditor.Commands;
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
@@ -32,7 +33,7 @@ import javafx.scene.layout.Region;
  */
 public class JointCleaner {
 
-  private final GConnection mConnection;
+  private final GConnectionSkin mConnectionSkin;
 
   private final Map<Region, EventHandler<MouseEvent>> mCleaningHandlers = new HashMap<>();
 
@@ -44,8 +45,8 @@ public class JointCleaner {
    * @param pConnection
    *          the connection whose joints should be cleaned up / removed
    */
-  public JointCleaner(final GConnection pConnection) {
-    mConnection = pConnection;
+  public JointCleaner(final GConnectionSkin pConnectionSkin) {
+    mConnectionSkin = pConnectionSkin;
   }
 
   /**
@@ -86,7 +87,7 @@ public class JointCleaner {
           final GModel model = mGraphEditor.getModel();
           final SkinLookup skinLookup = mGraphEditor.getSkinLookup();
 
-          JointCommands.removeJoints(command, jointsToCleanUp, mConnection);
+          JointCommands.removeJoints(command, jointsToCleanUp, mConnectionSkin);
           Commands.updateLayoutValues(command, model, skinLookup);
 
           if (command.canExecute()) {

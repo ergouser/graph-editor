@@ -55,7 +55,7 @@ public interface IMinimapRenderer<N extends Node>
         public Rectangle createMinimapNode(final GNode pNode)
         {
             final Rectangle minimapNode = new Rectangle();
-            minimapNode.getStyleClass().addAll(STYLE_CLASS_NODE, pNode.getType());
+            minimapNode.getStyleClass().addAll(STYLE_CLASS_NODE/** CSS class is a skin attribute, pNode.getType()*/);
             return minimapNode;
         }
 

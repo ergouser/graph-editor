@@ -1,6 +1,8 @@
 package com.ergotech.grapheditor.model;
 
-import java.util.List;
+import java.util.Collection;
+
+import javafx.beans.property.ObjectProperty;
 
 /**
  * A representation of the model object '<em><b>GConnector</b></em>'.
@@ -17,57 +19,104 @@ import java.util.List;
  *   <li>{@link #typeProperty()} - The type of the connector</li>
  *   <li>{@link #parentProperty()} - The parent node to which this connector belongs</li>
  *   <li>{@link #connectionsProperty()} - The list of connections associated with this connector</li>
- *   <li>{@link #xProperty()} - The x-coordinate of the connector</li>
- *   <li>{@link #yProperty()} - The y-coordinate of the connector</li>
- *   <li>{@link #connectionDetachedOnDragProperty()} - Indicates whether connections are detached when the connector is dragged</li>
  * </ul>
  */
 public interface GConnector extends Selectable {
 
+
+
+  /**
+   * Represents the directionality of a connector.
+   */
+  enum Direction {
     /**
-     * Returns the parent node to which this connector belongs.
-     *
-     * @return the parent GNode.
+     * The connector serves as an input.
      */
-    public GNode getParent();
+    INPUT,
 
     /**
-     * Sets the parent node to which this connector belongs.
-     *
-     * @param parent the parent GNode to set.
+     * The connector serves as an output.
      */
-    public void setParent(GNode parent);
+    OUTPUT,
 
     /**
-     * Gets the list of connections associated with this connector.
-     *
-     * @return the connections as an ObservableList.
+     * The connector can both input and output.
      */
-    public List<GConnection> getConnections();
-    /**
-     * Adds a connection to the connector.
-     *
-     * @param connection the connection to add.
-     */
-    public void addConnection(GConnection connection);
+    BIDIRECTIONAL
+  }
 
-    /**
-     * Removes a connection from the connector.
-     *
-     * @param connection the connection to remove.
-     */
-    public void removeConnection(GConnection connection);
+  /**
+   * Gets the direction property of this connector.
+   *
+   * @return the direction property of the connector.
+   */
+  ObjectProperty<Direction> directionProperty();
 
-    /**
-     * Returns whether connections are detached when the connector is dragged.
-     *
-     * @return true if connections are detached on drag, false otherwise.
-     */
-    public boolean isConnectionDetachedOnDrag();
-    /**
-     * Sets whether connections are detached when the connector is dragged.
-     *
-     * @param value true to detach connections on drag, false otherwise.
-     */
-    public void setConnectionDetachedOnDrag(boolean value);
+  /**
+   * Gets the direction of this connector.
+   * This is a convenience method for accessing the value of the direction property.
+   *
+   * @return the direction of the connector.
+   */
+  default Direction getDirection() {
+    return directionProperty().get();
+  }
+
+  /**
+   * Sets the direction of this connector.
+   * This is a convenience method for setting the value of the direction property.
+   *
+   * @param direction the new direction of the connector.
+   */
+  default void setDirection(Direction direction) {
+    directionProperty().set(direction);
+  }
+
+
+  /**
+   * Returns the parent node to which this connector belongs.
+   *
+   * @return the parent GNode.
+   */
+  public GNode getParent();
+
+  /**
+   * Sets the parent node to which this connector belongs.
+   *
+   * @param parent the parent GNode to set.
+   */
+  public void setParent(GNode parent);
+
+  /**
+   * Gets the list of connections associated with this connector.
+   *
+   * @return the connections as an ObservableList.
+   */
+  public Collection<GConnection> getConnections();
+  /**
+   * Adds a connection to the connector.
+   *
+   * @param connection the connection to add.
+   */
+  public void addConnection(GConnection connection);
+
+  /**
+   * Removes a connection from the connector.
+   *
+   * @param connection the connection to remove.
+   */
+  public void removeConnection(GConnection connection);
+
+  //    /**
+  //     * Returns whether connections are detached when the connector is dragged.
+  //     *
+  //     * @return true if connections are detached on drag, false otherwise.
+  //     */
+  //    public boolean isConnectionDetachedOnDrag();
+  //    /**
+  //     * Sets whether connections are detached when the connector is dragged.
+  //     *
+  //     * @param value true to detach connections on drag, false otherwise.
+  //     */
+  //    public void setConnectionDetachedOnDrag(boolean value);
 }

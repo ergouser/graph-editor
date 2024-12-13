@@ -20,14 +20,17 @@ import javafx.scene.layout.Region;
 
 
 /**
- * Provides functionality for displaying and editing graph-like diagrams in
- * JavaFX.
+ * Interface representing a Graph Editor component.
+ * <p>
+ * Provides methods to manage the graph model, selection, skins, and event handlers
+ * related to graph editing operations.
+ * </p>
  *
  * <p>
  * Example:
  *
  * <pre>
- * <code>GModel model = GraphFactory.eINSTANCE.createGModel();
+ * <code>GModel model = GraphFactory.create(GModel.class);
  *
  * GraphEditor graphEditor = new DefaultGraphEditor();
  * graphEditor.setModel(model);
@@ -41,7 +44,7 @@ import javafx.scene.layout.Region;
  * </p>
  *
  * <p>
- * The editor updates its underlying model via EMF commands. This means any user
+ * The editor updates its underlying model using instance of the Command interface. This means any user
  * action should be undoable. Helper methods for common operations are provided
  * in the {@link Commands} class, such as:
  *

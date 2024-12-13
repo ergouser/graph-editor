@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.command.AddCommand;
@@ -217,46 +216,83 @@ public class Commands {
   public static void updateLayoutValues(final CompoundCommand command, final GModel model,
       final SkinLookup skinLookup) {
       for (final GNode node : model.getNodes()) {
-        final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-        if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
-          final Region nodeRegion = nodeSkin.getRoot();
-          command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
-          command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
-          command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
-          command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
-        }
+          final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+          if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
+              final Region nodeRegion = nodeSkin.getRoot();
+
+              if (nodeSkin.xProperty().get() != nodeRegion.getLayoutX()) {
+                  command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
+              }
+
+              if (nodeSkin.yProperty().get() != nodeRegion.getLayoutY()) {
+                  command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
+              }
+
+              if (nodeSkin.widthProperty().get() != nodeRegion.getWidth()) {
+                  command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
+              }
+
+              if (nodeSkin.heightProperty().get() != nodeRegion.getHeight()) {
+                  command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
+              }
+          }
       }
 
       for (final GConnection connection : model.getConnections()) {
-        updateConnector(connection.getSource(), command, skinLookup);
-        updateConnector(connection.getTarget(), command, skinLookup);
+          updateConnector(connection.getSource(), command, skinLookup);
+          updateConnector(connection.getTarget(), command, skinLookup);
 
-        for (final GJoint joint : connection.getJoints()) {
-          final GJointSkin jointSkin = skinLookup.lookupJoint(joint);
-          if (jointSkin != null && checkJointChanged(joint, jointSkin)) {
-            final Region jointRegion = jointSkin.getRoot();
-            final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
-            final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
+          for (final GJointSkin jointSkin : skinLookup.lookupConnection(connection).getJointSkins()) {
+              if (jointSkin != null && checkJointChanged(jointSkin)) {
+                  final Region jointRegion = jointSkin.getRoot();
+                  final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
+                  final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
 
-            command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
-            command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
+                  if (jointSkin.xProperty().get() != x) {
+                      command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
+                  }
+
+                  if (jointSkin.yProperty().get() != y) {
+                      command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
+                  }
+              }
           }
-        }
       }
-    }
+  }
 
+  /**
+   * Updates the connector's position values to match the corresponding node skin layout.
+   *
+   * <p>
+   * This method checks if the connector's position values differ from the calculated values
+   * in the associated node skin. If so, it appends set commands to the given compound command
+   * to update the position.
+   * </p>
+   *
+   * @param connector
+   *          the {@link GConnector} whose position values need to be updated
+   * @param command
+   *          a {@link CompoundCommand} to which the set commands will be added
+   * @param skinLookup
+   *          the {@link SkinLookup} in use for this graph editor instance
+   */
   private static void updateConnector(final GConnector connector, final CompoundCommand command,
       final SkinLookup skinLookup) {
-    final GNode node = connector.getParent();
-    final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
-    final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-    if (nodeSkin != null && connectorSkin != null) {
-      final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
-      if (checkConnectorChanged(connectorSkin, connectorPosition)) {
-        command.append(SetPropertyCommand.create(connectorSkin.xProperty(), connectorPosition.getX()));
-        command.append(SetPropertyCommand.create(connectorSkin.yProperty(), connectorPosition.getY()));
+      final GNode node = connector.getParent();
+      final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
+      final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+      if (nodeSkin != null && connectorSkin != null) {
+          final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
+          if (checkConnectorChanged(connectorSkin, connectorPosition)) {
+              if (connectorSkin.xProperty().get() != connectorPosition.getX()) {
+                  command.append(SetPropertyCommand.create(connectorSkin.xProperty(), connectorPosition.getX()));
+              }
+
+              if (connectorSkin.yProperty().get() != connectorPosition.getY()) {
+                  command.append(SetPropertyCommand.create(connectorSkin.yProperty(), connectorPosition.getY()));
+              }
+          }
       }
-    }
   }
 
   /**
@@ -302,12 +338,12 @@ public class Commands {
   /**
    * Checks if a joint's JavaFX region has different layout values than those currently stored in the model.
    *
-   * @param joint
-   *          the model instance for the joint
+   * @param jointSkin
+   *          the instance of the jointSkin
    *
    * @return {@code true} if any layout value has changed, {@code false if not}
    */
-  private static boolean checkJointChanged(final GJoint joint, final GJointSkin jointSkin) {
+  private static boolean checkJointChanged(final GJointSkin jointSkin) {
     final Region jointRegion = jointSkin.getRoot();
 
     final double jointRegionX = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;

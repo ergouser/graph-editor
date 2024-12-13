@@ -4,6 +4,7 @@
 package io.github.eckig.grapheditor.core.skins.defaults.utils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnector;
@@ -15,7 +16,10 @@ import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
+import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.core.connections.ConnectionEventManager;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 
 /**
  * Provides utility methods for adding and removing connections via EMF commands.
@@ -43,7 +47,7 @@ public class ConnectionCommands {
    *          the list of {@link GJoint} instances to be added inside the new connection
    */
   public static void addConnection(final GModel model, final GConnector source, final GConnector target,
-      final String type, final List<GJoint> joints, final ConnectionEventManager connectionEventManager) {
+      final String type, final List<GJoint> joints, final ConnectionEventManager connectionEventManager, final SkinManager skinManager) {
 
     final CompoundCommand command = new CompoundCommand();
 
@@ -52,7 +56,11 @@ public class ConnectionCommands {
     connection.setType(type);
     connection.setSource(source);
     connection.setTarget(target);
-    connection.getJoints().addAll(joints);
+    List<GJointSkin> jointSkins = joints.stream()
+        .map(joint -> skinManager.lookupJoint(joint))
+        .collect(Collectors.toList());
+    GConnectionSkin gConnectionSkin = skinManager.lookupOrCreateConnection(connection);
+    gConnectionSkin.getJointSkins().addAll(jointSkins);
 
     // attributes that involve other members of the model, are modified through commands:
     //command.append(AddCommand.create(editingDomain, model, GraphPackage.Literals.GMODEL__CONNECTIONS, connection));

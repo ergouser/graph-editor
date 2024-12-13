@@ -1,9 +1,6 @@
 package com.ergotech.grapheditor.model;
 
-import java.util.List;
-
-import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GNode;
+import java.util.Collection;
 
 /**
  * Represents the model of a graph in the graph editor.
@@ -22,7 +19,7 @@ public interface GModel {
      *
      * @return a list of {@link GNode} instances contained in the model.
      */
-    List<GNode> getNodes();
+    Collection<GNode> getNodes();
 
     /**
      * Adds a node to the model.
@@ -45,7 +42,7 @@ public interface GModel {
      *
      * @return a list of {@link GConnection} instances contained in the model.
      */
-    List<GConnection> getConnections();
+    Collection<GConnection> getConnections();
 
     /**
      * Adds a connection to the model.

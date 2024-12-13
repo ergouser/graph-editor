@@ -2,6 +2,7 @@ package io.github.eckig.grapheditor.demo.customskins;
 
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
@@ -68,8 +69,8 @@ public class DefaultSkinController implements SkinController {
 
         //node.setX(NODE_INITIAL_X + windowXOffset);
 
-        rightOutput.setType(DefaultConnectorTypes.RIGHT_OUTPUT);
-        leftInput.setType(DefaultConnectorTypes.LEFT_INPUT);
+        rightOutput.setDirection(Direction.OUTPUT);
+        leftInput.setDirection(Direction.INPUT);
 
         Commands.addNode(graphEditor.getModel(), node);
     }

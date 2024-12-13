@@ -428,8 +428,9 @@ public class ConnectorDragManager {
    * @return {@code true} if a connection can be created from the given {@link GConnector}, {@code false} if not
    */
   private boolean checkCreatable(final GConnector connector) {
+    final GConnectorSkin gConnectorSkin = skinManager.lookupOrCreateConnector(connector);
     return connector != null && checkEditable()
-        && (connector.getConnections().isEmpty() || !connector.isConnectionDetachedOnDrag());
+        && (connector.getConnections().isEmpty() || !gConnectorSkin.isConnectionDetachedOnDrag());
   }
 
   /**
@@ -440,7 +441,8 @@ public class ConnectorDragManager {
    * @return {@code true} if a connection can be removed from the given {@link GConnector}, {@code false} if not
    */
   private boolean checkRemovable(final GConnector connector) {
-    return checkEditable() && !connector.getConnections().isEmpty() && connector.isConnectionDetachedOnDrag();
+    final GConnectorSkin gConnectorSkin = skinManager.lookupOrCreateConnector(connector);
+    return checkEditable() && !connector.getConnections().isEmpty() && gConnectorSkin.isConnectionDetachedOnDrag();
   }
 
   private boolean checkEditable() {
@@ -472,15 +474,15 @@ public class ConnectorDragManager {
 
     for (final Point2D position : jointPositions) {
       final GJoint joint = model.getGraphFactory().create(GJoint.class);
-      joint.setType(jointType);
       final GJointSkin gJointSkin = skinManager.lookupOrCreateJoint(joint);
+      gJointSkin.setType(jointType);
       gJointSkin.setX(position.getX());
       gJointSkin.setY(position.getY());
 
       joints.add(joint);
     }
 
-    ConnectionCommands.addConnection(model, source, target, connectionType, joints, connectionEventManager);
+    ConnectionCommands.addConnection(model, source, target, connectionType, joints, connectionEventManager,skinManager);
   }
 
   /**
@@ -511,7 +513,8 @@ public class ConnectorDragManager {
         continue;
       }
       final GConnector opposingConnector = getOpposingConnector(connection, connector);
-      final List<Point2D> jointPositions = GeometryUtils.getJointPositions(connection, skinManager);
+      
+      final List<Point2D> jointPositions = GeometryUtils.getJointPositions(skinManager.lookupConnection(connection));
       final GConnector newSource;
       if (connector.equals(connection.getSource())) {
         Collections.reverse(jointPositions);

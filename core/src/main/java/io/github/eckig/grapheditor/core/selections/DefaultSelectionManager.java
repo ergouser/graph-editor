@@ -12,6 +12,8 @@ import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
+import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
@@ -40,6 +42,7 @@ public class DefaultSelectionManager implements SelectionManager
 
     private final SelectionCreator selectionCreator;
     private final SelectionTracker selectionTracker;
+    private final SkinLookup skinLookup;
 
     private GModel model;
 
@@ -57,6 +60,7 @@ public class DefaultSelectionManager implements SelectionManager
         final SelectionDragManager selectionDragManager = new SelectionDragManager(skinLookup, view, this);
         selectionCreator = new SelectionCreator(skinLookup, view, this, selectionDragManager);
         selectionTracker = new SelectionTracker(skinLookup);
+        this.skinLookup = skinLookup;
     }
 
     /**
@@ -179,10 +183,10 @@ public class DefaultSelectionManager implements SelectionManager
             for (final GConnection connection : model.getConnections())
             {
                 getSelectedItems().add(connection);
-
-                for (final GJoint joint : connection.getJoints())
+                GConnectionSkin gConnectionSkin = skinLookup.lookupConnection(connection); 
+                for (final GJointSkin jointSkin : gConnectionSkin.getJointSkins())
                 {
-                    getSelectedItems().add(joint);
+                    getSelectedItems().add(jointSkin.getItem());
                 }
             }
         }

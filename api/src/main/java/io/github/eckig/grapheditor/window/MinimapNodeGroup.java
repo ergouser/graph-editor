@@ -16,6 +16,7 @@ import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
@@ -248,8 +249,7 @@ class MinimapNodeGroup extends Parent {
     }
 
     if (model != null) {
-      for (int i = 0; i < model.getNodes().size(); i++) {
-        final GNode node = model.getNodes().get(i);
+      for (GNode node : model.getNodes()) {
         final Node minimapNode = minimapRenderer == null ? null : minimapRenderer.createMinimapNode(node);
         if (minimapNode != null) {
           getChildren().add(minimapNode);
@@ -279,13 +279,12 @@ class MinimapNodeGroup extends Parent {
     gc.setLineWidth(1);
 
     if (model != null) {
-      for (int i = 0; i < model.getConnections().size(); i++) {
-        final GConnection conn = model.getConnections().get(i);
-        if (connectionFilter != null && !connectionFilter.test(conn)) {
+      for (GConnection connection : model.getConnections()) {
+         if (connectionFilter != null && !connectionFilter.test(connection)) {
           continue;
         }
 
-        final GConnector source = conn.getSource();
+        final GConnector source = connection.getSource();
         final GNode parentSource = source.getParent();
         final SkinLookup skinLookup = graphEditor.getSkinLookup();
 
@@ -295,16 +294,17 @@ class MinimapNodeGroup extends Parent {
             y = scaleSharp(sourceSkin.getY() + parentSkin.getY(), scaleFactor);
         gc.moveTo(x, y);
 
-        for (int j = 0; j <= conn.getJoints().size(); j++) {
+        GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+        List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+        for (int j = 0; j <= jointSkins.size(); j++) {
           final double newX;
           final double newY;
-          if (j < conn.getJoints().size()) {
-            final GJoint joint = conn.getJoints().get(j);
-            GJointSkin jointSkin = skinLookup.lookupJoint(joint);
+          if (j < jointSkins.size()) {
+            final GJointSkin jointSkin = jointSkins.get(j);
             newX = scaleSharp(jointSkin.getX(), scaleFactor);
             newY = scaleSharp(jointSkin.getY(), scaleFactor);
           } else {
-            final GConnector target = conn.getTarget();
+            final GConnector target = connection.getTarget();
             final GNode parentTarget = target.getParent();
             GConnectorSkin targetSkin = skinLookup.lookupConnector(source);
             GNodeSkin parentTargetSkin = skinLookup.lookupNode(parentSource);

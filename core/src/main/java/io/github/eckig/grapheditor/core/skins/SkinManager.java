@@ -81,15 +81,15 @@ public interface SkinManager extends SkinLookup, GraphEditorSkins
      */
     void updateConnectors(final GNode pNode);
 
-    /**
-     * Calls {@link GConnectionSkin#setJointSkins(List)} to update a connections
-     * list of joints.
-     *
-     * @param pConnection
-     *            connection to update
-     * @since 17.02.2016
-     */
-    void updateJoints(final GConnection pConnection);
+//    /**
+//     * Calls {@link GConnectionSkin#setJointSkins(List)} to update a connections
+//     * list of joints.
+//     *
+//     * @param pConnection
+//     *            connection to update
+//     * @since 17.02.2016
+//     */
+//    void updateJoints(final GConnection pConnection);
 
     /**
      * Creates (if not yet existing) and returns the skin for the given item

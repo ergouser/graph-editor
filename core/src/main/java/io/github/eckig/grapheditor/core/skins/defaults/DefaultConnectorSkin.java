@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -14,6 +15,7 @@ import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 import io.github.eckig.grapheditor.core.skins.defaults.utils.AnimatedColor;
 import io.github.eckig.grapheditor.core.skins.defaults.utils.ColorAnimationUtils;
 import javafx.css.PseudoClass;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -64,9 +66,22 @@ public class DefaultConnectorSkin extends GConnectorSkin {
         root.setPickOnBounds(false);
 
         polygon.setManaged(false);
-        polygon.getStyleClass().addAll(STYLE_CLASS_BASE, connector.getType());
+        
+        // by default, if the connector is an output, it's on the right side, an input on the left.
+        switch (connector.getDirection()) {
+          case INPUT: 
+            setSide(Side.LEFT);
+            break;
+          case OUTPUT:
+          case BIDIRECTIONAL:
+            setSide(Side.RIGHT);
+            break;
+        }
+        
+        String connectorStyleClass = getSide().name() + "-" + connector.getDirection().name();
+        polygon.getStyleClass().addAll(STYLE_CLASS_BASE, connectorStyleClass);
 
-        drawTriangleConnector(connector.getType(), polygon);
+        drawTriangleConnector(getSide(), connector.getDirection(), polygon);
 
         root.getChildren().add(polygon);
 
@@ -117,46 +132,60 @@ public class DefaultConnectorSkin extends GConnectorSkin {
     /**
      * Draws the given polygon to have a triangular shape.
      *
-     * @param type the connector type
+     * @param direction the connector type
      * @param polygon the polygon to be drawn
      */
-    public static void drawTriangleConnector(final String type, final Polygon polygon) {
+    public static void drawTriangleConnector(final Side side, final Direction direction, final Polygon polygon) {
+      switch (side) {
+          case TOP:
+              // TOP: INPUT was vertical(false), OUTPUT was vertical(true)
+              if (direction == Direction.INPUT) {
+                  drawVertical(false, polygon);
+              } else if (direction == Direction.OUTPUT) {
+                  drawVertical(true, polygon);
+              } else {
+                  // Possibly handle BIDIRECTIONAL if needed
+              }
+              break;
 
-        switch (type) {
+          case BOTTOM:
+              // BOTTOM: INPUT was vertical(true), OUTPUT was vertical(false)
+              if (direction == Direction.INPUT) {
+                  drawVertical(true, polygon);
+              } else if (direction == Direction.OUTPUT) {
+                  drawVertical(false, polygon);
+              } else {
+                  // Possibly handle BIDIRECTIONAL
+              }
+              break;
 
-        case DefaultConnectorTypes.TOP_INPUT:
-            drawVertical(false, polygon);
-            break;
+          case RIGHT:
+              // RIGHT: INPUT was horizontal(false), OUTPUT was horizontal(true)
+              if (direction == Direction.INPUT) {
+                  drawHorizontal(false, polygon);
+              } else if (direction == Direction.OUTPUT) {
+                  drawHorizontal(true, polygon);
+              } else {
+                  // Possibly handle BIDIRECTIONAL
+              }
+              break;
 
-        case DefaultConnectorTypes.TOP_OUTPUT:
-            drawVertical(true, polygon);
-            break;
+          case LEFT:
+              // LEFT: INPUT was horizontal(true), OUTPUT was horizontal(false)
+              if (direction == Direction.INPUT) {
+                  drawHorizontal(true, polygon);
+              } else if (direction == Direction.OUTPUT) {
+                  drawHorizontal(false, polygon);
+              } else {
+                  // Possibly handle BIDIRECTIONAL
+              }
+              break;
 
-        case DefaultConnectorTypes.RIGHT_INPUT:
-            drawHorizontal(false, polygon);
-            break;
-
-        case DefaultConnectorTypes.RIGHT_OUTPUT:
-            drawHorizontal(true, polygon);
-            break;
-
-        case DefaultConnectorTypes.BOTTOM_INPUT:
-            drawVertical(true, polygon);
-            break;
-
-        case DefaultConnectorTypes.BOTTOM_OUTPUT:
-            drawVertical(false, polygon);
-            break;
-
-        case DefaultConnectorTypes.LEFT_INPUT:
-            drawHorizontal(true, polygon);
-            break;
-
-        case DefaultConnectorTypes.LEFT_OUTPUT:
-            drawHorizontal(false, polygon);
-            break;
-        }
-    }
+          default:
+              // Handle OTHER or unexpected sides
+              break;
+      }
+  }
 
     /**
      * Draws the polygon for a horizontal orientation, pointing right or left.
@@ -191,13 +220,13 @@ public class DefaultConnectorSkin extends GConnectorSkin {
     /**
      * Checks that the connector has the correct values to be displayed using this skin.
      */
-    private void performChecks()
-    {
-        if (!DefaultConnectorTypes.isValid(getItem().getType()))
-        {
-            LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", getItem().getType());
-            getItem().setType(DefaultConnectorTypes.LEFT_INPUT);
-        }
+    private void performChecks() {
+      // the "types" (direction and side) are no enums so cannot be invalid
+      // if (!DefaultConnectorTypes.isValid(getItem().getType()))
+      // {
+      // LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", getItem().getType());
+      // getItem().setType(DefaultConnectorTypes.LEFT_INPUT);
+      // }
     }
 
     @Override

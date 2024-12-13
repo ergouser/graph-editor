@@ -84,7 +84,7 @@ public class GraphFactory {
      * @throws IllegalArgumentException if the class cannot be found, instantiated, or does not implement the interface
      */
     @SuppressWarnings("unchecked")
-    public <T> T create(String className, Class<T> interfaceClass) {
+    public static <T> T create(String className, Class<T> interfaceClass) {
         return create(className, interfaceClass, ClassLoader.getSystemClassLoader());
     }
 
@@ -100,7 +100,7 @@ public class GraphFactory {
      * @throws IllegalArgumentException if the class cannot be found, instantiated, or does not implement the interface
      */
     @SuppressWarnings("unchecked")
-    public <T> T create(String className, Class<T> interfaceClass, ClassLoader classLoader) {
+    public static <T> T create(String className, Class<T> interfaceClass, ClassLoader classLoader) {
         try {
             // Load the class dynamically using the specified class loader
             Class<?> clazz = Class.forName(className, true, classLoader);

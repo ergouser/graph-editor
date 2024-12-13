@@ -89,29 +89,34 @@ public class DefaultGraphEditor implements GraphEditor {
   }
 
   @Override
-  public void setNodeSkinFactory(final Callback<GNode, GNodeSkin> pSkinFactory) {
-    mSkinManager.setNodeSkinFactory(pSkinFactory);
+  public <T, R> void setSkinFactory(Class<T> componentType, Class<R> skinType, Callback<T, R> factory) {
+    mSkinManager.setSkinFactory(componentType, skinType, factory);
   }
-
-  @Override
-  public void setConnectorSkinFactory(final Callback<GConnector, GConnectorSkin> pConnectorSkinFactory) {
-    mSkinManager.setConnectorSkinFactory(pConnectorSkinFactory);
-  }
-
-  @Override
-  public void setConnectionSkinFactory(final Callback<GConnection, GConnectionSkin> pConnectionSkinFactory) {
-    mSkinManager.setConnectionSkinFactory(pConnectionSkinFactory);
-  }
-
-  @Override
-  public void setJointSkinFactory(final Callback<GJoint, GJointSkin> pJointSkinFactory) {
-    mSkinManager.setJointSkinFactory(pJointSkinFactory);
-  }
-
-  @Override
-  public void setTailSkinFactory(final Callback<GConnector, GTailSkin> pTailSkinFactory) {
-    mSkinManager.setTailSkinFactory(pTailSkinFactory);
-  }
+  
+//  @Override
+//  public void setNodeSkinFactory(final Callback<GNode, GNodeSkin> pSkinFactory) {
+//    mSkinManager.setNodeSkinFactory(pSkinFactory);
+//  }
+//
+//  @Override
+//  public void setConnectorSkinFactory(final Callback<GConnector, GConnectorSkin> pConnectorSkinFactory) {
+//    mSkinManager.setConnectorSkinFactory(pConnectorSkinFactory);
+//  }
+//
+//  @Override
+//  public void setConnectionSkinFactory(final Callback<GConnection, GConnectionSkin> pConnectionSkinFactory) {
+//    mSkinManager.setConnectionSkinFactory(pConnectionSkinFactory);
+//  }
+//
+//  @Override
+//  public void setJointSkinFactory(final Callback<GJoint, GJointSkin> pJointSkinFactory) {
+//    mSkinManager.setJointSkinFactory(pJointSkinFactory);
+//  }
+//
+//  @Override
+//  public void setTailSkinFactory(final Callback<GConnector, GTailSkin> pTailSkinFactory) {
+//    mSkinManager.setTailSkinFactory(pTailSkinFactory);
+//  }
 
   @Override
   public void setConnectorValidator(final GConnectorValidator pValidator) {
@@ -183,4 +188,5 @@ public class DefaultGraphEditor implements GraphEditor {
   private ModelEditingManager getModelEditingManager() {
     return mController.getModelEditingManager();
   }
+
 }

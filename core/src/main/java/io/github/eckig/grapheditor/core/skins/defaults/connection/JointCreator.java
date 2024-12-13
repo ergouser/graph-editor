@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GJoint;
 
 import io.github.eckig.grapheditor.EditorElement;
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
@@ -31,7 +31,7 @@ public class JointCreator {
     private static final String STYLE_CLASS_HOVER_EFFECT = "default-connection-hover-effect";
     private static final int HOVER_EFFECT_SIZE = 12;
 
-    private final GConnection connection;
+    private final GConnectionSkin connectionSkin;
     private final CursorOffsetCalculator offsetCalculator;
 
     private GraphEditor graphEditor;
@@ -43,7 +43,7 @@ public class JointCreator {
     private double newJointX;
     private double newJointY;
 
-    private List<GJoint> temporaryJoints;
+    private List<GJointSkin> temporaryJoints;
     private List<Point2D> oldJointPositions;
 
     /**
@@ -52,9 +52,9 @@ public class JointCreator {
      * @param connection the connection the joint creator is creating joints in
      * @param offsetCalculator used to determine where to put new joints based on the cursor position
      */
-    public JointCreator(final GConnection connection, final CursorOffsetCalculator offsetCalculator) {
+    public JointCreator(final GConnectionSkin connectionSkin, final CursorOffsetCalculator offsetCalculator) {
 
-        this.connection = connection;
+        this.connectionSkin = connectionSkin;
         this.offsetCalculator = offsetCalculator;
 
         hoverEffect.getStyleClass().addAll(STYLE_CLASS_HOVER_EFFECT);
@@ -119,21 +119,19 @@ public class JointCreator {
             return;
           }
 
-          oldJointPositions = GeometryUtils.getJointPositions(connection, graphEditor.getSkinLookup());
+          oldJointPositions = GeometryUtils.getJointPositions(connectionSkin);
 
           final int index = getNewJointLocation(event, root);
           if (index > -1) {
 
-            final int oldJointCount = connection.getJoints().size();
+            final int oldJointCount = connectionSkin.getJointSkins().size();
 
             addTemporaryJoints(index, newJointX, newJointY);
 
             if (index == oldJointCount) {
-              final GJoint newSelectedJoint1 = connection.getJoints().get(index);
-              temporarySelectedJointSkin = graphEditor.getSkinLookup().lookupJoint(newSelectedJoint1);
+              temporarySelectedJointSkin = connectionSkin.getJointSkins().get(index);
             } else {
-              final GJoint newSelectedJoint2 = connection.getJoints().get(index + 1);
-              temporarySelectedJointSkin = graphEditor.getSkinLookup().lookupJoint(newSelectedJoint2);
+              temporarySelectedJointSkin = connectionSkin.getJointSkins().get(index + 1);
             }
 
             temporarySelectedJointSkin.getRoot().fireEvent(event);
@@ -141,7 +139,7 @@ public class JointCreator {
               graphEditor.getSelectionManager().select(temporarySelectedJointSkin.getItem());
             }
           }
-
+          printJoints ("OnMousePressed");
           event.consume();
         });
 
@@ -153,15 +151,27 @@ public class JointCreator {
             }
 
             final List<Point2D> newJointPositions = getNewJointPositions();
-
+            printJoints ("OnMouseReleased");
             // It is important to remove the temporary joints even if we add new joints, otherwise we mess up the
             // undo/redo stack.
             removeTemporaryJoints();
 
             if (checkForNetChange(oldJointPositions, newJointPositions)) {
-                JointCommands.setNewJoints(graphEditor, newJointPositions, connection);
+                JointCommands.setNewJoints(graphEditor, newJointPositions, connectionSkin);
             }
         });
+    }
+    
+    public void printJoints (String title) {
+      System.out.println(title);
+     // Assuming 'connectionSkin' is already initialized
+      List<GJointSkin> jointSkinsCopy = new ArrayList<>(connectionSkin.getJointSkins());
+
+      // Print each element in the copied list
+      for (GJointSkin jointSkin : jointSkinsCopy) {
+        System.out.println(jointSkin);
+      }
+
     }
 
     /**
@@ -210,21 +220,21 @@ public class JointCreator {
         final double adjacentJointX;
         final double adjacentJointY;
 
-        final SkinLookup skinLookup = graphEditor.getSkinLookup();
-        if (index == -1 || connection.getJoints().isEmpty()) {
+        //final SkinLookup skinLookup = graphEditor.getSkinLookup();
+        if (index == -1 || connectionSkin.getJointSkins().isEmpty()) {
         	return -1;
         }
-        else if (index < connection.getJoints().size()) {
-            adjacentJointX = skinLookup.lookupJoint(connection.getJoints().get(index)).getX();
-            adjacentJointY = skinLookup.lookupJoint(connection.getJoints().get(index)).getY();
+        else if (index < connectionSkin.getJointSkins().size()) {
+            adjacentJointX = connectionSkin.getJointSkins().get(index).getX();
+            adjacentJointY = connectionSkin.getJointSkins().get(index).getY();
         } else {
-            adjacentJointX = skinLookup.lookupJoint(connection.getJoints().get(index - 1)).getX();
-            adjacentJointY = skinLookup.lookupJoint(connection.getJoints().get(index - 1)).getY();
+            adjacentJointX = connectionSkin.getJointSkins().get(index - 1).getX();
+            adjacentJointY = connectionSkin.getJointSkins().get(index - 1).getY();
         }
 
         final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
 
-        if (RectangularConnections.isSegmentHorizontal(connection, index)) {
+        if (RectangularConnections.isSegmentHorizontal(connectionSkin.getItem(), index)) {
             newJointX = GeometryUtils.moveOnPixel(clickPositionInParent.getX());
             newJointY = GeometryUtils.moveOnPixel(adjacentJointY);
         } else {
@@ -251,26 +261,28 @@ public class JointCreator {
      */
     private void addTemporaryJoints(final int index, final double x, final double y) {
 
-        final GJoint firstNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
-        final GJoint secondNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
+      final GJoint firstNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
+      final GJoint secondNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
 
-        final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
-        skinManager.lookupOrCreateJoint(firstNewJoint).setX(x);
-        skinManager.lookupOrCreateJoint(firstNewJoint).setY(y);
+      final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
+      GJointSkin firstNewJointSkin = skinManager.lookupOrCreateJoint(firstNewJoint);
+      firstNewJointSkin.setX(x);
+      firstNewJointSkin.setY(y);
 
-        skinManager.lookupOrCreateJoint(secondNewJoint).setX(x);
-        skinManager.lookupOrCreateJoint(secondNewJoint).setY(y);
+      GJointSkin secondNewJointSkin = skinManager.lookupOrCreateJoint(secondNewJoint);
+      secondNewJointSkin.setX(x);
+      secondNewJointSkin.setY(y);
 
-        temporaryJoints = new ArrayList<>();
+      temporaryJoints = new ArrayList<>();
 
-        temporaryJoints.add(firstNewJoint);
-        temporaryJoints.add(secondNewJoint);
+      temporaryJoints.add(firstNewJointSkin);
+      temporaryJoints.add(secondNewJointSkin);
 
-        connection.getJoints().add(index, secondNewJoint);
-        connection.getJoints().add(index, firstNewJoint);
+      connectionSkin.getJointSkins().add(index, secondNewJointSkin);
+      connectionSkin.getJointSkins().add(index, firstNewJointSkin);
 
-        skinManager.updateJoints(connection);
-        graphEditor.reload();
+      //skinManager.updateJoints(connectionSkin);
+      graphEditor.reload();
     }
 
     /**
@@ -278,8 +290,8 @@ public class JointCreator {
      */
     private void removeTemporaryJoints() {
 
-        for (final GJoint joint : temporaryJoints) {
-            connection.getJoints().remove(joint);
+        for (final GJointSkin jointSkin : temporaryJoints) {
+          connectionSkin.getJointSkins().remove(jointSkin);
         }
 
         graphEditor.reload();
@@ -292,8 +304,7 @@ public class JointCreator {
      */
     private List<Point2D> getNewJointPositions()
     {
-        final SkinLookup skinLookup = graphEditor.getSkinLookup();
-        final List<Point2D> allJointPositions = GeometryUtils.getJointPositions(connection, skinLookup);
+        final List<Point2D> allJointPositions = GeometryUtils.getJointPositions(connectionSkin);
 
         final BitSet jointsToCleanUp = JointCleaner.findJointsToCleanUp(allJointPositions);
         final List<Point2D> newJointPositions = new ArrayList<>();

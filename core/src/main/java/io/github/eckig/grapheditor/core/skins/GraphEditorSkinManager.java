@@ -45,7 +45,7 @@ public class GraphEditorSkinManager implements SkinManager {
 
   /** The map of class factories.*/
   private final Map<SkinFactoryKey, Callback<?, ?>> factoryMap = new HashMap<>();
-  
+
   private final ObservableMap<GNode, GNodeSkin> mNodeSkins = FXCollections.observableHashMap();
 
   private final ObservableMap<GConnection, GConnectionSkin> mConnectionSkins = FXCollections.observableHashMap();
@@ -68,54 +68,54 @@ public class GraphEditorSkinManager implements SkinManager {
    * component type but producing different skin types.
    */
   protected static class SkinFactoryKey {
-      private final Class<?> componentType;
-      private final Class<?> skinType;
+    private final Class<?> componentType;
+    private final Class<?> skinType;
 
-      /**
-       * Constructs a new {@code SkinFactoryKey} with the specified component type and skin type.
-       *
-       * @param componentType the class of the graph component
-       * @param skinType      the class of the skin associated with the graph component
-       * @throws IllegalArgumentException if {@code componentType} or {@code skinType} is {@code null}
-       */
-      public SkinFactoryKey(Class<?> componentType, Class<?> skinType) {
-          if (componentType == null || skinType == null) {
-              throw new IllegalArgumentException("Component type and skin type cannot be null.");
-          }
-          this.componentType = componentType;
-          this.skinType = skinType;
+    /**
+     * Constructs a new {@code SkinFactoryKey} with the specified component type and skin type.
+     *
+     * @param componentType the class of the graph component
+     * @param skinType      the class of the skin associated with the graph component
+     * @throws IllegalArgumentException if {@code componentType} or {@code skinType} is {@code null}
+     */
+    public SkinFactoryKey(Class<?> componentType, Class<?> skinType) {
+      if (componentType == null || skinType == null) {
+        throw new IllegalArgumentException("Component type and skin type cannot be null.");
       }
+      this.componentType = componentType;
+      this.skinType = skinType;
+    }
 
-      /**
-       * Returns the component type of this key.
-       *
-       * @return the component type
-       */
-      public Class<?> getComponentType() {
-          return componentType;
-      }
+    /**
+     * Returns the component type of this key.
+     *
+     * @return the component type
+     */
+    public Class<?> getComponentType() {
+      return componentType;
+    }
 
-      /**
-       * Returns the skin type of this key.
-       *
-       * @return the skin type
-       */
-      public Class<?> getSkinType() {
-          return skinType;
-      }
+    /**
+     * Returns the skin type of this key.
+     *
+     * @return the skin type
+     */
+    public Class<?> getSkinType() {
+      return skinType;
+    }
 
-      @Override
-      public boolean equals(Object obj) {
-          if (this == obj) return true;
-          if (!(obj instanceof SkinFactoryKey)) return false;
-          SkinFactoryKey other = (SkinFactoryKey) obj;
-          return componentType.equals(other.componentType) && skinType.equals(other.skinType);
-      }
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (!(obj instanceof SkinFactoryKey)) return false;
+      SkinFactoryKey other = (SkinFactoryKey) obj;
+      return componentType.equals(other.componentType) && skinType.equals(other.skinType);
+    }
 
-      @Override
-      public int hashCode() {
-          return 31 * componentType.hashCode() + skinType.hashCode();
-      }
+    @Override
+    public int hashCode() {
+      return 31 * componentType.hashCode() + skinType.hashCode();
+    }
   }
 
   /**
@@ -144,19 +144,19 @@ public class GraphEditorSkinManager implements SkinManager {
       }
     });
 
-    // Add listener to mConnectionSkins
-    mConnectionSkins.addListener((MapChangeListener<GConnection, GConnectionSkin>) change -> {
-      if (change.wasAdded() || change.wasRemoved()) {
-        updateJoints(change.getKey()); // Call updateJoints with the affected connection
-      }
-    });
-    
-    // Add listener to mJointSkins
-    mConnectionSkins.addListener((MapChangeListener<GConnection, GConnectionSkin>) change -> {
-      if (change.wasAdded() || change.wasRemoved()) {
-        updateJoints(change.getKey()); // Call updateJoints with the affected connection
-      }
-    });
+    //    // Add listener to mConnectionSkins
+    //    mConnectionSkins.addListener((MapChangeListener<GConnection, GConnectionSkin>) change -> {
+    //      if (change.wasAdded() || change.wasRemoved()) {
+    //        updateJoints(change.getKey()); // Call updateJoints with the affected connection
+    //      }
+    //    });
+    //    
+    //    // Add listener to mJointSkins
+    //    mConnectionSkins.addListener((MapChangeListener<GConnection, GConnectionSkin>) change -> {
+    //      if (change.wasAdded() || change.wasRemoved()) {
+    //        updateJoints(change.getKey()); // Call updateJoints with the affected connection
+    //      }
+    //    });
   }
 
   @Override
@@ -196,10 +196,10 @@ public class GraphEditorSkinManager implements SkinManager {
    * @throws IllegalArgumentException if any of the parameters are {@code null}
    */
   public <T, R> void setSkinFactory(Class<T> componentType, Class<R> skinType, Callback<T, R> factory) {
-      if (componentType == null || skinType == null || factory == null) {
-          throw new IllegalArgumentException("Component type, skin type, and factory cannot be null.");
-      }
-      factoryMap.put(new SkinFactoryKey(componentType, skinType), factory);
+    if (componentType == null || skinType == null || factory == null) {
+      throw new IllegalArgumentException("Component type, skin type, and factory cannot be null.");
+    }
+    factoryMap.put(new SkinFactoryKey(componentType, skinType), factory);
   }
 
   /**
@@ -214,23 +214,23 @@ public class GraphEditorSkinManager implements SkinManager {
    * @throws IllegalArgumentException if the factory for the specified types is required and cannot be removed
    */
   public <T, R> Callback<?, ?> removeSkinFactory(Class<T> componentType, Class<R> skinType) {
-      // List of required factories that cannot be removed
-      if (isRequiredFactory(componentType, skinType)) {
-          throw new IllegalArgumentException("Cannot remove the required factory for component type: "
-                  + componentType.getName() + " and skin type: " + skinType.getName());
-      }
+    // List of required factories that cannot be removed
+    if (isRequiredFactory(componentType, skinType)) {
+      throw new IllegalArgumentException("Cannot remove the required factory for component type: "
+          + componentType.getName() + " and skin type: " + skinType.getName());
+    }
 
-      // Remove and return the factory if it exists
-      return factoryMap.remove(new SkinFactoryKey(componentType, skinType));
+    // Remove and return the factory if it exists
+    return factoryMap.remove(new SkinFactoryKey(componentType, skinType));
   }
 
   // Helper method to determine if a factory is required
   private boolean isRequiredFactory(Class<?> componentType, Class<?> skinType) {
-      // Define the required component and skin type pairs
-      return (componentType == GConnector.class && (skinType == GConnectorSkin.class || skinType == GTailSkin.class))
-              || (componentType == GConnection.class && skinType == GConnectionSkin.class)
-              || (componentType == GJoint.class && skinType == GJointSkin.class)
-              || (componentType == GNode.class && skinType == GNodeSkin.class);
+    // Define the required component and skin type pairs
+    return (componentType == GConnector.class && (skinType == GConnectorSkin.class || skinType == GTailSkin.class))
+        || (componentType == GConnection.class && skinType == GConnectionSkin.class)
+        || (componentType == GJoint.class && skinType == GJointSkin.class)
+        || (componentType == GNode.class && skinType == GNodeSkin.class);
   }
 
   /**
@@ -275,34 +275,34 @@ public class GraphEditorSkinManager implements SkinManager {
    *
    * @param <T> the type of the graph component
    * @param <R> the type of the skin for the graph component
- * @param componentType the class of the graph component * @param skinType      the class of the skin
- *    * @return the factory for the specified type, or {@code null} if no factory is found
+   * @param componentType the class of the graph component * @param skinType      the class of the skin
+   *    * @return the factory for the specified type, or {@code null} if no factory is found
    */
   @SuppressWarnings("unchecked")
-  public <T, R> Callback<T, R> getSkinFactory(Class<T> componentType, Class<R> skinType) {
-      Class<?> currentType = componentType;
+  public <T, R> Callback<T, R> getSkinFactory(Class<?> componentType, Class<R> skinType) {
+    Class<?> currentType = componentType;
 
-      // Traverse the class hierarchy
-      while (currentType != null) {
-          SkinFactoryKey key = new SkinFactoryKey(currentType, skinType);
-          Callback<?, ?> factory = factoryMap.get(key);
-          if (factory != null) {
-              return (Callback<T, R>) factory;
-          }
-          currentType = currentType.getSuperclass(); // Move up the hierarchy
+    // Traverse the class hierarchy
+    while (currentType != null) {
+      SkinFactoryKey key = new SkinFactoryKey(currentType, skinType);
+      Callback<?, ?> factory = factoryMap.get(key);
+      if (factory != null) {
+        return (Callback<T, R>) factory;
       }
+      currentType = currentType.getSuperclass(); // Move up the hierarchy
+    }
 
-      // Check interfaces if no factory found in class hierarchy
-      for (Class<?> iface : componentType.getInterfaces()) {
-          SkinFactoryKey key = new SkinFactoryKey(iface, skinType);
-          Callback<?, ?> factory = factoryMap.get(key);
-          if (factory != null) {
-              return (Callback<T, R>) factory;
-          }
+    // Check interfaces if no factory found in class hierarchy
+    for (Class<?> iface : componentType.getInterfaces()) {
+      SkinFactoryKey key = new SkinFactoryKey(iface, skinType);
+      Callback<?, ?> factory = factoryMap.get(key);
+      if (factory != null) {
+        return (Callback<T, R>) factory;
       }
+    }
 
-      // No factory found
-      return null;
+    // No factory found
+    return null;
   }
 
   @Override
@@ -433,16 +433,16 @@ public class GraphEditorSkinManager implements SkinManager {
     }
   }
 
-  @Override
-  public void updateJoints(final GConnection pConnection) {
-    final GConnectionSkin connectionSkin = lookupConnection(pConnection);
-    if (connectionSkin != null) {
-      final List<GJointSkin> connectionJointSkins = pConnection.getJoints().stream().map(this::lookupOrCreateJoint)
-          .collect(Collectors.toList());
-      connectionSkin.setJointSkins(connectionJointSkins);
-    }
-  }
-
+//  @Override
+//  public void updateJoints(final GConnection pConnection) {
+//    final GConnectionSkin connectionSkin = lookupConnection(pConnection);
+//    if (connectionSkin != null) {
+//      final List<GJointSkin> connectionJointSkins = connectionSkin.getJointSkins().stream().map(this::lookupOrCreateJoint)
+//          .collect(Collectors.toList());
+//      connectionSkin.setJointSkins(connectionJointSkins);
+//    }
+//  }
+//
   @Override
   public GNodeSkin lookupOrCreateNode(final GNode pNode) {
     return mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
@@ -501,11 +501,11 @@ public class GraphEditorSkinManager implements SkinManager {
    * @return a new instance of {@link GConnectorSkin}
    */
   private GConnectorSkin createConnectorSkin(final GConnector pConnector) {
-      Callback<GConnector, GConnectorSkin> factory = getSkinFactory(GConnector.class, GConnectorSkin.class);
-      GConnectorSkin skin = factory.call(pConnector);
+    Callback<GConnector, GConnectorSkin> factory = getSkinFactory(GConnector.class, GConnectorSkin.class);
+    GConnectorSkin skin = factory.call(pConnector);
 
-      skin.setGraphEditor(mGraphEditor);
-      return skin;
+    skin.setGraphEditor(mGraphEditor);
+    return skin;
   }
 
   /**
@@ -519,7 +519,7 @@ public class GraphEditorSkinManager implements SkinManager {
    * @param pConnector the {@link GConnector} for which to create a skin
    * @return a new instance of {@link GTailSkin}
    */
- private GTailSkin createTailSkin(final GConnector pConnector) {
+  private GTailSkin createTailSkin(final GConnector pConnector) {
     Callback<GConnector, GTailSkin> factory = getSkinFactory(GConnector.class, GTailSkin.class);
     GTailSkin skin = factory.call(pConnector);
 
@@ -527,17 +527,17 @@ public class GraphEditorSkinManager implements SkinManager {
     return skin;
   }
 
- /**
-  * Creates a new {@link GConnectionSkin} for the given {@link GConnection} using the registered factory.
-  * <p>
-  * This method retrieves the appropriate factory based on the component type and skin type,
-  * and uses it to create a new skin instance. If no custom factory is registered, the default
-  * factory will be used.
-  * </p>
-  *
-  * @param pConnection the {@link GConnection} for which to create a skin
-  * @return a new instance of {@link GConnectionSkin}
-  */
+  /**
+   * Creates a new {@link GConnectionSkin} for the given {@link GConnection} using the registered factory.
+   * <p>
+   * This method retrieves the appropriate factory based on the component type and skin type,
+   * and uses it to create a new skin instance. If no custom factory is registered, the default
+   * factory will be used.
+   * </p>
+   *
+   * @param pConnection the {@link GConnection} for which to create a skin
+   * @return a new instance of {@link GConnectionSkin}
+   */
   private GConnectionSkin createConnectionSkin(final GConnection pConnection) {
     Callback<GConnection, GConnectionSkin> factory = getSkinFactory(GConnection.class, GConnectionSkin.class);
     GConnectionSkin skin = factory.call(pConnection);

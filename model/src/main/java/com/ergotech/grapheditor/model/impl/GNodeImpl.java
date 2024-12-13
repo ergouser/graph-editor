@@ -49,13 +49,13 @@ public class GNodeImpl extends SelectableType implements GNode {
     this.connectorsListener = connectorsListener;
 
     // Attach listeners using WeakListeners
-    typeProperty().addListener(typeListener);
+    //typeProperty().addListener(typeListener);
     ((ObservableList<GConnector>)getConnectors()).addListener(connectorsListener);
   }
 
   public void removeListeners() {
     if ( typeListener != null ) { // assume that all are null or none are null...
-      typeProperty().removeListener(typeListener);
+      //typeProperty().removeListener(typeListener);
       ((ObservableList<GConnector>)getConnectors()).removeListener(connectorsListener);
     }
   }

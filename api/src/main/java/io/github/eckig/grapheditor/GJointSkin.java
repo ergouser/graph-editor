@@ -8,6 +8,8 @@ import com.ergotech.grapheditor.model.GJoint;
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * The skin class for a {@link GJoint}. Responsible for visualizing joints in the graph editor.
@@ -30,6 +32,8 @@ public abstract class GJointSkin extends GSkin<GJoint> {
   protected final DoubleProperty width = new SimpleDoubleProperty(this, "width", 12);
 
   protected final DoubleProperty height = new SimpleDoubleProperty(this, "height", 12);
+
+  protected final StringProperty type = new SimpleStringProperty(this, "type");
 
   private final DraggableBox root = new DraggableBox(EditorElement.JOINT) {
 
@@ -205,6 +209,39 @@ public abstract class GJointSkin extends GSkin<GJoint> {
    */
   public void setHeight(double value) {
     height.set(value);
+  }
+
+
+  /**
+   * Gets the type of the connection.
+   *
+   * @return the type of the connection as a StringProperty.
+   */
+  public StringProperty typeProperty() {
+    return type;
+  }
+
+  /**
+   * Returns the value of the 'Type' attribute.
+   *
+   * @return the type of the connection.
+   */
+  public String getType() {
+    return type.get();
+  }
+
+  /**
+   * Sets the value of the 'Type' attribute.
+   *
+   * @param value the new value of the type.
+   */
+  public void setType(String value) {
+    type.set(value);
+  }
+
+  @Override
+  public String toString() {
+    return "GJointSkin [x=" + x + ", y=" + y + ", width=" + width + ", height=" + height + ", item=" + item + "]";
   }
 
 }
