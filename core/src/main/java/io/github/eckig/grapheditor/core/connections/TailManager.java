@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnector;
 
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
@@ -41,14 +42,14 @@ public class TailManager {
      * @param connector the connector where the tail starts from
      * @param event the mouse event responsible for creating the tail
      */
-    public void create(final GConnector connector, final MouseEvent event) {
+    public void create(final GConnectorSkin connectorSkin, final MouseEvent event) {
 
         // Check if tailSkin already created, because this method may be called multiple times.
         if (tailSkin == null) {
 
-            tailSkin = skinLookup.lookupTail(connector);
+            tailSkin = skinLookup.lookupTail(connectorSkin.getItem());
 
-            sourcePosition = GeometryUtils.getConnectorPosition(connector, skinLookup);
+            sourcePosition = GeometryUtils.getConnectorPosition(connectorSkin, skinLookup);
             final Point2D cursorPosition = getScaledPosition(GeometryUtils.getCursorPosition(event, view));
 
             tailSkin.draw(sourcePosition, cursorPosition);
@@ -70,9 +71,10 @@ public class TailManager {
         cleanUp();
         jointPositions = pJointPositions;
 
+        GConnectorSkin newSourceSkin = skinLookup.lookupConnector(pNewSource);
         tailSkin = skinLookup.lookupTail(pNewSource);
 
-        sourcePosition = GeometryUtils.getConnectorPosition(pNewSource, skinLookup);
+        sourcePosition = GeometryUtils.getConnectorPosition(newSourceSkin, skinLookup);
         final Point2D cursorPosition = getScaledPosition(GeometryUtils.getCursorPosition(pEvent, view));
 
         tailSkin.draw(sourcePosition, cursorPosition, jointPositions);
@@ -105,7 +107,7 @@ public class TailManager {
      * @param target the target connector
      * @param valid {@code true} if the connection is valid, {@code false} if invalid
      */
-    public void snapPosition(final GConnector source, final GConnector target, final boolean valid) {
+    public void snapPosition(final GConnectorSkin source, final GConnectorSkin target, final boolean valid) {
 
         if (tailSkin != null) {
 

@@ -13,12 +13,12 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 
 /**
- * The tail-skin class for a {@link GConnector}. Responsible for visualizing the tails that extend temporarily from
+ * The tail-skin class for a {@link GConnectorSkin}. Responsible for visualizing the tails that extend temporarily from
  * connectors during a drag gesture in the graph editor.
  *
  * <p>
  * A custom tail skin must extend this class. It <b>must</b> also provide a constructor taking exactly one
- * {@link GConnector} parameter.
+ * {@link GConnectorSkin} parameter.
  * </p>
  *
  * <p>
@@ -32,7 +32,7 @@ public abstract class GTailSkin extends GSkin<GConnector> {
   /**
      * Creates a new {@link GTailSkin}.
      *
-     * @param connector the {@link GConnector} that the tail will extend from
+     * @param connector the {@link GConnectorSkin} that the tail will extend from
      */
     public GTailSkin(final GConnector connector) {
         super(connector);
@@ -62,7 +62,7 @@ public abstract class GTailSkin extends GSkin<GConnector> {
      * @param target the target connector that the tail is snapping to
      * @param valid {@code true} if the connection is valid, {@code false} if invalid
      */
-    public abstract void draw(Point2D start, Point2D end, GConnector target, boolean valid);
+    public abstract void draw(Point2D start, Point2D end, GConnectorSkin target, boolean valid);
 
     /**
      * Updates the position of the tail according to the specified start points, end points, and joint positions.
@@ -92,7 +92,7 @@ public abstract class GTailSkin extends GSkin<GConnector> {
      * @param target the target connector that the tail is snapping to
      * @param valid {@code true} if the connection is valid, {@code false} if invalid
      */
-    public abstract void draw(Point2D start, Point2D end, List<Point2D> jointPositions, GConnector target, boolean valid);
+    public abstract void draw(Point2D start, Point2D end, List<Point2D> jointPositions, GConnectorSkin target, boolean valid);
 
     /**
      * Allocates a list of joint positions for a new connection.

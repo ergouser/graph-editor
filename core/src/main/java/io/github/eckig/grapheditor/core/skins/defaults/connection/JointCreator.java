@@ -234,7 +234,8 @@ public class JointCreator {
 
         final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
 
-        if (RectangularConnections.isSegmentHorizontal(connectionSkin.getItem(), index)) {
+        final SkinLookup skinLookup = graphEditor.getSkinLookup();
+        if (RectangularConnections.isSegmentHorizontal(connectionSkin.getItem(), skinLookup, index)) {
             newJointX = GeometryUtils.moveOnPixel(clickPositionInParent.getX());
             newJointY = GeometryUtils.moveOnPixel(adjacentJointY);
         } else {

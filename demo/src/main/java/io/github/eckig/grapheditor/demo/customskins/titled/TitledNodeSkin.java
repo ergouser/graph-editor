@@ -6,6 +6,7 @@ package io.github.eckig.grapheditor.demo.customskins.titled;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ergotech.grapheditor.model.GConnector.Direction;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 
@@ -105,8 +106,9 @@ public class TitledNodeSkin extends GNodeSkin {
         if (connectorSkins != null) {
             for (final GConnectorSkin connectorSkin : connectorSkins) {
 
-                final boolean isInput = connectorSkin.getItem().getType().contains("input"); //$NON-NLS-1$
-                final boolean isOutput = connectorSkin.getItem().getType().contains("output"); //$NON-NLS-1$
+                final boolean isInput = connectorSkin.getItem().getDirection() == Direction.INPUT;
+                final boolean isOutput = connectorSkin.getItem().getDirection() ==  Direction.OUTPUT
+                    ;
 
                 if (isInput) {
                     inputConnectorSkins.add(connectorSkin);

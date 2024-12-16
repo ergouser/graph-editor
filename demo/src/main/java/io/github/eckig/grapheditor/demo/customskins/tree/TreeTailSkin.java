@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.utils.Arrow;
 import javafx.geometry.Point2D;
@@ -46,13 +48,13 @@ public class TreeTailSkin extends GTailSkin {
     }
 
     @Override
-    public void draw(final Point2D start, final Point2D end, final GConnector target, final boolean valid) {
+    public void draw(final Point2D start, final Point2D end, final GConnectorSkin targetSkin, final boolean valid) {
         drawArrow(start, end);
     }
 
     @Override
     public void draw(final Point2D start, final Point2D end, final List<Point2D> jointPositions,
-            final GConnector target, final boolean valid) {
+            final GConnectorSkin targetSkin, final boolean valid) {
         drawArrow(start, end);
     }
 
@@ -74,7 +76,7 @@ public class TreeTailSkin extends GTailSkin {
      */
     private void drawArrow(final Point2D start, final Point2D end) {
 
-        if (getItem().getType().equals(TreeSkinConstants.TREE_OUTPUT_CONNECTOR)) {
+        if (getItem().getDirection() == Direction.OUTPUT ) {
             ArrowUtils.draw(arrow, start, end, OFFSET_DISTANCE);
         } else {
             ArrowUtils.draw(arrow, end, start, OFFSET_DISTANCE);

@@ -12,6 +12,7 @@ import com.ergotech.grapheditor.model.GConnection;
 
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
+import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.CursorOffsetCalculator;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.JointAlignmentManager;
@@ -74,15 +75,16 @@ public class DefaultConnectionSkin extends SimpleConnectionSkin {
     }
 
     /**
-     * Checks that the connection has the correct values to be displayed using
-     * this skin.
+     * Checks that the connection has the correct values to be displayed using this skin.
      */
-    private void performChecks()
-    {
-        if (!RectangularConnections.checkJointCount(this))
-        {
-            LOGGER.error("Joint count not compatible with source and target connector types.");
+    private void performChecks() {
+      final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+
+      if ( skinLookup != null ) {
+        if (!RectangularConnections.checkJointCount(this, skinLookup)) {
+          LOGGER.error("Joint count not compatible with source and target connector types.");
         }
+      }
     }
 
     @Override

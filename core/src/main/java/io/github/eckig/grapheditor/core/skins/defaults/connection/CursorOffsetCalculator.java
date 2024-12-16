@@ -94,38 +94,131 @@ public class CursorOffsetCalculator {
      * @param cursorY the cursor Y position
      * @return the index of the nearest connection segment
      */
-    public int getNearestSegment(final double cursorX, final double cursorY) {
+//    public int getNearestSegment(final double cursorX, final double cursorY) {
+//
+//        int nearestIndex = -1;
+//        double nearestDistance = -1;
+//
+//        for (int i = 0; i < connectionSegments.size(); i++) {
+//
+//            final Point2D start = path.localToScene(connectionSegments.get(i).getStart());
+//            final Point2D end = path.localToScene(connectionSegments.get(i).getEnd());
+//
+//            if (RectangularConnections.isSegmentHorizontal(connection, i)) {
+//
+//                final boolean inRangeX = GeometryUtils.checkInRange(start.getX(), end.getX(), cursorX);
+//                final double distanceY = Math.abs(start.getY() - cursorY);
+//
+//                if (inRangeX && (nearestDistance < 0 || distanceY < nearestDistance)) {
+//                    nearestIndex = i;
+//                    nearestDistance = distanceY;
+//                }
+//            } else {
+//
+//                final boolean inRangeY = GeometryUtils.checkInRange(start.getY(), end.getY(), cursorY);
+//                final double distanceX = Math.abs(start.getX() - cursorX);
+//
+//                if (inRangeY && (nearestDistance < 0 || distanceX < nearestDistance)) {
+//                    nearestIndex = i;
+//                    nearestDistance = distanceX;
+//                }
+//            }
+//        }
+//
+//        return nearestIndex;
+//    }
 
+    /**
+     * Gets the index of the connection segment that is closest to the given cursor position.
+     * This method determines the shortest distance from the cursor to each segment,
+     * regardless of the segment's orientation.
+     *
+     * @param cursorX the X position of the cursor
+     * @param cursorY the Y position of the cursor
+     * @return the index of the nearest connection segment, or -1 if no segments are available
+     */
+    public int getNearestSegment(final double cursorX, final double cursorY) {
         int nearestIndex = -1;
         double nearestDistance = -1;
 
+        // Iterate over all connection segments and track the one closest to (cursorX, cursorY).
         for (int i = 0; i < connectionSegments.size(); i++) {
-
+            // Convert the segment's start and end points from local to scene coordinates.
             final Point2D start = path.localToScene(connectionSegments.get(i).getStart());
             final Point2D end = path.localToScene(connectionSegments.get(i).getEnd());
 
-            if (RectangularConnections.isSegmentHorizontal(connection, i)) {
+            // Calculate the distance from the cursor point to this line segment.
+            double distance = distancePointToSegment(cursorX, cursorY, start, end);
 
-                final boolean inRangeX = GeometryUtils.checkInRange(start.getX(), end.getX(), cursorX);
-                final double distanceY = Math.abs(start.getY() - cursorY);
-
-                if (inRangeX && (nearestDistance < 0 || distanceY < nearestDistance)) {
-                    nearestIndex = i;
-                    nearestDistance = distanceY;
-                }
-            } else {
-
-                final boolean inRangeY = GeometryUtils.checkInRange(start.getY(), end.getY(), cursorY);
-                final double distanceX = Math.abs(start.getX() - cursorX);
-
-                if (inRangeY && (nearestDistance < 0 || distanceX < nearestDistance)) {
-                    nearestIndex = i;
-                    nearestDistance = distanceX;
-                }
+            // If this is the first segment or a closer segment, update nearest results.
+            if (nearestDistance < 0 || distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestIndex = i;
             }
         }
 
         return nearestIndex;
+    }
+
+    /**
+     * Computes the shortest distance from a given point (px, py) to the line segment defined by
+     * two points A and B.
+     *
+     * This method:
+     * <ol>
+     *   <li>Handles the case where A and B are the same point, returning the distance to that point.</li>
+     *   <li>Projects the point P onto the infinite line through A and B.</li>
+     *   <li>Clamps the projection parameter to ensure we measure distance to a point on the segment, not just the line.</li>
+     * </ol>
+     *
+     * @param px the X coordinate of the point
+     * @param py the Y coordinate of the point
+     * @param A  the start point of the segment
+     * @param B  the end point of the segment
+     * @return the shortest distance from the point P(px, py) to the line segment AB
+     */
+    private double distancePointToSegment(double px, double py, Point2D A, Point2D B) {
+        // Extract coordinates for clarity.
+        double ax = A.getX();
+        double ay = A.getY();
+        double bx = B.getX();
+        double by = B.getY();
+
+        // Compute the vector components of AB and AP.
+        double ABx = bx - ax;
+        double ABy = by - ay;
+        double APx = px - ax;
+        double APy = py - ay;
+
+        // Compute the squared length of AB to avoid a square root until necessary.
+        double abLengthSquared = ABx * ABx + ABy * ABy;
+
+        // If the segment is actually a point, return the distance from P to this point.
+        if (abLengthSquared == 0) {
+            // Distance to a single point is just the hypotenuse of the differences in X and Y.
+            return Math.hypot(px - ax, py - ay);
+        }
+
+        // Compute the projection parameter t:
+        // t represents where on AB the projection of P falls.
+        // t < 0   => projection before A
+        // 0 <= t <= 1 => projection is between A and B
+        // t > 1   => projection after B
+        double t = (APx * ABx + APy * ABy) / abLengthSquared;
+
+        // Clamp t to ensure the projection lies on the segment.
+        if (t < 0) {
+            t = 0;
+        } else if (t > 1) {
+            t = 1;
+        }
+
+        // Compute the projection point's coordinates.
+        double projX = ax + t * ABx;
+        double projY = ay + t * ABy;
+
+        // Return the distance from P to the projection point on the segment.
+        return Math.hypot(px - projX, py - projY);
     }
 
     /**

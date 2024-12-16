@@ -53,7 +53,6 @@ public class ConnectionCommands {
 
     // prepare new connection:
     final GConnection connection =model.getGraphFactory().create(GConnection.class);
-    connection.setType(type);
     connection.setSource(source);
     connection.setTarget(target);
     List<GJointSkin> jointSkins = joints.stream()

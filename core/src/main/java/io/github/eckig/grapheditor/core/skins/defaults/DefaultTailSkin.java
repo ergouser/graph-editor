@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnector;
 
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GTailSkin;
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 import io.github.eckig.grapheditor.core.skins.defaults.tail.RectangularPathCreator;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
@@ -46,7 +46,7 @@ public class DefaultTailSkin extends GTailSkin {
     /**
      * Creates a new default tail skin instance.
      *
-     * @param connector the {@link GConnector} the skin is being created for
+     * @param connector the {@link GConnectorSkin} the skin is being created for
      */
     public DefaultTailSkin(final GConnector connector) {
 
@@ -68,7 +68,7 @@ public class DefaultTailSkin extends GTailSkin {
         String connectorStyleClass = getSide().name() + "-" + connector.getDirection().name();
         endpoint.getStyleClass().addAll(STYLE_CLASS_ENDPOINT, connectorStyleClass);
         
-        DefaultConnectorSkin.drawTriangleConnector(connector.getDirection(), endpoint);
+        DefaultConnectorSkin.drawTriangleConnector(getSide(), connector.getDirection(), endpoint);
         line.getStyleClass().setAll(STYLE_CLASS);
         group.setManaged(false);
     }
@@ -87,7 +87,7 @@ public class DefaultTailSkin extends GTailSkin {
     }
 
     @Override
-    public void draw(final Point2D start, final Point2D end, final GConnector target, final boolean valid) {
+    public void draw(final Point2D start, final Point2D end, final GConnectorSkin target, final boolean valid) {
 
         endpoint.setVisible(false);
         if (valid) {
@@ -104,7 +104,7 @@ public class DefaultTailSkin extends GTailSkin {
 
     @Override
     public void draw(final Point2D start, final Point2D end, final List<Point2D> jointPositions,
-            final GConnector target, final boolean valid) {
+            final GConnectorSkin target, final boolean valid) {
         draw(start, end, target, valid);
     }
 
@@ -137,13 +137,12 @@ public class DefaultTailSkin extends GTailSkin {
     /**
      * Checks that the connector has the correct values to use this skin.
      */
-    private void performChecks()
-    {
-        if (!DefaultConnectorTypes.isValid(getItem().getType()))
-        {
-            LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", getItem().getType());
-            getItem().setType(DefaultConnectorTypes.LEFT_INPUT);
-        }
+    private void performChecks() {
+      // the "types" (direction and side) are no enums so cannot be invalid
+      //      if (!DefaultConnectorTypes.isValid(getItem().getType())) {
+      //        LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", getItem().getType());
+      //        getItem().setType(DefaultConnectorTypes.LEFT_INPUT);
+      //      }
     }
 
     /**
@@ -157,7 +156,7 @@ public class DefaultTailSkin extends GTailSkin {
         clearPoints();
         addPoint(start);
 
-        if (DefaultConnectorTypes.getSide(getItem().getType()).isVertical()) {
+        if (getSide().isVertical()) {
             addPoint((start.getX() + end.getX()) / 2, start.getY());
             addPoint((start.getX() + end.getX()) / 2, end.getY());
         } else {
@@ -175,13 +174,13 @@ public class DefaultTailSkin extends GTailSkin {
      * @param end the end position of the tail
      * @param target the connector the tail is attaching to
      */
-    private void drawSmart(final Point2D start, final Point2D end, final GConnector target) {
+    private void drawSmart(final Point2D start, final Point2D end, final GConnectorSkin target) {
 
         clearPoints();
         addPoint(start);
 
-        final Side startSide = DefaultConnectorTypes.getSide(getItem().getType());
-        final Side endSide = DefaultConnectorTypes.getSide(target.getType());
+        final Side startSide = getSide();
+        final Side endSide = target.getSide();
 
         final List<Point2D> points = RectangularPathCreator.createPath(start, end, startSide, endSide);
         points.stream().forEachOrdered(point -> addPoint(point));

@@ -18,6 +18,7 @@ import com.ergotech.grapheditor.model.impl.GNodeImpl;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectionSkin;
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorValidator;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
@@ -359,8 +360,8 @@ public class GraphEditorController<E extends GraphEditor> {
   }
 
   private void addConnector(GConnector connector) {
-    mSkinManager.lookupOrCreateConnector(connector);
-    mConnectorDragManager.addConnector(connector);
+    GConnectorSkin connectorSkin = mSkinManager.lookupOrCreateConnector(connector);
+    mConnectorDragManager.addConnector(connectorSkin);
     mSelectionManager.addConnector(connector);
   }
 

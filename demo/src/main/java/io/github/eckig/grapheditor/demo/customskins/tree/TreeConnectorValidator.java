@@ -4,6 +4,7 @@
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 
 import io.github.eckig.grapheditor.GConnectorValidator;
 
@@ -27,22 +28,40 @@ public class TreeConnectorValidator implements GConnectorValidator {
     @Override
     public boolean validate(final GConnector source, final GConnector target) {
 
-        if (source.getType() == null || target.getType() == null) {
+        if (source.getParent().equals(target.getParent())) {
             return false;
-        } else if (source.getParent().equals(target.getParent())) {
+        } else if (source.getDirection().equals(target.getDirection())) {
             return false;
-        } else if (source.getType().equals(target.getType())) {
-            return false;
-        } else if (source.getType().equals(TreeSkinConstants.TREE_INPUT_CONNECTOR)
+        } else if (source.getDirection() == Direction.OUTPUT
                 && !source.getConnections().isEmpty()) {
             return false;
-        } else if (target.getType().equals(TreeSkinConstants.TREE_INPUT_CONNECTOR)
+        } else if (target.getDirection() == Direction.INPUT
                 && !target.getConnections().isEmpty()) {
             return false;
         }
 
         return true;
     }
+
+//    @Override
+//    public boolean validate(final GConnector source, final GConnector target) {
+//
+//        if (source.getType() == null || target.getType() == null) {
+//            return false;
+//        } else if (source.getParent().equals(target.getParent())) {
+//            return false;
+//        } else if (source.getType().equals(target.getType())) {
+//            return false;
+//        } else if (source.getType().equals(TreeSkinConstants.TREE_INPUT_CONNECTOR)
+//                && !source.getConnections().isEmpty()) {
+//            return false;
+//        } else if (target.getType().equals(TreeSkinConstants.TREE_INPUT_CONNECTOR)
+//                && !target.getConnections().isEmpty()) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     @Override
     public String createConnectionType(final GConnector source, final GConnector target) {

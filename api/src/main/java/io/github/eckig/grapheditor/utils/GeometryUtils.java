@@ -42,10 +42,9 @@ public class GeometryUtils {
    *
    * @return the x and y coordinates of the connector, or {@code null} if the connector isn't attached to a node
    */
-  public static Point2D getConnectorPosition(final GConnector connector, final SkinLookup skinLookup) {
+  public static Point2D getConnectorPosition(final GConnectorSkin connectorSkin, final SkinLookup skinLookup) {
 
-    final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
-    final GNode parent = connector.getParent();
+    final GNode parent = connectorSkin.getItem().getParent();
 
     final GNodeSkin nodeSkin = skinLookup.lookupNode(parent);
     if (nodeSkin == null) {

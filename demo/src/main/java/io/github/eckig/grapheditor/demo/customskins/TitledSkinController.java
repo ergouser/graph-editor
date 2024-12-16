@@ -51,17 +51,17 @@ public class TitledSkinController extends DefaultSkinController {
     }
 
     private GNodeSkin createSkin(final GNode node) {
-        return TitledSkinConstants.TITLED_NODE.equals(node.getType()) ? new TitledNodeSkin(node) : new DefaultNodeSkin(node);
+        return /*TitledSkinConstants.TITLED_NODE.equals(node.getType()) ? new TitledNodeSkin(node) :*/ new DefaultNodeSkin(node);
     }
 
     private GConnectorSkin createSkin(final GConnector connector) {
-        return TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_OUTPUT_CONNECTOR.equals(connector.getType()) ?
-                new TitledConnectorSkin(connector) : new DefaultConnectorSkin(connector);
+        return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_OUTPUT_CONNECTOR.equals(connector.getType()) ?
+                new TitledConnectorSkin(connector) :*/ new DefaultConnectorSkin(connector);
     }
 
     private GTailSkin createTailSkin(final GConnector connector) {
-        return TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) ?
-                new TitledTailSkin(connector) : new DefaultTailSkin(connector);
+        return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) ?
+                new TitledTailSkin(connector) :*/ new DefaultTailSkin(connector);
     }
 
     @Override
@@ -74,17 +74,17 @@ public class TitledSkinController extends DefaultSkinController {
         final GNode node = factory.create(GNode.class);
         //node.setY(NODE_INITIAL_Y + windowYOffset);
 
-        node.setType(TitledSkinConstants.TITLED_NODE);
+        //node.setType(TitledSkinConstants.TITLED_NODE);
         //node.setX(NODE_INITIAL_X + windowXOffset);
         node.setId(allocateNewId());
 
         final GConnector input = factory.create(GConnector.class);
         node.getConnectors().add(input);
-        input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
+        //input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
 
         final GConnector output = factory.create(GConnector.class);
         node.getConnectors().add(output);
-        output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
+        //output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
 
         Commands.addNode(graphEditor.getModel(), node);
     }

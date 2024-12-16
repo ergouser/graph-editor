@@ -4,9 +4,9 @@
 package io.github.eckig.grapheditor.core.connections;
 
 import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnector.Direction;
 
 import io.github.eckig.grapheditor.GConnectorValidator;
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 
 /**
  * Default validation rules that determine which connectors can be connected to each other.
@@ -28,7 +28,7 @@ public class DefaultConnectorValidator implements GConnectorValidator {
     @Override
     public boolean validate(final GConnector source, final GConnector target) {
 
-        if (source.getType() == null || target.getType() == null) {
+        if (source.getDirection() == null || target.getDirection() == null) {
             return false;
         } else if (!source.getConnections().isEmpty() || !target.getConnections().isEmpty()) {
             return false;
@@ -36,8 +36,8 @@ public class DefaultConnectorValidator implements GConnectorValidator {
             return false;
         }
 
-        final boolean sourceIsInput = DefaultConnectorTypes.isInput(source.getType());
-        final boolean targetIsInput = DefaultConnectorTypes.isInput(target.getType());
+        final boolean sourceIsInput = source.getDirection() == Direction.INPUT;
+        final boolean targetIsInput = target.getDirection() == Direction.INPUT;
 
         return sourceIsInput != targetIsInput;
     }

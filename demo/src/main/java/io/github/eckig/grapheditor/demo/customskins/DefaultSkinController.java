@@ -11,9 +11,11 @@ import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
 
 import io.github.eckig.grapheditor.Commands;
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
 import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
 import javafx.geometry.Side;
@@ -84,31 +86,37 @@ public class DefaultSkinController implements SkinController {
     @Override
     public void addConnector(final Side position, final boolean input) {
 
-        final String type = getType(position, input);
+      //final String type = getType(position, input);
 
-        final GModel model = graphEditor.getModel();
-        final GraphFactory factory = model.getGraphFactory();
-        final SkinLookup skinLookup = graphEditor.getSkinLookup();
-        final CompoundCommand command = new CompoundCommand();
+      final GModel model = graphEditor.getModel();
+      final GraphFactory factory = model.getGraphFactory();
+      final SkinLookup skinLookup = graphEditor.getSkinLookup();
+      final CompoundCommand command = new CompoundCommand();
 
-        for (final GNode node : model.getNodes()) {
+      for (final GNode node : model.getNodes()) {
 
-            if (skinLookup.lookupNode(node).isSelected()) {
-                if (countConnectors(node, position) < MAX_CONNECTOR_COUNT) {
+        if (skinLookup.lookupNode(node).isSelected()) {
+          if (countConnectors(node, position) < MAX_CONNECTOR_COUNT) {
 
-                    final GConnector connector = factory.create(GConnector.class);
-;
-                    connector.setType(type);
-
-                    command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
-                    //command.append(AddCommand.create(editingDomain, node, connectors, connector));
-                }
+            final GConnector connector = factory.create(GConnector.class);
+            if ( input ) {
+              connector.setDirection(Direction.INPUT);
+            } else {
+              connector.setDirection(Direction.OUTPUT);
             }
+            //  need the skin to set the side...
+            GConnectorSkin connectorSkin = ((SkinManager)skinLookup).lookupOrCreateConnector(connector);
+            connectorSkin.setSide(position);
+            
+            command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+            //command.append(AddCommand.create(editingDomain, node, connectors, connector));
+          }
         }
+      }
 
-        if (command.canExecute()) {
-            CommandStack.getCommandStack(model).execute(command);
-        }
+      if (command.canExecute()) {
+        CommandStack.getCommandStack(model).execute(command);
+      }
     }
 
     @Override
@@ -137,8 +145,10 @@ public class DefaultSkinController implements SkinController {
 
         int count = 0;
 
+        final SkinManager skinLookup = (SkinManager)graphEditor.getSkinLookup();
         for (final GConnector connector : node.getConnectors()) {
-            if (side.equals(DefaultConnectorTypes.getSide(connector.getType()))) {
+          GConnectorSkin connectorSkin = skinLookup.lookupOrCreateConnector(connector);
+            if (side.equals(connectorSkin.getSide())) {
                 count++;
             }
         }

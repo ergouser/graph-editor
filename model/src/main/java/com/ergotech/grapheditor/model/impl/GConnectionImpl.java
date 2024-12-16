@@ -73,7 +73,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
     // Attach listeners using WeakListeners
     sourceProperty().addListener(sourceListener);
     targetProperty().addListener(targetListener);
-    typeProperty().addListener(typeListener);
+    //typeProperty().addListener(typeListener);
     bidirectionalProperty().addListener(bidirectionalListener);
     ((ObservableList<GJoint>) getJoints()).addListener(jointsListener);
   }
@@ -82,7 +82,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
     if ( sourceListener != null ) { // assume that all are null or none are null...
       sourceProperty().removeListener(sourceListener);
       targetProperty().removeListener(targetListener);
-      typeProperty().removeListener(typeListener);
+      //typeProperty().removeListener(typeListener);
       bidirectionalProperty().removeListener(bidirectionalListener);
       ((ObservableList<GJoint>) getJoints()).removeListener(jointsListener);
     }

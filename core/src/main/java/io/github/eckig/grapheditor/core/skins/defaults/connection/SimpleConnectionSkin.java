@@ -11,6 +11,7 @@ import com.ergotech.grapheditor.model.GConnection;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
+import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.ConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.DetouredConnectionSegment;
@@ -136,11 +137,12 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    * Removes the old rectangular constraints on the connection's list of joint skins.
    */
   private void removeOldRectangularConstraints() {
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     for (int i = 0; i < jointSkins.size() - 1; i++) {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
       final DraggableBox nextJoint = jointSkins.get(i + 1).getRoot();
 
-      if (RectangularConnections.isSegmentHorizontal(getItem(), i)) {
+      if (RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, i)) {
         thisJoint.bindLayoutX(null);
         nextJoint.bindLayoutX(null);
       } else {
@@ -155,11 +157,12 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    */
   private void addRectangularConstraints() {
     // Our rectangular connection logic assumes an even number of joints.
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     for (int i = 0; i < jointSkins.size() - 1; i++) {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
       final DraggableBox nextJoint = jointSkins.get(i + 1).getRoot();
 
-      if (RectangularConnections.isSegmentHorizontal(getItem(), i)) {
+      if (RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, i)) {
         thisJoint.bindLayoutX(nextJoint);
         nextJoint.bindLayoutX(thisJoint);
       } else {
@@ -176,8 +179,9 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    *          all points that the connection should pass through (both connector and joint positions)
    */
   private void checkFirstAndLastJoints(final Point2D[] points) {
-    alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), 0), true);
-    alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), points.length - 2), false);
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, 0), true);
+    alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, points.length - 2), false);
   }
 
   /**
