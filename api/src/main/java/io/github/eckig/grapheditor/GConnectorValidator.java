@@ -3,7 +3,7 @@
  */
 package io.github.eckig.grapheditor;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 /**
  * An interface for customising connector validation.
@@ -21,22 +21,22 @@ public interface GConnectorValidator {
      * If the pre-validate check fails, the dragged connector will not interact with the dragged-over connector at all.
      * </p>
      *
-     * @param source the {@link GConnector} that was dragged
-     * @param target the {@link GConnector} that was dragged-over
+     * @param source the {@link GConnectorPort} that was dragged
+     * @param target the {@link GConnectorPort} that was dragged-over
      *
      * @return {@code true} if a validate check should be made, {@code false} if not
      */
-    boolean prevalidate(GConnector source, GConnector target);
+    boolean prevalidate(GConnectorPort source, GConnectorPort target);
 
     /**
      * Validate check made during drag-over events. Only made if the pre-validate check passes.
      *
-     * @param source the {@link GConnector} that was dragged
-     * @param target the {@link GConnector} that was dragged-over
+     * @param source the {@link GConnectorPort} that was dragged
+     * @param target the {@link GConnectorPort} that was dragged-over
      *
      * @return {@code true} if connection is allowed, {@code false} if it is forbidden
      */
-    boolean validate(GConnector source, GConnector target);
+    boolean validate(GConnectorPort source, GConnectorPort target);
 
     /**
      * Creates the 'type' string to be used in a new connection.
@@ -46,20 +46,20 @@ public interface GConnectorValidator {
      * method.
      * </p>
      *
-     * @param source the {@link GConnector} that was dragged
-     * @param target the {@link GConnector} that was dragged-over
+     * @param source the {@link GConnectorPort} that was dragged
+     * @param target the {@link GConnectorPort} that was dragged-over
      *
      * @return a {@link String} specifying the type for the new connection
      */
-    String createConnectionType(GConnector source, GConnector target);
+    String createConnectionType(GConnectorPort source, GConnectorPort target);
 
     /**
      * Creates the 'type' string to be used in the joints inside a new connection.
      *
-     * @param source the {@link GConnector} that was dragged
-     * @param target the {@link GConnector} that was dragged-over
+     * @param source the {@link GConnectorPort} that was dragged
+     * @param target the {@link GConnectorPort} that was dragged-over
      *
      * @return a {@link String} specifying the type for the new connection
      */
-    String createJointType(GConnector source, GConnector target);
+    String createJointType(GConnectorPort source, GConnectorPort target);
 }

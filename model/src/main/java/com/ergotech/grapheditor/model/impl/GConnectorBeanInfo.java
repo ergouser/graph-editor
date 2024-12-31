@@ -6,7 +6,7 @@ import java.beans.SimpleBeanInfo;
 
 public class GConnectorBeanInfo extends SimpleBeanInfo {
 
-    private final static Class<GConnectorImpl> beanClass = GConnectorImpl.class;
+    private final static Class<GConnectorPortImpl> beanClass = GConnectorPortImpl.class;
 
     @Override
     public PropertyDescriptor[] getPropertyDescriptors() {

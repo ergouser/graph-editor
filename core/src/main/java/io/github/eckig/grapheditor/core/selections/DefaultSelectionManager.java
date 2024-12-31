@@ -6,7 +6,7 @@ package io.github.eckig.grapheditor.core.selections;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -87,12 +87,12 @@ public class DefaultSelectionManager implements SelectionManager
         selectionCreator.removeNode(node);
     }
 
-    public void addConnector(final GConnector connector)
+    public void addConnector(final GConnectorPort connector)
     {
         selectionCreator.addConnector(connector);
     }
 
-    public void removeConnector(final GConnector connector)
+    public void removeConnector(final GConnectorPort connector)
     {
         selectionCreator.removeConnector(connector);
     }

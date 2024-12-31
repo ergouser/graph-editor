@@ -106,7 +106,7 @@ public interface GraphEditor extends GraphEditorSkins {
      *
      * @return a property containing the {@link GModel} being edited
      */
-    ObjectProperty<GModel> modelProperty();
+    ObjectProperty<? extends GModel> modelProperty();
 
     /**
      * Gets the view where the graph is displayed and edited.

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
 
 import io.github.eckig.grapheditor.GJointSkin;
@@ -282,7 +282,7 @@ public class JointAlignmentManager {
      */
     private boolean isNodeStationary(final GJointSkin jointSkin, final boolean source) {
 
-        final GConnector connector = source ? connection.getSource() : connection.getTarget();
+        final GConnectorPort connector = source ? connection.getSource() : connection.getTarget();
         final GNode parent = connector.getParent();
 
         final GNodeSkin nodeSkin = skinLookup.lookupNode(parent);

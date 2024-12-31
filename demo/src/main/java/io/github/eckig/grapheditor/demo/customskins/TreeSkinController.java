@@ -3,7 +3,7 @@ package io.github.eckig.grapheditor.demo.customskins;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
 
@@ -58,11 +58,11 @@ public class TreeSkinController implements SkinController {
     // or is there some other behavior that allows the mixing of TreeSkins and other Skins.
     graphEditorContainer.getMinimap().setConnectionFilter(c -> false);
     // Register default factories
-    graphEditor.setSkinFactory(GConnector.class, GConnectorSkin.class, connector -> new TreeConnectorSkin(connector));
+    graphEditor.setSkinFactory(GConnectorPort.class, GConnectorSkin.class, connector -> new TreeConnectorSkin(connector));
     graphEditor.setSkinFactory(GConnection.class, GConnectionSkin.class,
         connection -> new TreeConnectionSkin(connection));
     graphEditor.setSkinFactory(GNode.class, GNodeSkin.class, node -> new TreeNodeSkin(node));
-    graphEditor.setSkinFactory(GConnector.class, GTailSkin.class, connector -> new TreeTailSkin(connector));
+    graphEditor.setSkinFactory(GConnectorPort.class, GTailSkin.class, connector -> new TreeTailSkin(connector));
   }
 
   // private GNodeSkin createSkin(final GNode node) {
@@ -99,9 +99,9 @@ public class TreeSkinController implements SkinController {
     final GNodeSkin nodeSkin = skinManager.lookupOrCreateNode(node);
     nodeSkin.setY(TREE_NODE_INITIAL_Y + windowYOffset);
 
-    final GConnector output = factory.create(GConnector.class);
+    final GConnectorPort output = factory.create(GConnectorPort.class);
     final GConnectorSkin outputConnectorSkin = skinManager.lookupOrCreateConnector(output);
-    node.getConnectors().add(output);
+    node.addConnectorPort(output);
 
     final double initialX = graphEditorContainer.getWidth() / (2 * currentZoomFactor) - nodeSkin.getWidth() / 2;
     nodeSkin.setX(Math.floor(initialX) + windowXOffset);
@@ -143,7 +143,7 @@ public class TreeSkinController implements SkinController {
    */
   private void selectReferencedConnections(final List<GNode> nodes) {
 
-    nodes.stream().flatMap(node -> node.getConnectors().stream())
+    nodes.stream().flatMap(node -> node.getConnectorPorts().stream())
         .flatMap(connector -> connector.getConnections().stream()).forEach(graphEditor.getSelectionManager()::select);
   }
 }

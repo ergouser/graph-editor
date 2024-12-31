@@ -6,8 +6,8 @@ package io.github.eckig.grapheditor.core.skins.defaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -53,9 +53,9 @@ public class DefaultConnectorSkin extends GConnectorSkin {
     /**
      * Creates a new default connector skin instance.
      *
-     * @param connector the {@link GConnector} the skin is being created for
+     * @param connector the {@link GConnectorPort} the skin is being created for
      */
-    public DefaultConnectorSkin(final GConnector connector) {
+    public DefaultConnectorSkin(final GConnectorPort connector) {
 
         super(connector);
 

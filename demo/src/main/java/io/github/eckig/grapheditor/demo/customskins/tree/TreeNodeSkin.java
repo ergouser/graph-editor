@@ -3,10 +3,12 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
@@ -245,27 +247,27 @@ public class TreeNodeSkin extends GNodeSkin {
     childNodeSkin.setY(getY() + getHeight() + CHILD_Y_OFFSET);
 
     final GModel model = getGraphEditor().getModel();
-    final double maxAllowedY = model.getContentHeight() - VIEW_PADDING;
+    final double maxAllowedY = getGraphEditor().getView().getHeight() - VIEW_PADDING;
 
     if (childNodeSkin.getY() + childNodeSkin.getHeight() > maxAllowedY) {
       childNodeSkin.setY(maxAllowedY - childNodeSkin.getHeight());
     }
 
-    final GConnector input = factory.create(GConnector.class);
-    final GConnector output = factory.create(GConnector.class);
+    final GConnectorPort input = factory.create(GConnectorPort.class);
+    final GConnectorPort output = factory.create(GConnectorPort.class);
     final GConnectorSkin inputConnectorSkin = skinManager.lookupOrCreateConnector(input);
     final GConnectorSkin outputConnectorSkin = skinManager.lookupOrCreateConnector(output);
 
     inputConnectorSkin.setType(TreeSkinConstants.TREE_INPUT_CONNECTOR);
     outputConnectorSkin.setType(TreeSkinConstants.TREE_OUTPUT_CONNECTOR);
 
-    childNode.getConnectors().add(input);
-    childNode.getConnectors().add(output);
+    childNode.addConnectorPort(input);
+    childNode.addConnectorPort(output);
 
     // This allows multiple connections to be created from the output.
     outputConnectorSkin.setConnectionDetachedOnDrag(false);
 
-    final GConnector parentOutput = findOutput();
+    final GConnectorPort parentOutput = findOutput();
     final GConnection connection = factory.create(GConnection.class);
     final GConnectionSkin connectionSkin = skinManager.lookupOrCreateConnection(connection);
 
@@ -273,7 +275,7 @@ public class TreeNodeSkin extends GNodeSkin {
     connection.setSource(parentOutput);
     connection.setTarget(input);
 
-    input.getConnections().add(connection);
+    input.addConnection(connection);
 
     // Set the rest of the values via EMF commands because they touch the currently-edited model.
     final CompoundCommand command = new CompoundCommand();
@@ -298,15 +300,18 @@ public class TreeNodeSkin extends GNodeSkin {
    * only used in the demo.
    * </p>
    */
-  private GConnector findOutput() {
+  private GConnectorPort findOutput() {
+      Collection<? extends GConnectorPort> connectorPorts = getItem().getConnectorPorts(); // assumes a collection with a rational iteration order
 
-    if (getItem().getConnectors().size() == 1) {
-      return getItem().getConnectors().get(0);
-    } else if (getItem().getConnectors().size() == 2) {
-      return getItem().getConnectors().get(1);
-    } else {
-      return null;
-    }
+      if (connectorPorts.size() == 1) {
+          return connectorPorts.iterator().next(); // Return the first and only connector
+      } else if (connectorPorts.size() == 2) {
+          Iterator<? extends GConnectorPort> iterator = connectorPorts.iterator();
+          iterator.next(); // Skip the first connector
+          return iterator.next(); // Return the second connector
+      } else {
+          return null;
+      }
   }
 
   /**

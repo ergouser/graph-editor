@@ -3,7 +3,7 @@ package com.ergotech.grapheditor.model.impl;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 
 import javafx.beans.property.BooleanProperty;
@@ -35,18 +35,18 @@ import javafx.collections.ObservableList;
  */
 public class GConnectionImpl extends SelectableType implements GConnection {
 
-  private final ObjectProperty<GConnector> source = new SimpleObjectProperty<>(this, "source");
+  private final ObjectProperty<GConnectorPort> source = new SimpleObjectProperty<>(this, "source");
 
-  private final ObjectProperty<GConnector> target = new SimpleObjectProperty<>(this, "target");
+  private final ObjectProperty<GConnectorPort> target = new SimpleObjectProperty<>(this, "target");
 
   private final ObservableList<GJoint> joints = FXCollections.observableArrayList();
 
   private final BooleanProperty bidirectional = new SimpleBooleanProperty(this, "bidirectional", false);
 
   // Listener references
-  private ChangeListener<GConnector> sourceListener;
+  private ChangeListener<GConnectorPort> sourceListener;
 
-  private ChangeListener<GConnector> targetListener;
+  private ChangeListener<GConnectorPort> targetListener;
 
   private ChangeListener<String> typeListener;
 
@@ -59,7 +59,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
   }
 
   // Listener management methods
-  public void addListeners(ChangeListener<GConnector> sourceListener, ChangeListener<GConnector> targetListener,
+  public void addListeners(ChangeListener<GConnectorPort> sourceListener, ChangeListener<GConnectorPort> targetListener,
       ChangeListener<String> typeListener, ChangeListener<Boolean> bidirectionalListener,
       ListChangeListener<GJoint> jointsListener) {
     removeListeners(); // if there are any.
@@ -93,7 +93,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *
    * @return the source of the connection as an ObjectProperty.
    */
-  public ObjectProperty<GConnector> sourceProperty() {
+  public ObjectProperty<GConnectorPort> sourceProperty() {
     return source;
   }
 
@@ -102,7 +102,8 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *
    * @return the source node of the connection.
    */
-  public GConnector getSource() {
+  @Override
+  public GConnectorPort getSource() {
     return source.get();
   }
 
@@ -112,7 +113,8 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    * @param source
    *          the source node to set.
    */
-  public void setSource(GConnector source) {
+  @Override
+  public void setSource(GConnectorPort source) {
     this.source.set(source);
   }
 
@@ -121,7 +123,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *
    * @return the target of the connection as an ObjectProperty.
    */
-  public ObjectProperty<GConnector> targetProperty() {
+  public ObjectProperty<GConnectorPort> targetProperty() {
     return target;
   }
 
@@ -130,7 +132,8 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *
    * @return the target node of the connection.
    */
-  public GConnector getTarget() {
+  @Override
+  public GConnectorPort getTarget() {
     return target.get();
   }
 
@@ -140,7 +143,8 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    * @param target
    *          the target node to set.
    */
-  public void setTarget(GConnector target) {
+  @Override
+  public void setTarget(GConnectorPort target) {
     this.target.set(target);
   }
 
@@ -150,6 +154,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *
    * @return the list of joints as an ObservableList.
    */
+  @Override
   public List<GJoint> getJoints() {
     return joints;
   }
@@ -195,7 +200,8 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *
    * @return true if the connection is bidirectional, false otherwise.
    */
-  public boolean isBidirectional() {
+  @Override
+ public boolean isBidirectional() {
     return bidirectional.get();
   }
 
@@ -205,7 +211,8 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    * @param bidirectional
    *          true if the connection is bidirectional, false otherwise.
    */
-  public void setBidirectional(boolean bidirectional) {
+  @Override
+ public void setBidirectional(boolean bidirectional) {
     this.bidirectional.set(bidirectional);
   }
 

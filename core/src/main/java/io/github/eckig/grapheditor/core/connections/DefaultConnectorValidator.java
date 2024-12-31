@@ -3,8 +3,8 @@
  */
 package io.github.eckig.grapheditor.core.connections;
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 
 import io.github.eckig.grapheditor.GConnectorValidator;
 
@@ -14,7 +14,7 @@ import io.github.eckig.grapheditor.GConnectorValidator;
 public class DefaultConnectorValidator implements GConnectorValidator {
 
     @Override
-    public boolean prevalidate(final GConnector source, final GConnector target) {
+    public boolean prevalidate(final GConnectorPort source, final GConnectorPort target) {
 
         if (source == null || target == null) {
             return false;
@@ -26,7 +26,7 @@ public class DefaultConnectorValidator implements GConnectorValidator {
     }
 
     @Override
-    public boolean validate(final GConnector source, final GConnector target) {
+    public boolean validate(final GConnectorPort source, final GConnectorPort target) {
 
         if (source.getDirection() == null || target.getDirection() == null) {
             return false;
@@ -43,12 +43,12 @@ public class DefaultConnectorValidator implements GConnectorValidator {
     }
 
     @Override
-    public String createConnectionType(final GConnector source, final GConnector target) {
+    public String createConnectionType(final GConnectorPort source, final GConnectorPort target) {
         return null;
     }
 
     @Override
-    public String createJointType(final GConnector source, final GConnector target) {
+    public String createJointType(final GConnectorPort source, final GConnectorPort target) {
         return null;
     }
 }

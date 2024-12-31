@@ -1,5 +1,7 @@
 package com.ergotech.grapheditor.model.command;
 
+import java.util.Collection;
+
 public class AddCommand<T> extends AbstractCommand {
   private final Object owner;
   private final ModelListSupplier<T> listSupplier;
@@ -19,7 +21,9 @@ public class AddCommand<T> extends AbstractCommand {
   @Override
   public void execute() {
       if (!executed && canExecute()) {
-          listSupplier.getList(owner).add(element);
+        @SuppressWarnings("unchecked")
+        Collection<T> list = (Collection<T>) listSupplier.getList(owner);
+        list.add(element);
           executed = true;
       }
   }

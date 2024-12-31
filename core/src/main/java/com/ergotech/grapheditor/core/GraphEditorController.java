@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -138,37 +138,40 @@ public class GraphEditorController<E extends GraphEditor> {
     mConnectorDragManager = new ConnectorDragManager(pSkinManager, pConnectionEventManager, pView);
     mSelectionManager = new DefaultSelectionManager(pSkinManager, pView);
 
-    initDefaultListeners();
+    //itDefaultListeners();
 
     pEditor.modelProperty().addListener(mModelChangeListener);
-    modelChanged(null, pEditor.getModel());
-  }
-
-  private void initDefaultListeners() {
-    GModel model = mEditor.modelProperty().get();
-    addModelListeners(model);
-
-    for (GNode node : model.getNodes()) {
-      addNode(node);
-    }
-    for (GConnection connection : model.getConnections()) {
-      addConnection(connection);
+    if ( pEditor.getModel() != null ) {
+      modelChanged(null, pEditor.getModel());
     }
   }
+
+//  private void initDefaultListeners() {
+  // this is a duplicate of code on ModelChanged.
+//    GModel model = mEditor.modelProperty().get();
+//    addModelListeners(model);
+//
+//    for (GNode node : model.getNodes()) {
+//      addNode(node);
+//    }
+//    for (GConnection connection : model.getConnections()) {
+//      addConnection(connection);
+//    }
+//  }
 
   private void addModelListeners(GModel model) {
     // Set up listeners on the model's nodes list
-    ((ObservableList<GNode>) model.getNodes()).addListener(nodesChangeListener);
+    ((ObservableList<? extends GNode>) model.getNodes()).addListener(nodesChangeListener);
     // Set up listeners on the model's connections list
-    ((ObservableList<GConnection>)model.getConnections()).addListener(connectionsChangeListener);
+    ((ObservableList<? extends GConnection>)model.getConnections()).addListener(connectionsChangeListener);
   }
 
   private void removeModelListeners(GModel model) {
     // Remove listeners on the model's nodes list
-    ((ObservableList<GNode>) model.getNodes()).removeListener(nodesChangeListener);
+    ((ObservableList<? extends GNode>) model.getNodes()).removeListener(nodesChangeListener);
 
     // Remove listeners on the model's connections list
-    ((ObservableList<GConnection>) model.getConnections()).removeListener(connectionsChangeListener);
+    ((ObservableList<? extends GConnection>) model.getConnections()).removeListener(connectionsChangeListener);
 
   }
 
@@ -182,8 +185,8 @@ public class GraphEditorController<E extends GraphEditor> {
 
   private void addConnectionListeners(GConnection connection) {
     // Create listeners
-    ChangeListener<GConnector> sourceListener = (observable, oldValue, newValue) -> updateConnection(connection);
-    ChangeListener<GConnector> targetListener = (observable, oldValue, newValue) -> updateConnection(connection);
+    ChangeListener<GConnectorPort> sourceListener = (observable, oldValue, newValue) -> updateConnection(connection);
+    ChangeListener<GConnectorPort> targetListener = (observable, oldValue, newValue) -> updateConnection(connection);
     ChangeListener<String> typeListener = (observable, oldValue, newValue) -> updateConnection(connection);
     ChangeListener<Boolean> bidirectionalListener = (observable, oldValue, newValue) -> updateConnection(connection);
 
@@ -230,15 +233,15 @@ public class GraphEditorController<E extends GraphEditor> {
       removeNode(node);
       addNode(node);
     };
-    ListChangeListener<GConnector> connectorsListener = change -> {
+    ListChangeListener<GConnectorPort> connectorsListener = change -> {
       while (change.next()) {
         if (change.wasAdded()) {
-          for (GConnector connector : change.getAddedSubList()) {
+          for (GConnectorPort connector : change.getAddedSubList()) {
             addConnector(connector);
           }
         }
         if (change.wasRemoved()) {
-          for (GConnector connector : change.getRemoved()) {
+          for (GConnectorPort connector : change.getRemoved()) {
             removeConnector(connector);
           }
         }
@@ -250,7 +253,7 @@ public class GraphEditorController<E extends GraphEditor> {
     ((GNodeImpl)node).addListeners(typeListener, connectorsListener);
 
     // Process existing connectors
-    for (GConnector connector : node.getConnectors()) {
+    for (GConnectorPort connector : node.getConnectorPorts()) {
       addConnector(connector);
     }
   }
@@ -359,13 +362,13 @@ public class GraphEditorController<E extends GraphEditor> {
     //joint.removeListeners();
   }
 
-  private void addConnector(GConnector connector) {
+  private void addConnector(GConnectorPort connector) {
     GConnectorSkin connectorSkin = mSkinManager.lookupOrCreateConnector(connector);
     mConnectorDragManager.addConnector(connectorSkin);
     mSelectionManager.addConnector(connector);
   }
 
-  private void removeConnector(GConnector connector) {
+  private void removeConnector(GConnectorPort connector) {
     mSelectionManager.removeConnector(connector);
     mConnectorDragManager.removeConnector(connector);
     mSkinManager.removeConnector(connector);

@@ -3,7 +3,7 @@ package io.github.eckig.grapheditor.core.skins;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
 
@@ -46,13 +46,13 @@ public interface SkinManager extends SkinLookup, GraphEditorSkins
     void removeNode(final GNode pNodeToRemove);
 
     /**
-     * Removes the given {@link GConnector} skin from the view
+     * Removes the given {@link GConnectorPort} skin from the view
      *
      * @param pConnectorToRemove
      *            connector to remove
      * @since 10.02.2016
      */
-    void removeConnector(final GConnector pConnectorToRemove);
+    void removeConnector(final GConnectorPort pConnectorToRemove);
 
     /**
      * Removes the given {@link GConnection} skin from the view
@@ -107,7 +107,7 @@ public interface SkinManager extends SkinLookup, GraphEditorSkins
      * @return skin
      * @since 21.01.2019
      */
-    GConnectorSkin lookupOrCreateConnector(final GConnector pConnector);
+    GConnectorSkin lookupOrCreateConnector(final GConnectorPort pConnector);
 
     /**
      * Creates (if not yet existing) and returns the skin for the given item

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -284,7 +284,7 @@ class MinimapNodeGroup extends Parent {
           continue;
         }
 
-        final GConnector source = connection.getSource();
+        final GConnectorPort source = connection.getSource();
         final GNode parentSource = source.getParent();
         final SkinLookup skinLookup = graphEditor.getSkinLookup();
 
@@ -304,7 +304,7 @@ class MinimapNodeGroup extends Parent {
             newX = scaleSharp(jointSkin.getX(), scaleFactor);
             newY = scaleSharp(jointSkin.getY(), scaleFactor);
           } else {
-            final GConnector target = connection.getTarget();
+            final GConnectorPort target = connection.getTarget();
             final GNode parentTarget = target.getParent();
             GConnectorSkin targetSkin = skinLookup.lookupConnector(source);
             GNodeSkin parentTargetSkin = skinLookup.lookupNode(parentSource);

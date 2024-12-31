@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.command.AddCommand;
@@ -97,7 +97,7 @@ public class Commands {
 
       final List<GConnection> connectionsToDelete = new ArrayList<>();
 
-      for (final GConnector connector : node.getConnectors()) {
+      for (final GConnectorPort connector : node.getConnectorPorts()) {
         for (final GConnection connection : connector.getConnections()) {
           if (connection != null && !connectionsToDelete.contains(connection)) {
             connectionsToDelete.add(connection);
@@ -108,16 +108,16 @@ public class Commands {
       for (final GConnection connection : connectionsToDelete) {
         command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
 
-        final GConnector source = connection.getSource();
-        final GConnector target = connection.getTarget();
+        final GConnectorPort source = connection.getSource();
+        final GConnectorPort target = connection.getTarget();
 
         if (!node.equals(source.getParent())) {
           // need to include what the connection is being removed from
-          command.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), connection));
+          command.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), connection));
         }
 
         if (!node.equals(target.getParent())) {
-          command.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), connection));
+          command.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), connection));
         }
       }
 
@@ -163,32 +163,32 @@ public class Commands {
       final CompoundCommand command = new CompoundCommand();
 
       final Set<GConnection> connectionsToRemove = new HashSet<>();
-      final Set<GConnector> connectorsToRemove = new HashSet<>();
+      final Set<GConnectorPort> connectorsToRemove = new HashSet<>();
 
       List<GNode> existingNodes = new ArrayList<>(nodes);
       for (final GNode node : existingNodes) {
-        List<GConnector> existingConnectors = new ArrayList<>(node.getConnectors());
-        for (GConnector connector : existingConnectors) {
-          command.append(RemoveCommand.create(node, owner -> ((GNode) owner).getConnectors(), connector));
+        List<GConnectorPort> existingConnectors = new ArrayList<>(node.getConnectorPorts());
+        for (GConnectorPort connector : existingConnectors) {
+          command.append(RemoveCommand.create(node, owner -> ((GNode) owner).getConnectorPorts(), connector));
         }
 
-        connectorsToRemove.addAll(node.getConnectors());
+        connectorsToRemove.addAll(node.getConnectorPorts());
 
-        for (final GConnector connector : node.getConnectors()) {
+        for (final GConnectorPort connector : node.getConnectorPorts()) {
           connectionsToRemove.addAll(connector.getConnections());
         }
       }
 
       for (final GConnection connection : connectionsToRemove) {
-        final GConnector source = connection.getSource();
-        final GConnector target = connection.getTarget();
+        final GConnectorPort source = connection.getSource();
+        final GConnectorPort target = connection.getTarget();
 
         if (!connectorsToRemove.contains(source)) {
-          command.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), connection));
+          command.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), connection));
         }
 
         if (!connectorsToRemove.contains(target)) {
-          command.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), connection));
+          command.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), connection));
         }
         command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
       }
@@ -270,13 +270,13 @@ public class Commands {
    * </p>
    *
    * @param connector
-   *          the {@link GConnector} whose position values need to be updated
+   *          the {@link GConnectorPort} whose position values need to be updated
    * @param command
    *          a {@link CompoundCommand} to which the set commands will be added
    * @param skinLookup
    *          the {@link SkinLookup} in use for this graph editor instance
    */
-  private static void updateConnector(final GConnector connector, final CompoundCommand command,
+  private static void updateConnector(final GConnectorPort connector, final CompoundCommand command,
       final SkinLookup skinLookup) {
       final GNode node = connector.getParent();
       final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);

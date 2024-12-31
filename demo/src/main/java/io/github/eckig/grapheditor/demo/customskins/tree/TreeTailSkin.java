@@ -6,8 +6,8 @@ package io.github.eckig.grapheditor.demo.customskins.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GTailSkin;
@@ -25,7 +25,7 @@ public class TreeTailSkin extends GTailSkin {
 
     private final Arrow arrow = new Arrow();
 
-    public TreeTailSkin(final GConnector connector) {
+    public TreeTailSkin(final GConnectorPort connector) {
 
         super(connector);
 

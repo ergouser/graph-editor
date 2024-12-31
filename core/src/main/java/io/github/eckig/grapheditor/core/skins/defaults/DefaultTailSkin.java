@@ -9,7 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GTailSkin;
@@ -48,7 +48,7 @@ public class DefaultTailSkin extends GTailSkin {
      *
      * @param connector the {@link GConnectorSkin} the skin is being created for
      */
-    public DefaultTailSkin(final GConnector connector) {
+    public DefaultTailSkin(final GConnectorPort connector) {
 
         super(connector);
 

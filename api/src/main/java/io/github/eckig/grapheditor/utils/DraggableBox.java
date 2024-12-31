@@ -512,6 +512,7 @@ public class DraggableBox extends StackPane {
    * @return the node's closest ancestor that is a subclass of {@link Region}, or {@code null} if none exists
    */
   Region getContainer(final Node node) {
+    //printParentDimensions(node);
     final Parent parent = node.getParent();
     if (parent == null) {
       return null;
@@ -521,6 +522,31 @@ public class DraggableBox extends StackPane {
       return getContainer(parent);
     }
   }
+
+  public static void printParentDimensions(final Node node) {
+    if (node == null) {
+        System.out.println("Node is null.");
+        return;
+    }
+
+    final Parent parent = node.getParent();
+    if (parent == null) {
+        System.out.println("Reached the root. No more parents.");
+        return;
+    }
+
+    if (parent instanceof Region region) {
+        System.out.printf("Region: %s, Width: %.2f, Height: %.2f%n", 
+                          region.getClass().getSimpleName(),
+                          region.getWidth(), 
+                          region.getHeight());
+    } else {
+        System.out.printf("Parent: %s (not a Region)%n", parent.getClass().getSimpleName());
+    }
+
+    // Recursively call the method for the next parent
+    printParentDimensions(parent);
+}
 
   /**
    * Aligns the given position to the first alignment value that is closer than the alignment threshold.

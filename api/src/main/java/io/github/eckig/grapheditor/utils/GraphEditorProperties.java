@@ -35,15 +35,15 @@ import javafx.event.Event;
  */
 public class GraphEditorProperties implements GraphEventManager {
 
-    /**
-     * The default max width of the editor region, set on startup.
-     */
-    public static final double DEFAULT_MAX_WIDTH = Double.MAX_VALUE;
+  /**
+   * The default max width of the editor region, set on startup.
+   */
+  public static final double DEFAULT_MAX_WIDTH = Double.MAX_VALUE;
 
-    /**
-     * The default max height of the editor region, set on startup.
-     */
-    public static final double DEFAULT_MAX_HEIGHT = Double.MAX_VALUE;
+  /**
+   * The default max height of the editor region, set on startup.
+   */
+  public static final double DEFAULT_MAX_HEIGHT = Double.MAX_VALUE;
 
     public static final double DEFAULT_BOUND_VALUE = 15;
 

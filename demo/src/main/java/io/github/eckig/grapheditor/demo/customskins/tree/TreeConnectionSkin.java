@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;

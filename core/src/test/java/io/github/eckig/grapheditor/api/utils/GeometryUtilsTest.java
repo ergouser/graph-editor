@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -41,7 +41,7 @@ public class GeometryUtilsTest {
 
     private final GModel model = new GModelImpl();
     private final GNode node = model.getGraphFactory().create(GNode.class);
-    private final GConnector connector = model.getGraphFactory().create(GConnector.class);
+    private final GConnectorPort connector = model.getGraphFactory().create(GConnectorPort.class);
 
     private SkinLookup skinLookup;
 
@@ -57,7 +57,7 @@ public class GeometryUtilsTest {
       nodeSkin.setY(NODE_Y);
 
         model.getNodes().add(node);
-        node.getConnectors().add(connector);
+        node.getConnectorPorts().add(connector);
 
     }
 
@@ -111,7 +111,7 @@ public class GeometryUtilsTest {
         }
 
         @Override
-        public GConnectorSkin lookupConnector(GConnector pConnector)
+        public GConnectorSkin lookupConnector(GConnectorPort pConnector)
         {
             return new GConnectorSkin(pConnector)
             {
@@ -162,7 +162,7 @@ public class GeometryUtilsTest {
         }
 
         @Override
-        public GTailSkin lookupTail(GConnector pConnector)
+        public GTailSkin lookupTail(GConnectorPort pConnector)
         {
             throw new UnsupportedOperationException();
         }

@@ -3,7 +3,7 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.titled;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -34,9 +34,9 @@ public class TitledConnectorSkin extends GConnectorSkin {
     /**
      * Creates a new {@link TitledConnectorSkin} instance.
      *
-     * @param connector the {@link GConnector} that this skin is representing
+     * @param connector the {@link GConnectorPort} that this skin is representing
      */
-    public TitledConnectorSkin(final GConnector connector) {
+    public TitledConnectorSkin(final GConnectorPort connector) {
 
         super(connector);
 

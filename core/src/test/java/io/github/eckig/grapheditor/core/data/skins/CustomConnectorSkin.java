@@ -3,13 +3,13 @@
  */
 package io.github.eckig.grapheditor.core.data.skins;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectorSkin;
 
 public class CustomConnectorSkin extends DefaultConnectorSkin {
 
-    public CustomConnectorSkin(final GConnector gConnector) {
+    public CustomConnectorSkin(final GConnectorPort gConnector) {
         super(gConnector);
     }
 }

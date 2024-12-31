@@ -136,7 +136,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   /**
    * Removes the old rectangular constraints on the connection's list of joint skins.
    */
-  private void removeOldRectangularConstraints() {
+  protected void removeOldRectangularConstraints() {
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     for (int i = 0; i < jointSkins.size() - 1; i++) {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
@@ -155,7 +155,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   /**
    * Adds constraints to the connection's joints in order to keep the connection rectangular in shape.
    */
-  private void addRectangularConstraints() {
+  protected void addRectangularConstraints() {
     // Our rectangular connection logic assumes an even number of joints.
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     for (int i = 0; i < jointSkins.size() - 1; i++) {
@@ -178,7 +178,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    * @param points
    *          all points that the connection should pass through (both connector and joint positions)
    */
-  private void checkFirstAndLastJoints(final Point2D[] points) {
+  protected void checkFirstAndLastJoints(final Point2D[] points) {
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, 0), true);
     alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, points.length - 2), false);
@@ -194,7 +194,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    * @param start
    *          {@code true} to align the first joint to the start, {@code false} for the last joint to the end
    */
-  private void alignJoint(final Point2D[] points, final boolean vertical, final boolean start) {
+  protected void alignJoint(final Point2D[] points, final boolean vertical, final boolean start) {
     final int targetPositionIndex = start ? 0 : points.length - 1;
     final int jointPositionIndex = start ? 1 : points.length - 2;
     final GJointSkin jointSkin = jointSkins.get(start ? 0 : jointSkins.size() - 1);
@@ -224,7 +224,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    * @param intersections
    *          all intersection-points of this connection with other connections
    */
-  private void drawAllSegments(final Point2D[] points, final double[][] intersections) {
+  protected void drawAllSegments(final Point2D[] points, final double[][] intersections) {
     final double startX = points[0].getX();
     final double startY = points[0].getY();
 
@@ -262,7 +262,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    *
    * @return {@code true} if the custom property to show detours has been set
    */
-  private boolean checkShowDetours() {
+  protected boolean checkShowDetours() {
     boolean showDetours = false;
 
     final String value = getGraphEditor().getProperties().getCustomProperties().get(SHOW_DETOURS_KEY);

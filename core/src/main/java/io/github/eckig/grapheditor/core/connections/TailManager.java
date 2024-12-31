@@ -2,7 +2,7 @@ package io.github.eckig.grapheditor.core.connections;
 
 import java.util.List;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GTailSkin;
@@ -66,7 +66,7 @@ public class TailManager {
      * @param pEvent
      *            the mouse event responsible for creating the tail
      */
-    public void updateToNewSource(final List<Point2D> pJointPositions, final GConnector pNewSource, final MouseEvent pEvent)
+    public void updateToNewSource(final List<Point2D> pJointPositions, final GConnectorPort pNewSource, final MouseEvent pEvent)
     {
         cleanUp();
         jointPositions = pJointPositions;

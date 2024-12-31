@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
@@ -94,7 +94,7 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     for (final Selectable obj : pToRemove) {
       if (obj instanceof GNode n && editContext.canRemove(obj)) {
         delete.add(obj);
-        for (final GConnector connector : n.getConnectors()) {
+        for (final GConnectorPort connector : n.getConnectorPorts()) {
           for (final GConnection connection : connector.getConnections()) {
             if (connection != null && editContext.canRemove(connection)) {
               delete.add(connection);
@@ -126,17 +126,17 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   }
 
   private void remove(final RemoveContext pRemoveContext, final CompoundCommand pCommand, final GConnection pToDelete) {
-    final GConnector source = pToDelete.getSource();
-    final GConnector target = pToDelete.getTarget();
+    final GConnectorPort source = pToDelete.getSource();
+    final GConnectorPort target = pToDelete.getTarget();
 
     // Remove the connection from the model's connections list
     pCommand.append(RemoveCommand.create(model, owner -> model.getConnections(), pToDelete));
 
     // Remove the connection from the source connector's connections list
-    pCommand.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), pToDelete));
+    pCommand.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), pToDelete));
 
     // Remove the connection from the target connector's connections list
-    pCommand.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), pToDelete));
+    pCommand.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), pToDelete));
 
     final Command onRemoved = mOnConnectionRemoved == null ? null
         : mOnConnectionRemoved.apply(pRemoveContext, pToDelete);

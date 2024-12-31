@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 
@@ -47,11 +47,6 @@ public final class ModelSanityChecker {
    * @return {@code true} if the model width and height parameters are valid
    */
   private static boolean validateSizes(final GModel pModel, final SkinManager pSkinManager) {
-    if (pModel.getContentWidth() < 0 || pModel.getContentHeight() < 0) {
-      LOGGER.error("Model contains negative width / height values.");
-      return false;
-    }
-
     for (final GNode node : pModel.getNodes()) {
       GNodeSkin nodeSkin = pSkinManager.lookupNode(node);
       if (nodeSkin.getWidth() < 0 || nodeSkin.getHeight() < 0) {
@@ -75,8 +70,8 @@ public final class ModelSanityChecker {
 
     for (final GConnection connection : model.getConnections()) {
 
-      final GConnector source = connection.getSource();
-      final GConnector target = connection.getTarget();
+      final GConnectorPort source = connection.getSource();
+      final GConnectorPort target = connection.getTarget();
 
       if (source == null || target == null) {
         LOGGER.error("Connection must have non-null source and target connectors.");

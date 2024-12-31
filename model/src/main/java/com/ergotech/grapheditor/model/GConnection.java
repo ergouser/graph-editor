@@ -28,7 +28,7 @@ public interface GConnection extends Selectable {
    *
    * @return the source node of the connection.
    */
-  public GConnector getSource();
+  public GConnectorPort getSource();
 
   /**
    * Sets the value of the 'Source' attribute.
@@ -36,14 +36,14 @@ public interface GConnection extends Selectable {
    * @param source
    *          the source node to set.
    */
-  public void setSource(GConnector source);
+  public void setSource(GConnectorPort source);
 
   /**
    * Returns the value of the 'Target' attribute.
    *
    * @return the target node of the connection.
    */
-  public GConnector getTarget();
+  public GConnectorPort getTarget();
 
   /**
    * Sets the value of the 'Target' attribute.
@@ -51,16 +51,16 @@ public interface GConnection extends Selectable {
    * @param target
    *          the target node to set.
    */
-  public void setTarget(GConnector target);
+  public void setTarget(GConnectorPort target);
 
-  //  /**
-  //   * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
-  //   * that define the path of the connection.  IS THIS AN ATTRIBUTE OF THE CONNECTION OR THE SKIN?????
-  //   *
-  //   * @return the list of joints as an ObservableList.
-  //   */
-  //  public List<GJoint> getJoints();
-  //
+  /**
+   * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
+   * that define the path of the connection.  IS THIS AN ATTRIBUTE OF THE CONNECTION OR THE SKIN?????
+   *
+   * @return the list of joints as an ObservableList.
+   */
+  public List<? extends GJoint> getJoints();
+
   //  /**
   //   * Adds a joint to the connection. This method also sets the connection property of the joint to this connection.
   //   *

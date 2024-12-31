@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
@@ -63,7 +63,7 @@ public class SelectionTracker
         {
             skin = skinLookup.lookupConnection(c);
         }
-        else if (obj instanceof GConnector c)
+        else if (obj instanceof GConnectorPort c)
         {
             skin = skinLookup.lookupConnector(c);
         }

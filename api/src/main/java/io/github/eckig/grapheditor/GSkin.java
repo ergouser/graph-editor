@@ -68,6 +68,9 @@ public abstract class GSkin<T extends Selectable> {
    */
   public void setGraphEditor(final GraphEditor pGraphEditor) {
     this.graphEditor = pGraphEditor;
+    selectedProperty.addListener((obs, wasSelected, isSelected) -> {
+      selectionChanged(isSelected);
+    });
     updateSelection();
   }
 

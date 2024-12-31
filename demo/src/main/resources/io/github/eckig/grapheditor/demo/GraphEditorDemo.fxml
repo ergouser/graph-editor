@@ -4,7 +4,8 @@
 <?import javafx.scene.layout.*?>
 <?import io.github.eckig.grapheditor.core.view.GraphEditorContainer?>
 
-<AnchorPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="io.github.eckig.grapheditor.demo.GraphEditorDemoController">
+<AnchorPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="io.github.eckig.grapheditor.demo.GraphEditorDemoController"
+  prefWidth="3000" prefHeight="2250">
 	<VBox fillWidth="true" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
 		<MenuBar fx:id="menuBar">
 			<menus>

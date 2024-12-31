@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -159,7 +159,7 @@ public class SelectionCreator {
         mousePressedHandlers.put(nodeRegion, newNodePressedHandler);
       }
 
-      for (final GConnector connector : node.getConnectors()) {
+      for (final GConnectorPort connector : node.getConnectorPorts()) {
         addConnector(connector);
       }
     }
@@ -176,13 +176,13 @@ public class SelectionCreator {
         nodeRegion.removeEventHandler(MouseEvent.MOUSE_PRESSED, newNodePressedHandler);
       }
 
-      for (final GConnector connector : node.getConnectors()) {
+      for (final GConnectorPort connector : node.getConnectorPorts()) {
         removeConnector(connector);
       }
     }
   }
 
-  public void addConnector(final GConnector connector) {
+  public void addConnector(final GConnectorPort connector) {
     final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
     if (connectorSkin != null) {
       final Node connectorRoot = connectorSkin.getRoot();
@@ -195,7 +195,7 @@ public class SelectionCreator {
     }
   }
 
-  public void removeConnector(final GConnector connector) {
+  public void removeConnector(final GConnectorPort connector) {
     final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
     if (connectorSkin != null) {
       final Node connectorRoot = connectorSkin.getRoot();
@@ -383,9 +383,11 @@ public class SelectionCreator {
     if (model == null || pEvent.isConsumed() || selectionBoxStart == null || !activateGesture(pEvent)) {
       return;
     }
+    final double width = view.getWidth();
+    final double height = view.getHeight();
 
-    selectionBoxEnd = new Point2D(Math.min(model.getContentWidth(), Math.max(0, pEvent.getX())),
-        Math.min(model.getContentHeight(), Math.max(0, pEvent.getY())));
+    selectionBoxEnd = new Point2D(Math.min(width, Math.max(0, pEvent.getX())),
+        Math.min(height, Math.max(0, pEvent.getY())));
 
     evaluateSelectionBoxParameters();
 

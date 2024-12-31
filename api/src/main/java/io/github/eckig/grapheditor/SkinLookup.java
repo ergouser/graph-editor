@@ -4,7 +4,7 @@
 package io.github.eckig.grapheditor;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
 
@@ -25,11 +25,11 @@ public interface SkinLookup {
     /**
      * Gets the skin for the given connector.
      *
-     * @param connector a {@link GConnector} instance
+     * @param connector a {@link GConnectorPort} instance
      *
      * @return the associated {@link GConnectorSkin} instance
      */
-    GConnectorSkin lookupConnector(final GConnector connector);
+    GConnectorSkin lookupConnector(final GConnectorPort connector);
 
     /**
      * Gets the skin for the given connection.
@@ -52,9 +52,9 @@ public interface SkinLookup {
     /**
      * Gets the tail skin for the given connector.
      *
-     * @param connector a {@link GConnector} instance
+     * @param connector a {@link GConnectorPort} instance
      *
      * @return the associated {@link GTailSkin} instance
      */
-    GTailSkin lookupTail(final GConnector connector);
+    GTailSkin lookupTail(final GConnectorPort connector);
 }

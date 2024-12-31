@@ -9,8 +9,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 import com.ergotech.grapheditor.model.GNode;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -47,22 +47,22 @@ public class DefaultNodeSkin extends GNodeSkin {
 
     private static final PseudoClass PSEUDO_CLASS_SELECTED = PseudoClass.getPseudoClass("selected");
 
-    private static final double HALO_OFFSET = 5;
-    private static final double HALO_CORNER_SIZE = 10;
+    protected static final double HALO_OFFSET = 5;
+    protected static final double HALO_CORNER_SIZE = 10;
 
-    private static final double MINOR_POSITIVE_OFFSET = 2;
-    private static final double MINOR_NEGATIVE_OFFSET = -3;
+    protected static final double MINOR_POSITIVE_OFFSET = 2;
+    protected static final double MINOR_NEGATIVE_OFFSET = -3;
 
-    private static final double MIN_WIDTH = 41;
-    private static final double MIN_HEIGHT = 41;
+    protected static final double MIN_WIDTH = 41;
+    protected static final double MIN_HEIGHT = 41;
 
-    private final Rectangle selectionHalo = new Rectangle();
+    protected final Rectangle selectionHalo = new Rectangle();
 
-    private final List<GConnectorSkin> connectorSkins = new ArrayList<>();
+    protected final List<GConnectorSkin> connectorSkins = new ArrayList<>();
     
     // Border and background are separated into 2 rectangles so they can have different effects applied to them.
-    private final Rectangle border = new Rectangle();
-    private final Rectangle background = new Rectangle();
+    protected final Rectangle border = new Rectangle();
+    protected final Rectangle background = new Rectangle();
 
     /**
      * Creates a new default node skin instance.
@@ -146,8 +146,8 @@ public class DefaultNodeSkin extends GNodeSkin {
     /**
      * Checks that the node and its connectors have the correct values to be displayed using this skin.
      */
-    private void performChecks() {
-      // the "types" (direction and side) are no enums so cannot be invalid
+    protected void performChecks() {
+      // the "types" (direction and side) are now enums so cannot be invalid
 //      for (final GConnector connector : getItem().getConnectors()) {
 //        if (!DefaultConnectorTypes.isValid(connector.getType())) {
 //          LOGGER.error("Connector type '{}' not recognized, setting to 'left-input'.", connector.getType());
@@ -159,7 +159,7 @@ public class DefaultNodeSkin extends GNodeSkin {
     /**
      * Lays out the node's connectors.
      */
-    private void layoutAllConnectors() {
+    protected void layoutAllConnectors() {
         layoutConnectors(getTopConnectorSkins(), false, 0);
         layoutConnectors(getRightConnectorSkins(), true, getRoot().getWidth());
         layoutConnectors(getBottomConnectorSkins(), false, getRoot().getHeight());
@@ -173,7 +173,7 @@ public class DefaultNodeSkin extends GNodeSkin {
      * @param vertical {@code true} to lay out vertically, {@code false} to lay out horizontally
      * @param offset the offset in the other dimension that the skins are layed out in
      */
-    private void layoutConnectors(final List<GConnectorSkin> connectorSkins, final boolean vertical, final double offset) {
+    protected void layoutConnectors(final List<GConnectorSkin> connectorSkins, final boolean vertical, final double offset) {
 
         final int count = connectorSkins.size();
 
@@ -204,7 +204,7 @@ public class DefaultNodeSkin extends GNodeSkin {
     /**
      * Adds the selection halo and initializes some of its values.
      */
-    private void addSelectionHalo() {
+    protected void addSelectionHalo() {
 
         getRoot().getChildren().add(selectionHalo);
 
@@ -221,7 +221,7 @@ public class DefaultNodeSkin extends GNodeSkin {
     /**
      * Lays out the selection halo based on the current width and height of the node skin region.
      */
-    private void layoutSelectionHalo() {
+    protected void layoutSelectionHalo() {
 
         if (selectionHalo.isVisible()) {
 
@@ -253,7 +253,7 @@ public class DefaultNodeSkin extends GNodeSkin {
     /**
      * Removes all connectors from the list of children.
      */
-    private void removeAllConnectors() {
+    protected void removeAllConnectors() {
 
         connectorSkins.stream().forEach(skin -> getRoot().getChildren().remove(skin.getRoot()));
     }
@@ -265,7 +265,7 @@ public class DefaultNodeSkin extends GNodeSkin {
      * @param connector the connector to be positioned
      * @return an x-offset of a few pixels
      */
-    private double getMinorOffsetX(final GConnector connector) {
+    protected double getMinorOffsetX(final GConnectorPort connector) {
 
       GConnectorSkin connectorSkin = connectorSkins.stream()
           .filter(skin -> skin.getItem() == connector)
@@ -293,7 +293,7 @@ public class DefaultNodeSkin extends GNodeSkin {
      * @param connector the connector to be positioned
      * @return a y-offset of a few pixels
      */
-    private double getMinorOffsetY(final GConnector connector) {
+    protected double getMinorOffsetY(final GConnectorPort connector) {
 
       GConnectorSkin connectorSkin = connectorSkins.stream()
           .filter(skin -> skin.getItem() == connector)
@@ -319,7 +319,7 @@ public class DefaultNodeSkin extends GNodeSkin {
      *
      * @param event a mouse-dragged event on the node
      */
-    private void filterMouseDragged(final MouseEvent event) {
+    protected void filterMouseDragged(final MouseEvent event) {
         if (event.isPrimaryButtonDown() && !isSelected()) {
             event.consume();
         }

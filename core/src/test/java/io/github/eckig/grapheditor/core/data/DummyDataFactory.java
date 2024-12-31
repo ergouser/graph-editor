@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -43,7 +43,7 @@ public class DummyDataFactory {
       System.out.println("    width: " + node.getWidth());
       System.out.println("    height: " + node.getHeight());
       System.out.println("    connectors:");
-      for (GConnector connector : node.getConnectors()) {
+      for (GConnectorPort connector : node.getConnectorPorts()) {
         System.out.println("      GConnector:");
         System.out.println("        type: " + connector.getType());
         System.out.println("        connections:");
@@ -66,13 +66,13 @@ public class DummyDataFactory {
     }
   }
 
-  private static GConnector createConnector(String type, GNode node, CompoundCommand compoundCommand) {
-    GConnector connector = new GConnector();
+  private static GConnectorPort createConnector(String type, GNode node, CompoundCommand compoundCommand) {
+    GConnectorPort connector = new GConnectorPort();
     connector.setType(type);
     connector.setParent(node);
 
     // Add the connector to the node's connectors using a command
-    compoundCommand.append(AddCommand.create(node, owner -> ((GNode) owner).getConnectors(), connector));
+    compoundCommand.append(AddCommand.create(node, owner -> ((GNode) owner).getConnectorPorts(), connector));
 
     return connector;
   }
@@ -82,14 +82,14 @@ public class DummyDataFactory {
 
     final GNode node = new GNode();
 
-    final GConnector input = new GConnector();
+    final GConnectorPort input = new GConnectorPort();
     input.setType(INPUT_TYPE);
 
-    final GConnector output = new GConnector();
+    final GConnectorPort output = new GConnectorPort();
     output.setType(OUTPUT_TYPE);
 
-    node.getConnectors().add(input);
-    node.getConnectors().add(output);
+    node.getConnectorPorts().add(input);
+    node.getConnectorPorts().add(output);
 
     return node;
   }
@@ -110,7 +110,7 @@ public class DummyDataFactory {
 
     // Create lists to hold nodes and connectors for easy reference
     List<GNode> nodes = new ArrayList<>();
-    Map<Integer, List<GConnector>> nodeConnectors = new HashMap<>();
+    Map<Integer, List<GConnectorPort>> nodeConnectors = new HashMap<>();
 
     // Node IDs to keep track (0 to 5)
     for (int nodeId = 0; nodeId <= 5; nodeId++) {
@@ -161,7 +161,7 @@ public class DummyDataFactory {
       compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getNodes(), node));
       
       // Create connectors for the node
-      List<GConnector> connectors = new ArrayList<>();
+      List<GConnectorPort> connectors = new ArrayList<>();
       switch (nodeId) {
         case 0:
           // Node 0 connectors
@@ -207,15 +207,15 @@ public class DummyDataFactory {
 
     // Connection 0: from node0 connector1 to node1 connector0
     GConnection connection0 = new GConnection();
-    GConnector source0 = nodeConnectors.get(0).get(1); // node0's output connector
-    GConnector target0 = nodeConnectors.get(1).get(0); // node1's input connector
+    GConnectorPort source0 = nodeConnectors.get(0).get(1); // node0's output connector
+    GConnectorPort target0 = nodeConnectors.get(1).get(0); // node1's input connector
     connection0.setSource(source0);
     connection0.setTarget(target0);
 
      // Add the connection to the model, source, and target using commands
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection0));
-    compoundCommand.append(AddCommand.create(source0, owner -> ((GConnector) owner).getConnections(), connection0));
-    compoundCommand.append(AddCommand.create(target0, owner -> ((GConnector) owner).getConnections(), connection0));
+    compoundCommand.append(AddCommand.create(source0, owner -> ((GConnectorPort) owner).getConnections(), connection0));
+    compoundCommand.append(AddCommand.create(target0, owner -> ((GConnectorPort) owner).getConnections(), connection0));
 
     // Add joints to the connection using commands
     List<Point2D> joints0 = Arrays.asList(
@@ -234,15 +234,15 @@ public class DummyDataFactory {
 
     // Connection 1: from node5 connector1 to node4 connector0
     GConnection connection1 = new GConnection();
-    GConnector source1 = nodeConnectors.get(5).get(1); // node5's output connector
-    GConnector target1 = nodeConnectors.get(4).get(0); // node4's input connector
+    GConnectorPort source1 = nodeConnectors.get(5).get(1); // node5's output connector
+    GConnectorPort target1 = nodeConnectors.get(4).get(0); // node4's input connector
     connection1.setSource(source1);
     connection1.setTarget(target1);
 
     // Add the connection and its associations
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection1));
-    compoundCommand.append(AddCommand.create(source1, owner -> ((GConnector) owner).getConnections(), connection1));
-    compoundCommand.append(AddCommand.create(target1, owner -> ((GConnector) owner).getConnections(), connection1));
+    compoundCommand.append(AddCommand.create(source1, owner -> ((GConnectorPort) owner).getConnections(), connection1));
+    compoundCommand.append(AddCommand.create(target1, owner -> ((GConnectorPort) owner).getConnections(), connection1));
 
     // Add joints to connection1
     List<Point2D> joints1 = Arrays.asList(
@@ -259,15 +259,15 @@ public class DummyDataFactory {
 
     // Connection 2: from node1 connector2 to node2 connector0
     GConnection connection2 = new GConnection();
-    GConnector source2 = nodeConnectors.get(1).get(2); // node1's second output connector
-    GConnector target2 = nodeConnectors.get(2).get(0); // node2's input connector
+    GConnectorPort source2 = nodeConnectors.get(1).get(2); // node1's second output connector
+    GConnectorPort target2 = nodeConnectors.get(2).get(0); // node2's input connector
     connection2.setSource(source2);
     connection2.setTarget(target2);
 
     // Add the connection and its associations
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection2));
-    compoundCommand.append(AddCommand.create(source2, owner -> ((GConnector) owner).getConnections(), connection2));
-    compoundCommand.append(AddCommand.create(target2, owner -> ((GConnector) owner).getConnections(), connection2));
+    compoundCommand.append(AddCommand.create(source2, owner -> ((GConnectorPort) owner).getConnections(), connection2));
+    compoundCommand.append(AddCommand.create(target2, owner -> ((GConnectorPort) owner).getConnections(), connection2));
 
     // Add joints to connection2
     List<Point2D> joints2 = Arrays.asList(
@@ -284,15 +284,15 @@ public class DummyDataFactory {
 
     // Connection 3: from node1 connector1 to node3 connector0
     GConnection connection3 = new GConnection();
-    GConnector source3 = nodeConnectors.get(1).get(1); // node1's first output connector
-    GConnector target3 = nodeConnectors.get(3).get(0); // node3's input connector
+    GConnectorPort source3 = nodeConnectors.get(1).get(1); // node1's first output connector
+    GConnectorPort target3 = nodeConnectors.get(3).get(0); // node3's input connector
     connection3.setSource(source3);
     connection3.setTarget(target3);
 
     // Add the connection and its associations
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection3));
-    compoundCommand.append(AddCommand.create(source3, owner -> ((GConnector) owner).getConnections(), connection3));
-    compoundCommand.append(AddCommand.create(target3, owner -> ((GConnector) owner).getConnections(), connection3));
+    compoundCommand.append(AddCommand.create(source3, owner -> ((GConnectorPort) owner).getConnections(), connection3));
+    compoundCommand.append(AddCommand.create(target3, owner -> ((GConnectorPort) owner).getConnections(), connection3));
 
     // Add joints to connection3
     List<Point2D> joints3 = Arrays.asList(

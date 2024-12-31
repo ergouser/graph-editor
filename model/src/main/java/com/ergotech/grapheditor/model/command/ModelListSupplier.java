@@ -4,5 +4,5 @@ import java.util.Collection;
 
 @FunctionalInterface
 public interface ModelListSupplier<T> {
-    Collection<T> getList(Object owner);
+    Collection<? extends T> getList(Object owner);
 }

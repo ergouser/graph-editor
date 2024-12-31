@@ -6,7 +6,7 @@
 package io.github.eckig.grapheditor;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
 
@@ -65,8 +65,8 @@ public interface GraphEditorSkins {
    *
    * @param connectorSkinFactory factory for creating the skins
    */
-  default public void setConnectorSkinFactory(final Callback<GConnector, GConnectorSkin> pConnectorSkinFactory) {
-    setSkinFactory(GConnector.class, GConnectorSkin.class, pConnectorSkinFactory);
+  default public void setConnectorSkinFactory(final Callback<GConnectorPort, GConnectorSkin> pConnectorSkinFactory) {
+    setSkinFactory(GConnectorPort.class, GConnectorSkin.class, pConnectorSkinFactory);
   }
 
   /**
@@ -92,8 +92,8 @@ public interface GraphEditorSkins {
    *
    * @param tailSkinFactory factory for creating the skins
    */
-  default public void setTailSkinFactory(final Callback<GConnector, GTailSkin> pTailSkinFactory) {
-    setSkinFactory(GConnector.class, GTailSkin.class, pTailSkinFactory);
+  default public void setTailSkinFactory(final Callback<GConnectorPort, GTailSkin> pTailSkinFactory) {
+    setSkinFactory(GConnectorPort.class, GTailSkin.class, pTailSkinFactory);
   }
 
 }

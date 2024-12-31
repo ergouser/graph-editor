@@ -19,7 +19,7 @@ public interface GModel {
      *
      * @return a list of {@link GNode} instances contained in the model.
      */
-    Collection<GNode> getNodes();
+    Collection<? extends GNode> getNodes();
 
     /**
      * Adds a node to the model.
@@ -42,7 +42,7 @@ public interface GModel {
      *
      * @return a list of {@link GConnection} instances contained in the model.
      */
-    Collection<GConnection> getConnections();
+    Collection<? extends GConnection> getConnections();
 
     /**
      * Adds a connection to the model.
@@ -72,34 +72,34 @@ public interface GModel {
      */
     void setType(String value);
 
-    /**
-     * Gets the content width of the model.
-     *
-     * @return the content width as a double.
-     */
-    double getContentWidth();
-
-    /**
-     * Sets the content width of the model.
-     *
-     * @param value the content width to set.
-     */
-    void setContentWidth(double value);
-
-    /**
-     * Gets the content height of the model.
-     *
-     * @return the content height as a double.
-     */
-    double getContentHeight();
-
-    /**
-     * Sets the content height of the model.
-     *
-     * @param value the content height to set.
-     */
-    void setContentHeight(double value);
-
+//    /**
+//     * Gets the content width of the model.
+//     *
+//     * @return the content width as a double.
+//     */
+//    double getContentWidth();
+//
+//    /**
+//     * Sets the content width of the model.
+//     *
+//     * @param value the content width to set.
+//     */
+//    void setContentWidth(double value);
+//
+//    /**
+//     * Gets the content height of the model.
+//     *
+//     * @return the content height as a double.
+//     */
+//    double getContentHeight();
+//
+//    /**
+//     * Sets the content height of the model.
+//     *
+//     * @param value the content height to set.
+//     */
+//    void setContentHeight(double value);
+//
     /** Return the graph factory. */
     GraphFactory getGraphFactory();
 

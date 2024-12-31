@@ -1,15 +1,15 @@
 package com.ergotech.grapheditor.model;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface GNode extends Selectable {
  
   // Connectors
-  public List<GConnector> getConnectors();
+  public Collection<? extends GConnectorPort> getConnectorPorts();
 
   // Methods to add and remove connectors
-  public void addConnector(GConnector connector);
+  public void addConnectorPort(GConnectorPort connectorPort);
 
-  public void removeConnector(GConnector connector);
+  public void removeConnectorPort(GConnectorPort connectorPort);
 
 }

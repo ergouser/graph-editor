@@ -152,7 +152,19 @@ public class GraphEditorDemoController {
     final GModelImpl model = new GModelImpl();
 
     graphEditor.setModel(model);
+
+    // Bind GraphEditorView dimensions to match the root window
+    graphEditor.getView().prefWidthProperty().bind(root.prefWidthProperty());
+    graphEditor.getView().prefHeightProperty().bind(root.prefHeightProperty());
+
+    graphEditorContainer.prefWidthProperty().bind(root.prefHeightProperty());
+    graphEditorContainer.prefHeightProperty().bind(root.prefHeightProperty());
+    
+    //    System.out.printf("Root %f %f, container %f %f, view %f %f", root.prefWidthProperty().get(), root.prefHeightProperty().get(), 
+    //        graphEditorContainer.prefWidthProperty().get(), graphEditorContainer.prefHeightProperty().get(),
+    //        graphEditor.getView().prefWidthProperty().get(), graphEditor.getView().prefHeightProperty().get());
     graphEditorContainer.setGraphEditor(graphEditor);
+
 
     setDetouredStyle();
 

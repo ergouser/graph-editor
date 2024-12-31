@@ -1,8 +1,8 @@
 package io.github.eckig.grapheditor.demo.customskins;
 
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
@@ -61,13 +61,13 @@ public class DefaultSkinController implements SkinController {
         final GNode node = factory.create(GNode.class);
         //node.setY(NODE_INITIAL_Y + windowYOffset);
 
-        final GConnector rightOutput = factory.create(GConnector.class);
+        final GConnectorPort rightOutput = factory.create(GConnectorPort.class);
 
-        node.getConnectors().add(rightOutput);
+        node.addConnectorPort(rightOutput);
 
-        final GConnector leftInput = factory.create(GConnector.class);
+        final GConnectorPort leftInput = factory.create(GConnectorPort.class);
 
-        node.getConnectors().add(leftInput);
+        node.addConnectorPort(leftInput);
 
         //node.setX(NODE_INITIAL_X + windowXOffset);
 
@@ -98,7 +98,7 @@ public class DefaultSkinController implements SkinController {
         if (skinLookup.lookupNode(node).isSelected()) {
           if (countConnectors(node, position) < MAX_CONNECTOR_COUNT) {
 
-            final GConnector connector = factory.create(GConnector.class);
+            final GConnectorPort connector = factory.create(GConnectorPort.class);
             if ( input ) {
               connector.setDirection(Direction.INPUT);
             } else {
@@ -146,7 +146,7 @@ public class DefaultSkinController implements SkinController {
         int count = 0;
 
         final SkinManager skinLookup = (SkinManager)graphEditor.getSkinLookup();
-        for (final GConnector connector : node.getConnectors()) {
+        for (final GConnectorPort connector : node.getConnectorPorts()) {
           GConnectorSkin connectorSkin = skinLookup.lookupOrCreateConnector(connector);
             if (side.equals(connectorSkin.getSide())) {
                 count++;

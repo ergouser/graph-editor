@@ -5,7 +5,7 @@ package io.github.eckig.grapheditor;
 
 import java.util.List;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -25,7 +25,7 @@ import javafx.geometry.Side;
  * Tail skins can have similar logic to connection skins, but they do not have to worry about positionable joints.
  * </p>
  */
-public abstract class GTailSkin extends GSkin<GConnector> {
+public abstract class GTailSkin extends GSkin<GConnectorPort> {
 
   ObjectProperty<Side> side  = new SimpleObjectProperty<>(this, "side");
 
@@ -34,7 +34,7 @@ public abstract class GTailSkin extends GSkin<GConnector> {
      *
      * @param connector the {@link GConnectorSkin} that the tail will extend from
      */
-    public GTailSkin(final GConnector connector) {
+    public GTailSkin(final GConnectorPort connector) {
         super(connector);
     }
 

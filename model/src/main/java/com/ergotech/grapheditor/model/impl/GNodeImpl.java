@@ -1,8 +1,8 @@
 package com.ergotech.grapheditor.model.impl;
 
-import java.util.List;
+import java.util.Collection;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
 
 import javafx.beans.value.ChangeListener;
@@ -13,24 +13,24 @@ import javafx.collections.ObservableList;
 public class GNodeImpl extends SelectableType implements GNode {
   
   // Observable List for connectors
-  private final ObservableList<GConnector> connectors = FXCollections.observableArrayList();
+  private final ObservableList<GConnectorPort> connectors = FXCollections.observableArrayList();
 
   private ChangeListener<String> typeListener;
 
-  private ListChangeListener<GConnector> connectorsListener;
+  private ListChangeListener<GConnectorPort> connectorsListener;
 
   // Constructor
   public GNodeImpl() {
     // Listen for changes in the connectors list to manage parent references
-    connectors.addListener((ListChangeListener<GConnector>) change -> {
+    connectors.addListener((ListChangeListener<GConnectorPort>) change -> {
       while (change.next()) {
         if (change.wasAdded()) {
-          for (GConnector connector : change.getAddedSubList()) {
+          for (GConnectorPort connector : change.getAddedSubList()) {
             connector.setParent(this);
           }
         }
         if (change.wasRemoved()) {
-          for (GConnector connector : change.getRemoved()) {
+          for (GConnectorPort connector : change.getRemoved()) {
             if (connector.getParent() == this) {
               connector.setParent(null);
             }
@@ -42,7 +42,7 @@ public class GNodeImpl extends SelectableType implements GNode {
 
   // Listener management methods
   public void addListeners(ChangeListener<String> typeListener,
-      ListChangeListener<GConnector> connectorsListener) {
+      ListChangeListener<GConnectorPort> connectorsListener) {
     removeListeners(); // if there are any.
     // Store strong references
     this.typeListener = typeListener;
@@ -50,27 +50,27 @@ public class GNodeImpl extends SelectableType implements GNode {
 
     // Attach listeners using WeakListeners
     //typeProperty().addListener(typeListener);
-    ((ObservableList<GConnector>)getConnectors()).addListener(connectorsListener);
+    ((ObservableList<GConnectorPort>)getConnectorPorts()).addListener(connectorsListener);
   }
 
   public void removeListeners() {
     if ( typeListener != null ) { // assume that all are null or none are null...
       //typeProperty().removeListener(typeListener);
-      ((ObservableList<GConnector>)getConnectors()).removeListener(connectorsListener);
+      ((ObservableList<GConnectorPort>)getConnectorPorts()).removeListener(connectorsListener);
     }
   }
 
    // Connectors
-  public List<GConnector> getConnectors() {
+  public Collection<GConnectorPort> getConnectorPorts() {
     return connectors;
   }
 
   // Methods to add and remove connectors
-  public void addConnector(GConnector connector) {
+  public void addConnectorPort(GConnectorPort connector) {
     connectors.add(connector);
   }
 
-  public void removeConnector(GConnector connector) {
+  public void removeConnectorPort(GConnectorPort connector) {
     connectors.remove(connector);
   }
 

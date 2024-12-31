@@ -3,7 +3,7 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.titled;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
@@ -19,9 +19,9 @@ public class TitledTailSkin extends DefaultTailSkin {
     /**
      * Creates a new default tail skin instance.
      *
-     * @param connector the {@link GConnector} the skin is being created for
+     * @param connector the {@link GConnectorPort} the skin is being created for
      */
-    public TitledTailSkin(final GConnector connector) {
+    public TitledTailSkin(final GConnectorPort connector) {
 
         super(connector);
 

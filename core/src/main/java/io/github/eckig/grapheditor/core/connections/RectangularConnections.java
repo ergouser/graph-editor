@@ -4,7 +4,7 @@
 package io.github.eckig.grapheditor.core.connections;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
@@ -43,7 +43,7 @@ public final class RectangularConnections {
    * @return {@code true} if the segment beginning at this index is horizontal
    */
   public static boolean isSegmentHorizontal(final GConnection connection, final SkinLookup skinLookup, final int i) {
-    GConnector source = connection.getSource();
+    GConnectorPort source = connection.getSource();
     GConnectorSkin connectorSkin = skinLookup.lookupConnector(source);
     final Side side = connectorSkin.getSide();
     final boolean sourceIsLeft = side == Side.LEFT;

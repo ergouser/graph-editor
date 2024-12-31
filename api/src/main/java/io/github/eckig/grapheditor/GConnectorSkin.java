@@ -3,8 +3,8 @@
  */
 package io.github.eckig.grapheditor;
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.impl.GConnectorImpl;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.impl.GConnectorPortImpl;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -15,18 +15,18 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Side;
 
 /**
- * The skin class for a {@link GConnectorImpl}. Responsible for visualizing connectors in the graph editor.
+ * The skin class for a {@link GConnectorPortImpl}. Responsible for visualizing connectors in the graph editor.
  *
  * <p>
  * A custom connector skin must extend this class. It <b>must</b> also provide a constructor taking exactly one
- * {@link GConnectorImpl} parameter.
+ * {@link GConnectorPortImpl} parameter.
  * </p>
  *
  * <p>
  * The root JavaFX node must be created by the skin implementation and returned in the {@link #getRoot()} method.
  * </p>
  */
-public abstract class GConnectorSkin extends GSkin<GConnector> {
+public abstract class GConnectorSkin extends GSkin<GConnectorPort> {
 
   protected final DoubleProperty x = new SimpleDoubleProperty(this, "x", 0);
   protected final DoubleProperty y = new SimpleDoubleProperty(this, "y", 0);
@@ -39,9 +39,9 @@ public abstract class GConnectorSkin extends GSkin<GConnector> {
   /**
    * Creates a new {@link GConnectorSkin}.
    *
-   * @param connector the {@link GConnectorImpl} represented by the skin
+   * @param connector the {@link GConnectorPortImpl} represented by the skin
    */
-  public GConnectorSkin(final GConnector connector) {
+  public GConnectorSkin(final GConnectorPort connector) {
     super(connector);
   }
 

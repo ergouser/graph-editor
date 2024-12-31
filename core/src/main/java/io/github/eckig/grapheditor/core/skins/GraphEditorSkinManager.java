@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
 
@@ -20,11 +20,11 @@ import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.VirtualSkin;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
-import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectionSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectorSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultJointSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultNodeSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
+import io.github.eckig.grapheditor.core.skins.defaults.connection.BezierConnectionSkin;
 import io.github.eckig.grapheditor.core.view.ConnectionLayouter;
 import io.github.eckig.grapheditor.core.view.GraphEditorView;
 import javafx.collections.FXCollections;
@@ -51,12 +51,12 @@ public class GraphEditorSkinManager implements SkinManager {
   private final ObservableMap<GConnection, GConnectionSkin> mConnectionSkins = FXCollections.observableHashMap();
 
   // private final Map<GNode, GNodeSkin> mNodeSkins = new HashMap<>();
-  private final Map<GConnector, GConnectorSkin> mConnectorSkins = new HashMap<>();
+  private final Map<GConnectorPort, GConnectorSkin> mConnectorSkins = new HashMap<>();
 
   // private final Map<GConnection, GConnectionSkin> mConnectionSkins = new HashMap<>();
   private final Map<GJoint, GJointSkin> mJointSkins = new HashMap<>();
 
-  private final Map<GConnector, GTailSkin> mTailSkins = new HashMap<>();
+  private final Map<GConnectorPort, GTailSkin> mTailSkins = new HashMap<>();
 
   private ConnectionLayouter mConnectionLayouter;
 
@@ -131,11 +131,12 @@ public class GraphEditorSkinManager implements SkinManager {
     mGraphEditor = pGraphEditor;
 
     // Register default factories
-    setSkinFactory(GConnector.class, GConnectorSkin.class, connector -> new DefaultConnectorSkin(connector));
-    setSkinFactory(GConnection.class, GConnectionSkin.class, connection -> new DefaultConnectionSkin(connection));
+    setSkinFactory(GConnectorPort.class, GConnectorSkin.class, connector -> new DefaultConnectorSkin(connector));
+    //setSkinFactory(GConnection.class, GConnectionSkin.class, connection -> new DefaultConnectionSkin(connection));
+    setSkinFactory(GConnection.class, GConnectionSkin.class, connection -> new BezierConnectionSkin(connection));
     setSkinFactory(GJoint.class, GJointSkin.class, joint -> new DefaultJointSkin(joint));
     setSkinFactory(GNode.class, GNodeSkin.class, node -> new DefaultNodeSkin(node));
-    setSkinFactory(GConnector.class, GTailSkin.class, connector -> new DefaultTailSkin(connector));
+    setSkinFactory(GConnectorPort.class, GTailSkin.class, connector -> new DefaultTailSkin(connector));
 
     // Add listener to mNodeSkins
     mNodeSkins.addListener((MapChangeListener<GNode, GNodeSkin>) change -> {
@@ -227,7 +228,7 @@ public class GraphEditorSkinManager implements SkinManager {
   // Helper method to determine if a factory is required
   private boolean isRequiredFactory(Class<?> componentType, Class<?> skinType) {
     // Define the required component and skin type pairs
-    return (componentType == GConnector.class && (skinType == GConnectorSkin.class || skinType == GTailSkin.class))
+    return (componentType == GConnectorPort.class && (skinType == GConnectorSkin.class || skinType == GTailSkin.class))
         || (componentType == GConnection.class && skinType == GConnectionSkin.class)
         || (componentType == GJoint.class && skinType == GJointSkin.class)
         || (componentType == GNode.class && skinType == GNodeSkin.class);
@@ -275,8 +276,9 @@ public class GraphEditorSkinManager implements SkinManager {
    *
    * @param <T> the type of the graph component
    * @param <R> the type of the skin for the graph component
-   * @param componentType the class of the graph component * @param skinType      the class of the skin
-   *    * @return the factory for the specified type, or {@code null} if no factory is found
+   * @param componentType the class of the graph component 
+   * @param skinType      the class of the skin
+   * @return the factory for the specified type, or {@code null} if no factory is found
    */
   @SuppressWarnings("unchecked")
   public <T, R> Callback<T, R> getSkinFactory(Class<?> componentType, Class<R> skinType) {
@@ -292,13 +294,17 @@ public class GraphEditorSkinManager implements SkinManager {
       currentType = currentType.getSuperclass(); // Move up the hierarchy
     }
 
-    // Check interfaces if no factory found in class hierarchy
-    for (Class<?> iface : componentType.getInterfaces()) {
-      SkinFactoryKey key = new SkinFactoryKey(iface, skinType);
-      Callback<?, ?> factory = factoryMap.get(key);
-      if (factory != null) {
-        return (Callback<T, R>) factory;
+    // No match found in the class hierarchy, check all interfaces in the hierarchy
+    currentType = componentType;
+    while (currentType != null) {
+      for (Class<?> iface : currentType.getInterfaces()) {
+        SkinFactoryKey key = new SkinFactoryKey(iface, skinType);
+        Callback<?, ?> factory = factoryMap.get(key);
+        if (factory != null) {
+          return (Callback<T, R>) factory;
+        }
       }
+      currentType = currentType.getSuperclass(); // Move up the hierarchy
     }
 
     // No factory found
@@ -311,8 +317,8 @@ public class GraphEditorSkinManager implements SkinManager {
   }
 
   @Override
-  public void setConnectorSkinFactory(final Callback<GConnector, GConnectorSkin> pConnectorSkinFactory) {
-    setSkinFactory(GConnector.class, GConnectorSkin.class, pConnectorSkinFactory);
+  public void setConnectorSkinFactory(final Callback<GConnectorPort, GConnectorSkin> pConnectorSkinFactory) {
+    setSkinFactory(GConnectorPort.class, GConnectorSkin.class, pConnectorSkinFactory);
   }
 
   @Override
@@ -326,8 +332,8 @@ public class GraphEditorSkinManager implements SkinManager {
   }
 
   @Override
-  public void setTailSkinFactory(final Callback<GConnector, GTailSkin> pTailSkinFactory) {
-    setSkinFactory(GConnector.class, GTailSkin.class, pTailSkinFactory);
+  public void setTailSkinFactory(final Callback<GConnectorPort, GTailSkin> pTailSkinFactory) {
+    setSkinFactory(GConnectorPort.class, GTailSkin.class, pTailSkinFactory);
   }
 
   @Override
@@ -340,8 +346,8 @@ public class GraphEditorSkinManager implements SkinManager {
     }
 
     if (!mConnectorSkins.isEmpty()) {
-      final GConnector[] connectors = mConnectorSkins.keySet().toArray(new GConnector[0]);
-      for (final GConnector c : connectors) {
+      final GConnectorPort[] connectors = mConnectorSkins.keySet().toArray(new GConnectorPort[0]);
+      for (final GConnectorPort c : connectors) {
         removeConnector(c);
       }
     }
@@ -374,21 +380,22 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public void removeNode(final GNode pNodeToRemove) {
-    if (pNodeToRemove != null) {
-      final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
-      if (removedSkin != null) {
-        mView.remove(removedSkin);
-        removedSkin.dispose();
-      }
+      if (pNodeToRemove != null) {
+          final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
+          if (removedSkin != null) {
+              mView.remove(removedSkin);
+              removedSkin.dispose();
+          }
 
-      for (int i = 0; i < pNodeToRemove.getConnectors().size(); i++) {
-        removeConnector(pNodeToRemove.getConnectors().get(i));
+          // Iterate over the connector ports directly
+          for (GConnectorPort connectorPort : pNodeToRemove.getConnectorPorts()) {
+              removeConnector(connectorPort);
+          }
       }
-    }
   }
 
   @Override
-  public void removeConnector(final GConnector pConnectorToRemove) {
+  public void removeConnector(final GConnectorPort pConnectorToRemove) {
     if (pConnectorToRemove != null) {
       final GConnectorSkin removedSkin = mConnectorSkins.remove(pConnectorToRemove);
       if (removedSkin != null) {
@@ -427,7 +434,7 @@ public class GraphEditorSkinManager implements SkinManager {
   public void updateConnectors(final GNode pNode) {
     final GNodeSkin nodeSkin = mNodeSkins.get(pNode);
     if (nodeSkin != null) {
-      final List<GConnectorSkin> nodeConnectorSkins = pNode.getConnectors().stream().map(this::lookupOrCreateConnector)
+      final List<GConnectorSkin> nodeConnectorSkins = pNode.getConnectorPorts().stream().map(this::lookupOrCreateConnector)
           .collect(Collectors.toList());
       nodeSkin.setConnectorSkins(nodeConnectorSkins);
     }
@@ -443,13 +450,71 @@ public class GraphEditorSkinManager implements SkinManager {
 //    }
 //  }
 //
+  /**
+   * Looks up or creates a skin for the given component based on its type and the skin type.
+   * <p>
+   * The appropriate map is selected based on the {@code skinType}, and the skin is either
+   * retrieved from the map or created using the associated factory.
+   * </p>
+   *
+   * @param <T>       the type of the component (e.g., GNode, GConnector)
+   * @param <R>       the type of the skin (e.g., GNodeSkin, GConnectorSkin)
+   * @param component the component instance for which a skin should be created
+   * @param skinType  the class of the skin
+   * @return the existing or newly created skin for the component
+   */
+  public <T, R> R lookupOrCreateSkin(T component, Class<R> skinType) {
+      // Determine the appropriate map based on the skin type
+      Map<T, R> skinsMap = getSkinsMapForType(skinType);
+
+      // Use computeIfAbsent to either retrieve an existing skin or create a new one
+      return skinsMap.computeIfAbsent(component, key -> {
+          // Look up the factory using the component's runtime class and the skin type
+          Callback<T, R> factory = getSkinFactory(component.getClass(), skinType);
+          if (factory == null) {
+              throw new IllegalStateException(
+                  "No factory registered for component type: " + component.getClass().getName()
+                  + " and skin type: " + skinType.getName()
+              );
+          }
+          // Create a new skin using the factory
+          return factory.call(key);
+      });
+  }
+
+  /**
+   * Returns the appropriate map for the given skin type.
+   *
+   * @param <T>      the type of the component
+   * @param <R>      the type of the skin
+   * @param skinType the class of the skin
+   * @return the map corresponding to the given skin type
+   * @throws IllegalArgumentException if no map is associated with the given skin type
+   */
+  @SuppressWarnings("unchecked")
+  private <T, R> Map<T, R> getSkinsMapForType(Class<R> skinType) {
+      if (skinType == GNodeSkin.class) {
+          return (Map<T, R>) mNodeSkins;
+      } else if (skinType == GConnectionSkin.class) {
+          return (Map<T, R>) mConnectionSkins;
+      } else if (skinType == GConnectorSkin.class) {
+          return (Map<T, R>) mConnectorSkins;
+      } else if (skinType == GJointSkin.class) {
+          return (Map<T, R>) mJointSkins;
+      } else if (skinType == GTailSkin.class) {
+          return (Map<T, R>) mTailSkins;
+      } else {
+          throw new IllegalArgumentException("Unsupported skin type: " + skinType.getName());
+      }
+  }
+
   @Override
   public GNodeSkin lookupOrCreateNode(final GNode pNode) {
     return mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
   }
 
   @Override
-  public GConnectorSkin lookupOrCreateConnector(final GConnector pConnector) {
+  public GConnectorSkin lookupOrCreateConnector(final GConnectorPort pConnector) {
     return mConnectorSkins.computeIfAbsent(pConnector, this::createConnectorSkin);
   }
 
@@ -469,7 +534,7 @@ public class GraphEditorSkinManager implements SkinManager {
   }
 
   @Override
-  public GConnectorSkin lookupConnector(final GConnector pConnector) {
+  public GConnectorSkin lookupConnector(final GConnectorPort pConnector) {
     return mConnectorSkins.get(pConnector);
   }
 
@@ -484,24 +549,24 @@ public class GraphEditorSkinManager implements SkinManager {
   }
 
   @Override
-  public GTailSkin lookupTail(final GConnector pConnector) {
+  public GTailSkin lookupTail(final GConnectorPort pConnector) {
     // GTailSkin is always/only created on demand
     return mTailSkins.computeIfAbsent(pConnector, this::createTailSkin);
   }
 
   /**
-   * Creates a new {@link GConnectorSkin} for the given {@link GConnector} using the registered factory.
+   * Creates a new {@link GConnectorSkin} for the given {@link GConnectorPort} using the registered factory.
    * <p>
    * This method retrieves the appropriate factory based on the component type and skin type,
    * and uses it to create a new skin instance. If no custom factory is registered, the default
    * factory will be used.
    * </p>
    *
-   * @param pConnector the {@link GConnector} for which to create a skin
+   * @param pConnector the {@link GConnectorPort} for which to create a skin
    * @return a new instance of {@link GConnectorSkin}
    */
-  private GConnectorSkin createConnectorSkin(final GConnector pConnector) {
-    Callback<GConnector, GConnectorSkin> factory = getSkinFactory(GConnector.class, GConnectorSkin.class);
+  private GConnectorSkin createConnectorSkin(final GConnectorPort pConnector) {
+    Callback<GConnectorPort, GConnectorSkin> factory = getSkinFactory(pConnector.getClass(), GConnectorSkin.class);
     GConnectorSkin skin = factory.call(pConnector);
 
     skin.setGraphEditor(mGraphEditor);
@@ -509,18 +574,18 @@ public class GraphEditorSkinManager implements SkinManager {
   }
 
   /**
-   * Creates a new {@link GTailSkin} for the given {@link GConnector} using the registered factory.
+   * Creates a new {@link GTailSkin} for the given {@link GConnectorPort} using the registered factory.
    * <p>
    * This method retrieves the appropriate factory based on the component type and skin type,
    * and uses it to create a new skin instance. If no custom factory is registered, the default
    * factory will be used.
    * </p>
    *
-   * @param pConnector the {@link GConnector} for which to create a skin
+   * @param pConnector the {@link GConnectorPort} for which to create a skin
    * @return a new instance of {@link GTailSkin}
    */
-  private GTailSkin createTailSkin(final GConnector pConnector) {
-    Callback<GConnector, GTailSkin> factory = getSkinFactory(GConnector.class, GTailSkin.class);
+  private GTailSkin createTailSkin(final GConnectorPort pConnector) {
+    Callback<GConnectorPort, GTailSkin> factory = getSkinFactory(pConnector.getClass(), GTailSkin.class);
     GTailSkin skin = factory.call(pConnector);
 
     skin.setGraphEditor(mGraphEditor);
@@ -539,7 +604,7 @@ public class GraphEditorSkinManager implements SkinManager {
    * @return a new instance of {@link GConnectionSkin}
    */
   private GConnectionSkin createConnectionSkin(final GConnection pConnection) {
-    Callback<GConnection, GConnectionSkin> factory = getSkinFactory(GConnection.class, GConnectionSkin.class);
+    Callback<GConnection, GConnectionSkin> factory = getSkinFactory(pConnection.getClass(), GConnectionSkin.class);
     GConnectionSkin skin = factory.call(pConnection);
 
     skin.setGraphEditor(mGraphEditor);
@@ -561,7 +626,7 @@ public class GraphEditorSkinManager implements SkinManager {
    * @return a new instance of {@link GJointSkin}
    */
   private GJointSkin createJointSkin(final GJoint pJoint) {
-    Callback<GJoint, GJointSkin> factory = getSkinFactory(GJoint.class, GJointSkin.class);
+    Callback<GJoint, GJointSkin> factory = getSkinFactory(pJoint.getClass(), GJointSkin.class);
     GJointSkin skin = factory.call(pJoint);
 
     skin.setGraphEditor(mGraphEditor);
@@ -586,7 +651,7 @@ public class GraphEditorSkinManager implements SkinManager {
    * @return a new instance of {@link GNodeSkin}
    */
   private GNodeSkin createNodeSkin(final GNode pNode) {
-    Callback<GNode, GNodeSkin> factory = getSkinFactory(GNode.class, GNodeSkin.class);
+    Callback<GNode, GNodeSkin> factory = getSkinFactory(pNode.getClass(), GNodeSkin.class);
     GNodeSkin skin = factory.call(pNode);
 
     skin.setGraphEditor(mGraphEditor);

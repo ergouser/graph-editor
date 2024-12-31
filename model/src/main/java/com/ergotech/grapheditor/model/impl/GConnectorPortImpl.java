@@ -3,9 +3,9 @@ package com.ergotech.grapheditor.model.impl;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -36,7 +36,7 @@ import javafx.collections.ObservableList;
  *   <li>{@link #connectionDetachedOnDragProperty()} - Indicates whether connections are detached when the connector is dragged</li>
  * </ul>
  */
-public class GConnectorImpl extends SelectableType implements GConnector {
+public class GConnectorPortImpl extends SelectableType implements GConnectorPort {
 
     // Properties
     private final ObjectProperty<GNode> parent = new SimpleObjectProperty<>(this, "parent");
@@ -138,8 +138,31 @@ public class GConnectorImpl extends SelectableType implements GConnector {
                 '}';
     }
 
-    @Override
     public ObjectProperty<Direction> directionProperty() {
       return direction;
     }
+    
+    /**
+     * Gets the direction of this connector.
+     * This is a convenience method for accessing the value of the direction property.
+     *
+     * @return the direction of the connector.
+     */
+    @Override
+    public Direction getDirection() {
+      return directionProperty().get();
+    };
+    
+    /**
+     * Sets the direction of this connector.
+     * This is a convenience method for setting the value of the direction property.
+     *
+     * @param direction the new direction of the connector.
+     */
+    @Override
+    public void setDirection(Direction direction) {
+      directionProperty().set(direction);
+    }
+
+
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
@@ -36,7 +36,7 @@ public class GeometryUtils {
    * <p>
    *
    * @param connector
-   *          the {@link GConnector} whose position is desired
+   *          the {@link GConnectorPort} whose position is desired
    * @param skinLookup
    *          the {@link SkinLookup} instance for this graph editor
    *

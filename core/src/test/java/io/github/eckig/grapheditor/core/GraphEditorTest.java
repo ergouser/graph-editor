@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
@@ -123,8 +123,8 @@ public class GraphEditorTest {
     final GNode firstNode = addNodeToModel();
     final GNode secondNode = addNodeToModel();
 
-    final GConnector firstNodeOutput = firstNode.getConnectors().get(1);
-    final GConnector secondNodeInput = secondNode.getConnectors().get(0);
+    final GConnectorPort firstNodeOutput = firstNode.getConnectorPorts().get(1);
+    final GConnectorPort secondNodeInput = secondNode.getConnectorPorts().get(0);
 
     final List<GJoint> joints = new ArrayList<>();
     joints.add(model.getGraphFactory().create(GJoint.class));

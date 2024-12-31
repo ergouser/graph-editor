@@ -6,7 +6,7 @@ package io.github.eckig.grapheditor.demo.customskins.titled;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.command.AddCommand;
@@ -38,15 +38,15 @@ public class ConnectionCommands {
    * @param model
    *          the {@link GModel} to which the connection should be added
    * @param source
-   *          the source {@link GConnector} of the new connection
+   *          the source {@link GConnectorPort} of the new connection
    * @param target
-   *          the target {@link GConnector} of the new connection
+   *          the target {@link GConnectorPort} of the new connection
    * @param type
    *          the type attribute for the new connection
    * @param joints
    *          the list of {@link GJoint} instances to be added inside the new connection
    */
-  public static void addConnection(final GModel model, final GConnector source, final GConnector target,
+  public static void addConnection(final GModel model, final GConnectorPort source, final GConnectorPort target,
       final String type, final List<GJoint> joints, final ConnectionEventManager connectionEventManager, final SkinManager skinManager) {
 
     final CompoundCommand command = new CompoundCommand();
@@ -66,8 +66,8 @@ public class ConnectionCommands {
     //command.append(AddCommand.create(editingDomain, source, GraphPackage.Literals.GCONNECTOR__CONNECTIONS, connection));
     //command.append(AddCommand.create(editingDomain, target, GraphPackage.Literals.GCONNECTOR__CONNECTIONS, connection));
     command.append(AddCommand.create(model, owner -> model.getConnections(), connection));
-    command.append(AddCommand.create(source, owner -> ((GConnector) owner).getConnections(), connection));
-    command.append(AddCommand.create(target, owner -> ((GConnector) owner).getConnections(), connection));
+    command.append(AddCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), connection));
+    command.append(AddCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), connection));
 
     final Command onCreate;
     if (connectionEventManager != null
@@ -94,8 +94,8 @@ public class ConnectionCommands {
 
     final CompoundCommand command = new CompoundCommand();
 
-    final GConnector source = connection.getSource();
-    final GConnector target = connection.getTarget();
+    final GConnectorPort source = connection.getSource();
+    final GConnectorPort target = connection.getTarget();
 
     //      command.append(RemoveCommand.create(editingDomain, model, GraphPackage.Literals.GMODEL__CONNECTIONS, connection));
     //      command.append(
@@ -103,8 +103,8 @@ public class ConnectionCommands {
     //      command.append(
     //          RemoveCommand.create(editingDomain, target, GraphPackage.Literals.GCONNECTOR__CONNECTIONS, connection));
     command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
-    command.append(RemoveCommand.create(source, owner -> ((GConnector) owner).getConnections(), connection));
-    command.append(RemoveCommand.create(target, owner -> ((GConnector) owner).getConnections(), connection));
+    command.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), connection));
+    command.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), connection));
 
 
 

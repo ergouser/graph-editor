@@ -21,7 +21,7 @@ import javafx.beans.property.ObjectProperty;
  *   <li>{@link #connectionsProperty()} - The list of connections associated with this connector</li>
  * </ul>
  */
-public interface GConnector extends Selectable {
+public interface GConnectorPort extends Selectable {
 
 
 
@@ -46,32 +46,20 @@ public interface GConnector extends Selectable {
   }
 
   /**
-   * Gets the direction property of this connector.
-   *
-   * @return the direction property of the connector.
-   */
-  ObjectProperty<Direction> directionProperty();
-
-  /**
    * Gets the direction of this connector.
    * This is a convenience method for accessing the value of the direction property.
    *
    * @return the direction of the connector.
    */
-  default Direction getDirection() {
-    return directionProperty().get();
-  }
-
+  Direction getDirection();
+  
   /**
    * Sets the direction of this connector.
    * This is a convenience method for setting the value of the direction property.
    *
    * @param direction the new direction of the connector.
    */
-  default void setDirection(Direction direction) {
-    directionProperty().set(direction);
-  }
-
+  void setDirection(Direction direction);
 
   /**
    * Returns the parent node to which this connector belongs.
@@ -92,7 +80,8 @@ public interface GConnector extends Selectable {
    *
    * @return the connections as an ObservableList.
    */
-  public Collection<GConnection> getConnections();
+  public Collection<? extends GConnection> getConnections();
+  
   /**
    * Adds a connection to the connector.
    *

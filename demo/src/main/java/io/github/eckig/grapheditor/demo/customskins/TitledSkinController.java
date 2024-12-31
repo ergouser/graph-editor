@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.OptionalInt;
 
-import com.ergotech.grapheditor.model.GConnector;
+import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
 import com.ergotech.grapheditor.model.command.Command;
@@ -54,12 +54,12 @@ public class TitledSkinController extends DefaultSkinController {
         return /*TitledSkinConstants.TITLED_NODE.equals(node.getType()) ? new TitledNodeSkin(node) :*/ new DefaultNodeSkin(node);
     }
 
-    private GConnectorSkin createSkin(final GConnector connector) {
+    private GConnectorSkin createSkin(final GConnectorPort connector) {
         return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_OUTPUT_CONNECTOR.equals(connector.getType()) ?
                 new TitledConnectorSkin(connector) :*/ new DefaultConnectorSkin(connector);
     }
 
-    private GTailSkin createTailSkin(final GConnector connector) {
+    private GTailSkin createTailSkin(final GConnectorPort connector) {
         return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) ?
                 new TitledTailSkin(connector) :*/ new DefaultTailSkin(connector);
     }
@@ -78,12 +78,12 @@ public class TitledSkinController extends DefaultSkinController {
         //node.setX(NODE_INITIAL_X + windowXOffset);
         node.setId(allocateNewId());
 
-        final GConnector input = factory.create(GConnector.class);
-        node.getConnectors().add(input);
+        final GConnectorPort input = factory.create(GConnectorPort.class);
+        node.addConnectorPort(input);
         //input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
 
-        final GConnector output = factory.create(GConnector.class);
-        node.getConnectors().add(output);
+        final GConnectorPort output = factory.create(GConnectorPort.class);
+        node.addConnectorPort(output);
         //output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
 
         Commands.addNode(graphEditor.getModel(), node);
@@ -140,7 +140,7 @@ public class TitledSkinController extends DefaultSkinController {
      */
     private String allocateNewId() {
 
-        final Collection<GNode> nodes = graphEditor.getModel().getNodes();
+        final Collection<? extends GNode> nodes = graphEditor.getModel().getNodes();
         final OptionalInt max = nodes.stream().mapToInt(node -> Integer.parseInt(node.getId())).max();
 
         if (max.isPresent()) {

@@ -3,8 +3,8 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
-import com.ergotech.grapheditor.model.GConnector;
-import com.ergotech.grapheditor.model.GConnector.Direction;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GConnectorStyle;
@@ -32,9 +32,9 @@ public class TreeConnectorSkin extends GConnectorSkin {
     /**
      * Creates a new {@link TreeConnectorSkin} instance.
      *
-     * @param connector the {@link GConnector} that this skin is representing
+     * @param connector the {@link GConnectorPort} that this skin is representing
      */
-    public TreeConnectorSkin(final GConnector connector) {
+    public TreeConnectorSkin(final GConnectorPort connector) {
 
         super(connector);
 
