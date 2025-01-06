@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
@@ -33,7 +34,7 @@ import javafx.collections.ObservableMap;
 import javafx.util.Callback;
 
 /**
- * Default {@link SkinManager} ementation
+ * Default {@link SkinManager} documementation
  *
  * @since 09.02.2016
  */
@@ -380,18 +381,18 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public void removeNode(final GNode pNodeToRemove) {
-      if (pNodeToRemove != null) {
-          final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
-          if (removedSkin != null) {
-              mView.remove(removedSkin);
-              removedSkin.dispose();
-          }
-
-          // Iterate over the connector ports directly
-          for (GConnectorPort connectorPort : pNodeToRemove.getConnectorPorts()) {
-              removeConnector(connectorPort);
-          }
+    if (pNodeToRemove != null) {
+      final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
+      if (removedSkin != null) {
+        mView.remove(removedSkin);
+        removedSkin.dispose();
       }
+
+      // Iterate over the connector ports directly
+      for (GConnectorPort connectorPort : pNodeToRemove.getConnectorPorts()) {
+        removeConnector(connectorPort);
+      }
+    }
   }
 
   @Override
@@ -440,16 +441,16 @@ public class GraphEditorSkinManager implements SkinManager {
     }
   }
 
-//  @Override
-//  public void updateJoints(final GConnection pConnection) {
-//    final GConnectionSkin connectionSkin = lookupConnection(pConnection);
-//    if (connectionSkin != null) {
-//      final List<GJointSkin> connectionJointSkins = connectionSkin.getJointSkins().stream().map(this::lookupOrCreateJoint)
-//          .collect(Collectors.toList());
-//      connectionSkin.setJointSkins(connectionJointSkins);
-//    }
-//  }
-//
+  //  @Override
+  //  public void updateJoints(final GConnection pConnection) {
+  //    final GConnectionSkin connectionSkin = lookupConnection(pConnection);
+  //    if (connectionSkin != null) {
+  //      final List<GJointSkin> connectionJointSkins = connectionSkin.getJointSkins().stream().map(this::lookupOrCreateJoint)
+  //          .collect(Collectors.toList());
+  //      connectionSkin.setJointSkins(connectionJointSkins);
+  //    }
+  //  }
+  //
   /**
    * Looks up or creates a skin for the given component based on its type and the skin type.
    * <p>
@@ -464,22 +465,22 @@ public class GraphEditorSkinManager implements SkinManager {
    * @return the existing or newly created skin for the component
    */
   public <T, R> R lookupOrCreateSkin(T component, Class<R> skinType) {
-      // Determine the appropriate map based on the skin type
-      Map<T, R> skinsMap = getSkinsMapForType(skinType);
+    // Determine the appropriate map based on the skin type
+    Map<T, R> skinsMap = getSkinsMapForType(skinType);
 
-      // Use computeIfAbsent to either retrieve an existing skin or create a new one
-      return skinsMap.computeIfAbsent(component, key -> {
-          // Look up the factory using the component's runtime class and the skin type
-          Callback<T, R> factory = getSkinFactory(component.getClass(), skinType);
-          if (factory == null) {
-              throw new IllegalStateException(
-                  "No factory registered for component type: " + component.getClass().getName()
-                  + " and skin type: " + skinType.getName()
-              );
-          }
-          // Create a new skin using the factory
-          return factory.call(key);
-      });
+    // Use computeIfAbsent to either retrieve an existing skin or create a new one
+    return skinsMap.computeIfAbsent(component, key -> {
+      // Look up the factory using the component's runtime class and the skin type
+      Callback<T, R> factory = getSkinFactory(component.getClass(), skinType);
+      if (factory == null) {
+        throw new IllegalStateException(
+            "No factory registered for component type: " + component.getClass().getName()
+            + " and skin type: " + skinType.getName()
+            );
+      }
+      // Create a new skin using the factory
+      return factory.call(key);
+    });
   }
 
   /**
@@ -493,19 +494,19 @@ public class GraphEditorSkinManager implements SkinManager {
    */
   @SuppressWarnings("unchecked")
   private <T, R> Map<T, R> getSkinsMapForType(Class<R> skinType) {
-      if (skinType == GNodeSkin.class) {
-          return (Map<T, R>) mNodeSkins;
-      } else if (skinType == GConnectionSkin.class) {
-          return (Map<T, R>) mConnectionSkins;
-      } else if (skinType == GConnectorSkin.class) {
-          return (Map<T, R>) mConnectorSkins;
-      } else if (skinType == GJointSkin.class) {
-          return (Map<T, R>) mJointSkins;
-      } else if (skinType == GTailSkin.class) {
-          return (Map<T, R>) mTailSkins;
-      } else {
-          throw new IllegalArgumentException("Unsupported skin type: " + skinType.getName());
-      }
+    if (skinType == GNodeSkin.class) {
+      return (Map<T, R>) mNodeSkins;
+    } else if (skinType == GConnectionSkin.class) {
+      return (Map<T, R>) mConnectionSkins;
+    } else if (skinType == GConnectorSkin.class) {
+      return (Map<T, R>) mConnectorSkins;
+    } else if (skinType == GJointSkin.class) {
+      return (Map<T, R>) mJointSkins;
+    } else if (skinType == GTailSkin.class) {
+      return (Map<T, R>) mTailSkins;
+    } else {
+      throw new IllegalArgumentException("Unsupported skin type: " + skinType.getName());
+    }
   }
 
   @Override
@@ -670,4 +671,35 @@ public class GraphEditorSkinManager implements SkinManager {
       layouter.draw();
     }
   }
+
+  /** Return a List containing the values of all the Skin Maps. */
+  public List<? extends GSkin<?>> getSkins() {
+      return Stream.concat(
+              Stream.concat(
+                  mNodeSkins.values().stream(),
+                  mConnectionSkins.values().stream()
+              ),
+              mConnectorSkins.values().stream()
+          )
+          .collect(Collectors.toList());
+  }
+
+  /** Set a list of skins. These will populate the Skin Maps. */
+  public void setSkins(List<? extends GSkin<?>> skins) {
+      for (GSkin<?> skin : skins) {
+          if (skin instanceof GNodeSkin gNodeSkin) {
+              //  add to mNodeSkins
+              mNodeSkins.put(gNodeSkin.getItem(), gNodeSkin);
+          } else if (skin instanceof GConnectionSkin gConnectionSkin) {
+              //  add to mConnectionSkins
+              mConnectionSkins.put(gConnectionSkin.getItem(), gConnectionSkin);
+          } else if (skin instanceof GConnectorSkin gConnectorSkin) {
+              // add to mConnectorSkins
+              mConnectorSkins.put(gConnectorSkin.getItem(), gConnectorSkin);
+          } else {
+              throw new IllegalArgumentException("Unsupported GSkin type: " + skin.getClass().getName());
+          }
+      }
+  }
+
 }
