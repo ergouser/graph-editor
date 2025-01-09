@@ -1,3 +1,6 @@
 # jitpack.yml
 jdk:
   - openjdk21
+install:
+  - echo "Running maven manually (over gradle)"
+  - mvn install -DskipTests
