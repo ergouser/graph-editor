@@ -5,11 +5,9 @@
 .checkstyle
 target/
 .idea/
-.gradle/
-**/.gradle/
+.gradle
 **/build/
 **/bin/
-/gradle/
 **.iml
 .build*
 /libs
