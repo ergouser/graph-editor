@@ -8,7 +8,8 @@ This branch replaces the EMF framework with JavaFX (JFX) notifications. Here’s
 
 The Eclipse Modeling Framework (EMF) is a powerful tool, offering extensive flexibility for supporting various types of models. However, this flexibility introduces complexity, especially when only basic functionality, like notifications, is needed. In the Graph Editor, EMF is used mainly for notifications.
 
-Since the model components—such as `GNodes`, `GConnections`, `GConnectors`, and `GJoints`—are essentially JavaBeans, we can treat them accordingly. Thus, the EMF notification mechanism can be replaced with a custom application-specific setup using JavaFX’s `javafx.beans.property` classes and `Observable` classes from `javafx.collections`. This approach simplifies the code significantly and removes the EMF dependency.
+Since the model components—such as `GNodes`, `GConnections`, `GConnectors`, and `GJoints`—are essentially JavaBeans, we can treat them accordingly.
+Thus, the EMF notification mechanism can be replaced with a custom application-specific setup using JavaFX’s `javafx.beans.property` classes and `Observable` classes from `javafx.collections`. This approach simplifies the code significantly and removes the EMF dependency.
 
 To demonstrate the differences, let's take a look at a simple example - AddCommand
 
