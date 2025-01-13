@@ -5,12 +5,10 @@ plugins {
     id 'application'  // Add the application plugin
 }
 
-group = 'com.ergotech.graph-editor'
-version = 'E19.0.0'
 
 allprojects {
-    group = 'com.ergotech.graph-editor' // Set group for all subprojects
-    version = "SNAPSHOT"                // Set version for all subprojects
+    group = 'com.ergotech.graph-editor'
+    version = 'E19.0.0'
 }
 sourceCompatibility = 21
 targetCompatibility = 21
