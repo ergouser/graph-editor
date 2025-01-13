@@ -1,3 +1,5 @@
 # jitpack.yml
 jdk:
   - openjdk21
+install:
+  - ./gradlew ./gradlew build publishToMavenLocal -xtest

@@ -10,8 +10,6 @@ target/
 **/build/
 **/bin/
 /gradle/
-gradlew
-gradlew.bat
 **.iml
 .build*
 /libs
