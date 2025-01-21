@@ -2,8 +2,6 @@ package com.ergotech.grapheditor.model;
 
 import java.util.Collection;
 
-import javafx.beans.property.ObjectProperty;
-
 /**
  * A representation of the model object '<em><b>GConnector</b></em>'.
  *
