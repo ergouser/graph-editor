@@ -2,14 +2,14 @@ plugins {
     id 'eclipse'
     id 'org.openjfx.javafxplugin' version '0.1.0'
     id 'java'
-    id 'application'  // Add the application plugin
+    id 'application' // Add the application plugin
 }
-
 
 allprojects {
     group = 'com.ergotech.graph-editor'
-    version = 'E19.0.0'
+    version = 'E20.0.0'
 }
+
 sourceCompatibility = 21
 targetCompatibility = 21
 
@@ -29,23 +29,27 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'org.openjfx.javafxplugin'
     apply plugin: 'maven-publish'
-        apply plugin:  'application'  // Add the application plugin
-    
-repositories {
-    mavenCentral()
-}
+    apply plugin: 'application' // Add the application plugin
 
-dependencies {
-    testImplementation "junit:junit:${junitVersion}"
-    implementation "org.slf4j:slf4j-api:${orgSlf4jVersion}"
-    implementation 'org.slf4j:slf4j-simple:2.0.11'
-    implementation "org.openjfx:javafx-controls:${orgOpenjfxVersion}"
-    implementation "org.openjfx:javafx-fxml:${orgOpenjfxVersion}"
-    implementation 'org.openjfx:javafx-base:${orgOpenjfxVersion}'
-    implementation 'org.openjfx:javafx-graphics:${orgOpenjfxVersion}'
-    implementation 'org.openjfx:javafx-web:${orgOpenjfxVersion}'
-    testImplementation "org.testfx:openjfx-monocle:${openjfxMonocleVersion}"
-}
+    java {
+        withSourcesJar()
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testImplementation "junit:junit:${junitVersion}"
+        implementation "org.slf4j:slf4j-api:${orgSlf4jVersion}"
+        implementation 'org.slf4j:slf4j-simple:2.0.11'
+        implementation "org.openjfx:javafx-controls:${orgOpenjfxVersion}"
+        implementation "org.openjfx:javafx-fxml:${orgOpenjfxVersion}"
+        implementation "org.openjfx:javafx-base:${orgOpenjfxVersion}"
+        implementation "org.openjfx:javafx-graphics:${orgOpenjfxVersion}"
+        implementation "org.openjfx:javafx-web:${orgOpenjfxVersion}"
+        testImplementation "org.testfx:openjfx-monocle:${openjfxMonocleVersion}"
+    }
 
     javafx {
         version = '21'
@@ -68,6 +72,3 @@ dependencies {
     }
 }
 
-
-run {
-}
