@@ -1,16 +1,1 @@
 
-// Exclude the package 'io.github.eckig.grapheditor.model' and its subpackages
-sourceSets {
-    main {
-        java {
-            exclude 'io/github/eckig/grapheditor/model/**'
-        }
-    }
-    test {
-        java {
-            exclude 'io/github/eckig/grapheditor/model/**'
-        }
-    }
-}
-
-

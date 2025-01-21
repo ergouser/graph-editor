@@ -7,6 +7,4 @@ module com.ergotech.grapheditor.model {
   requires java.desktop;
 
   exports com.ergotech.grapheditor.model;
-  exports com.ergotech.grapheditor.model.impl;
-  exports com.ergotech.grapheditor.model.command;
 }
