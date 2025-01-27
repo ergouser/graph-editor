@@ -38,6 +38,11 @@ public abstract class GConnectorSkin extends GSkin<GConnectorPort> {
 
   /**
    * Creates a new {@link GConnectorSkin}.
+   */
+  public GConnectorSkin() {}
+
+  /**
+   * Creates a new {@link GConnectorSkin}.
    *
    * @param connector the {@link GConnectorPortImpl} represented by the skin
    */

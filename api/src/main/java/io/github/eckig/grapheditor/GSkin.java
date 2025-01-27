@@ -46,9 +46,12 @@ public abstract class GSkin<T extends Selectable> {
 
   protected GraphEditor graphEditor;
 
-  protected final T item;
+  protected T item;
 
   private Consumer<GSkin<?>> onPositionMoved;
+
+  protected GSkin() {
+  }
 
   /**
    * Constructor
@@ -160,6 +163,16 @@ public abstract class GSkin<T extends Selectable> {
    */
   public final T getItem() {
     return item;
+  }
+
+    /**
+     * Sets the item represented by this skin.
+     *
+     * @param item
+     *          the item to set
+     */
+  public final void setItem(T item) {
+    this.item = item;
   }
 
   /**
