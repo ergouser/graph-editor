@@ -632,7 +632,7 @@ public class GraphEditorSkinManager implements SkinManager {
     Callback<GConnection, GConnectionSkin> factory = getSkinFactory(pConnection.getClass(), GConnectionSkin.class);
     GConnectionSkin skin = factory.call(pConnection);
 
-    initConnectorSkin(skin);
+    initConnectionSkin(skin);
     return skin;
   }
 
@@ -645,7 +645,7 @@ public class GraphEditorSkinManager implements SkinManager {
    *
    * @param pSkin the {@link GConnectionSkin} to initialize
    */
-  public void initConnectorSkin(final GConnectionSkin pSkin) {
+  public void initConnectionSkin(final GConnectionSkin pSkin) {
     pSkin.setGraphEditor(mGraphEditor);
     if (!(pSkin instanceof VirtualSkin)) {
       mView.add(pSkin);
