@@ -570,8 +570,20 @@ public class GraphEditorSkinManager implements SkinManager {
     Callback<GConnectorPort, GConnectorSkin> factory = getSkinFactory(pConnector.getClass(), GConnectorSkin.class);
     GConnectorSkin skin = factory.call(pConnector);
 
-    skin.setGraphEditor(mGraphEditor);
+    initConnectorSkin(skin);
     return skin;
+  }
+
+  /**
+   * Initializes the given {@link GConnectorSkin} by setting the graph editor.
+   * <p>
+   * This method is called when a new connector skin is created, and it sets the graph editor instance.
+   * </p>
+   *
+   * @param pConnectorSkin the {@link GConnectorSkin} to initialize
+   */
+  public void initConnectorSkin(final GConnectorSkin pConnectorSkin) {
+    pConnectorSkin.setGraphEditor(mGraphEditor);
   }
 
   /**
@@ -589,8 +601,20 @@ public class GraphEditorSkinManager implements SkinManager {
     Callback<GConnectorPort, GTailSkin> factory = getSkinFactory(pConnector.getClass(), GTailSkin.class);
     GTailSkin skin = factory.call(pConnector);
 
-    skin.setGraphEditor(mGraphEditor);
+    initTailSkin(skin);
     return skin;
+  }
+
+  /**
+   * Initializes the given {@link GTailSkin} by setting the graph editor.
+   * <p>
+   * This method is called when a new tail skin is created, and it sets the graph editor instance.
+   * </p>
+   *
+   * @param pTailSkin the {@link GTailSkin} to initialize
+   */
+  public void initTailSkin(final GTailSkin pTailSkin) {
+    pTailSkin.setGraphEditor(mGraphEditor);
   }
 
   /**
@@ -608,11 +632,24 @@ public class GraphEditorSkinManager implements SkinManager {
     Callback<GConnection, GConnectionSkin> factory = getSkinFactory(pConnection.getClass(), GConnectionSkin.class);
     GConnectionSkin skin = factory.call(pConnection);
 
-    skin.setGraphEditor(mGraphEditor);
-    if (!(skin instanceof VirtualSkin)) {
-      mView.add(skin);
-    }
+    initConnectionSkin(skin);
     return skin;
+  }
+
+  /**
+   * Initializes the given {@link GConnectionSkin} by setting the graph editor and adding it to the view.
+   * <p>
+   * This method is called when a new connection skin is created, and it sets the graph editor instance
+   * and adds the skin to the view. If the skin is a virtual skin, it will not be added to the view.
+   * </p>
+   *
+   * @param pSkin the {@link GConnectionSkin} to initialize
+   */
+  public void initConnectionSkin(final GConnectionSkin pSkin) {
+    pSkin.setGraphEditor(mGraphEditor);
+    if (!(pSkin instanceof VirtualSkin)) {
+      mView.add(pSkin);
+    }
   }
 
   /**
@@ -630,14 +667,27 @@ public class GraphEditorSkinManager implements SkinManager {
     Callback<GJoint, GJointSkin> factory = getSkinFactory(pJoint.getClass(), GJointSkin.class);
     GJointSkin skin = factory.call(pJoint);
 
-    skin.setGraphEditor(mGraphEditor);
-    skin.getRoot().setEditorProperties(mGraphEditor.getProperties());
-    skin.impl_setOnPositionMoved(mOnPositionMoved);
-    skin.initialize();
-    if (!(skin instanceof VirtualSkin)) {
-      mView.add(skin);
-    }
+    initJointSkin(skin);
     return skin;
+  }
+
+  /**
+   * Initializes the given {@link GJointSkin} by setting the graph editor and adding it to the view.
+   * <p>
+   * This method is called when a new joint skin is created, and it sets the graph editor instance
+   * and adds the skin to the view. If the skin is a virtual skin, it will not be added to the view.
+   * </p>
+   *
+   * @param pSkin the {@link GJointSkin} to initialize
+   */
+  public void initJointSkin(final GJointSkin pSkin) {
+    pSkin.setGraphEditor(mGraphEditor);
+    pSkin.getRoot().setEditorProperties(mGraphEditor.getProperties());
+    pSkin.impl_setOnPositionMoved(mOnPositionMoved);
+    pSkin.initialize();
+    if (!(pSkin instanceof VirtualSkin)) {
+      mView.add(pSkin);
+    }
   }
 
   /**
@@ -655,14 +705,27 @@ public class GraphEditorSkinManager implements SkinManager {
     Callback<GNode, GNodeSkin> factory = getSkinFactory(pNode.getClass(), GNodeSkin.class);
     GNodeSkin skin = factory.call(pNode);
 
-    skin.setGraphEditor(mGraphEditor);
-    skin.getRoot().setEditorProperties(mGraphEditor.getProperties());
-    skin.impl_setOnPositionMoved(mOnPositionMoved);
-    skin.initialize();
-    if (!(skin instanceof VirtualSkin)) {
-      mView.add(skin);
-    }
+    initNodeSkin(skin);
     return skin;
+  }
+
+  /**
+   * Initializes the given {@link GNodeSkin} by setting the graph editor and adding it to the view.
+   * <p>
+   * This method is called when a new node skin is created, and it sets the graph editor instance
+   * and adds the skin to the view. If the skin is a virtual skin, it will not be added to the view.
+   * </p>
+   *
+   * @param pNodeSkin the {@link GNodeSkin} to initialize
+   */
+  public void initNodeSkin(final GNodeSkin pNodeSkin) {
+    pNodeSkin.setGraphEditor(mGraphEditor);
+    pNodeSkin.getRoot().setEditorProperties(mGraphEditor.getProperties());
+    pNodeSkin.impl_setOnPositionMoved(mOnPositionMoved);
+    pNodeSkin.initialize();
+    if (!(pNodeSkin instanceof VirtualSkin)) {
+      mView.add(pNodeSkin);
+    }
   }
 
   private void positionMoved(final GSkin<?> pMovedSkin) {

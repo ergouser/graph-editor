@@ -40,6 +40,13 @@ public abstract class GNodeSkin extends GSkin<GNode> {
 
     /**
      * Creates a new {@link GNodeSkin}.
+     */
+    public GNodeSkin() {
+        this(null);
+    }
+
+    /**
+     * Creates a new {@link GNodeSkin}.
      *
      * @param node the {@link GNode} represented by the skin
      */

@@ -40,6 +40,11 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
 
   /**
    * Creates a new {@link GConnectionSkin}.
+   */
+  public GConnectionSkin() {}
+
+  /**
+   * Creates a new {@link GConnectionSkin}.
    *
    * @param connection
    *          the {@link GConnection} represented by the skin
