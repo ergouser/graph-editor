@@ -71,10 +71,10 @@ public final class ConnectionCopier {
                     }
 
                     // Update the source or target of the copied connection
-                    if (connection.getSource().equals(connector)) {
-                        copiedConnection.setSource(copiedConnector);
+                    if (connection.getSourcePort().equals(connector)) {
+                        copiedConnection.setSourcePort(copiedConnector);
                     } else {
-                        copiedConnection.setTarget(copiedConnector);
+                        copiedConnection.setTargetPort(copiedConnector);
                     }
 
                     // Add the copied connection to the copied connector
@@ -98,10 +98,10 @@ public final class ConnectionCopier {
    */
   private static GNode getOpposingNode(final GConnectorPort connector, final GConnection connection) {
     GConnectorPort opposingConnector;
-    if (connection.getSource().equals(connector)) {
-      opposingConnector = connection.getTarget();
+    if (connection.getSourcePort().equals(connector)) {
+      opposingConnector = connection.getTargetPort();
     } else {
-      opposingConnector = connection.getSource();
+      opposingConnector = connection.getSourcePort();
     }
 
     if (opposingConnector != null && opposingConnector.getParent() != null) {

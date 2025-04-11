@@ -42,8 +42,8 @@ public class GModelUtilsTest {
         assertTrue(copies.get(1).getConnectorPorts().get(0).getConnections().size() == 1);
         assertEquals(copies.get(1).getConnectorPorts().get(0).getConnections().get(0), newConnection);
 
-        assertEquals(copies.get(0).getConnectorPorts().get(1), newConnection.getSource());
-        assertEquals(copies.get(1).getConnectorPorts().get(0), newConnection.getTarget());
+        assertEquals(copies.get(0).getConnectorPorts().get(1), newConnection.getSourcePort());
+        assertEquals(copies.get(1).getConnectorPorts().get(0), newConnection.getTargetPort());
 
         // Check no other connections have appeared.
         assertTrue(copies.get(0).getConnectorPorts().get(0).getConnections().isEmpty());
@@ -87,7 +87,7 @@ public class GModelUtilsTest {
         source.getConnections().add(connection);
         target.getConnections().add(connection);
 
-        connection.setSource(source);
-        connection.setTarget(target);
+        connection.setSourcePort(source);
+        connection.setTargetPort(target);
     }
 }

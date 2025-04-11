@@ -284,7 +284,7 @@ class MinimapNodeGroup extends Parent {
           continue;
         }
 
-        final GConnectorPort source = connection.getSource();
+        final GConnectorPort source = connection.getSourcePort();
         final GNode parentSource = source.getParent();
         final SkinLookup skinLookup = graphEditor.getSkinLookup();
 
@@ -304,7 +304,7 @@ class MinimapNodeGroup extends Parent {
             newX = scaleSharp(jointSkin.getX(), scaleFactor);
             newY = scaleSharp(jointSkin.getY(), scaleFactor);
           } else {
-            final GConnectorPort target = connection.getTarget();
+            final GConnectorPort target = connection.getTargetPort();
             final GNode parentTarget = target.getParent();
             GConnectorSkin targetSkin = skinLookup.lookupConnector(source);
             GNodeSkin parentTargetSkin = skinLookup.lookupNode(parentSource);

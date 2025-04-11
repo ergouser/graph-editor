@@ -28,7 +28,7 @@ public interface GConnection extends Selectable {
    *
    * @return the source node of the connection.
    */
-  public GConnectorPort getSource();
+  public GConnectorPort getSourcePort();
 
   /**
    * Sets the value of the 'Source' attribute.
@@ -36,14 +36,14 @@ public interface GConnection extends Selectable {
    * @param source
    *          the source node to set.
    */
-  public void setSource(GConnectorPort source);
+  public void setSourcePort(GConnectorPort source);
 
   /**
    * Returns the value of the 'Target' attribute.
    *
    * @return the target node of the connection.
    */
-  public GConnectorPort getTarget();
+  public GConnectorPort getTargetPort();
 
   /**
    * Sets the value of the 'Target' attribute.
@@ -51,7 +51,7 @@ public interface GConnection extends Selectable {
    * @param target
    *          the target node to set.
    */
-  public void setTarget(GConnectorPort target);
+  public void setTargetPort(GConnectorPort target);
 
   /**
    * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points

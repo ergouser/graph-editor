@@ -53,8 +53,8 @@ public class ConnectionCommands {
 
     // prepare new connection:
     final GConnection connection =model.getGraphFactory().create(GConnection.class);
-    connection.setSource(source);
-    connection.setTarget(target);
+    connection.setSourcePort(source);
+    connection.setTargetPort(target);
     List<GJointSkin> jointSkins = joints.stream()
         .map(joint -> skinManager.lookupJoint(joint))
         .collect(Collectors.toList());
@@ -94,8 +94,8 @@ public class ConnectionCommands {
 
     final CompoundCommand command = new CompoundCommand();
 
-    final GConnectorPort source = connection.getSource();
-    final GConnectorPort target = connection.getTarget();
+    final GConnectorPort source = connection.getSourcePort();
+    final GConnectorPort target = connection.getTargetPort();
 
     //      command.append(RemoveCommand.create(editingDomain, model, GraphPackage.Literals.GMODEL__CONNECTIONS, connection));
     //      command.append(

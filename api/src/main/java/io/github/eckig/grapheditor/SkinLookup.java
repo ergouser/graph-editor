@@ -30,6 +30,7 @@ public interface SkinLookup {
      * @return the associated {@link GConnectorSkin} instance
      */
     GConnectorSkin lookupConnector(final GConnectorPort connector);
+    
 
     /**
      * Gets the skin for the given connection.

@@ -464,7 +464,7 @@ public class GraphEditorSkinManager implements SkinManager {
    * @param skinType  the class of the skin
    * @return the existing or newly created skin for the component
    */
-  public <T, R> R lookupOrCreateSkin(T component, Class<R> skinType) {
+  public <T, R extends GSkin<?>> R lookupOrCreateSkin(T component, Class<R> skinType) {
     // Determine the appropriate map based on the skin type
     Map<T, R> skinsMap = getSkinsMapForType(skinType);
 

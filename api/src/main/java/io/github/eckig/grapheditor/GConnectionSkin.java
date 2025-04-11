@@ -126,10 +126,10 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
       final Point2D[] points = new Point2D[2];
 
       // Start: Source position
-      points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSource()), skinLookup);
+      points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSourcePort()), skinLookup);
 
       // End: Target position
-      points[1] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getTarget()), skinLookup);
+      points[1] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getTargetPort()), skinLookup);
 
       return points;
     } else {
@@ -140,10 +140,10 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
       GeometryUtils.fillJointPositions(this, points);
 
       // Start: Source position
-      points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSource()), skinLookup);
+      points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSourcePort()), skinLookup);
 
       // End: Target position
-      points[len - 1] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getTarget()), skinLookup);
+      points[len - 1] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getTargetPort()), skinLookup);
 
       return points;
     }

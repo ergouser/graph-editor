@@ -90,42 +90,55 @@ public class Commands {
    * @param node
    *          the {@link GNode} to remove from the model
    */
-  public static void removeNode(final GModel model, final GNode node) {
+  public static  void removeNode(final GModel model, final GNode node ) {
+    removeNode(model, node, null);
+  }
+    /**
+     * Removes a node from the model.
+     *
+     * <p>
+     * Also removes any connections that were attached to the node.
+     * </p>
+     *
+     * @param model
+     *          the {@link GModel} from which the node should be removed
+     * @param node
+     *          the {@link GNode} to remove from the model
+     * @param baseCommand
+     *          a command provided as part of a larger removal process (eg clearing the model)
+     *          the command will not be executed by this method if passed in
+     */
+    public static  void removeNode(final GModel model, final GNode node, final CompoundCommand baseCommand) {
 
-      final CompoundCommand command = new CompoundCommand();
-      command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+    final CompoundCommand command;
+    if ( baseCommand != null ) {
+      command = baseCommand;
+    } else {
+      command = new CompoundCommand();
+    }
 
-      final List<GConnection> connectionsToDelete = new ArrayList<>();
+    final List<GConnection> connectionsToDelete = new ArrayList<>();
 
-      for (final GConnectorPort connector : node.getConnectorPorts()) {
-        for (final GConnection connection : connector.getConnections()) {
-          if (connection != null && !connectionsToDelete.contains(connection)) {
-            connectionsToDelete.add(connection);
-          }
+    // Iterate through the connector ports and remove all the connections
+    for (final GConnectorPort connector : node.getConnectorPorts()) {
+      // Create an undoable command for the connectioin removal
+      for (final GConnection connection : connector.getConnections()) {
+        if (connection != null && !connectionsToDelete.contains(connection)) {
+          command.append(RemoveCommand.create(connector, owner -> ((GConnectorPort) owner).getConnections(), connection));
+          connectionsToDelete.add(connection);
         }
       }
-
-      for (final GConnection connection : connectionsToDelete) {
-        command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
-
-        final GConnectorPort source = connection.getSource();
-        final GConnectorPort target = connection.getTarget();
-
-        if (!node.equals(source.getParent())) {
-          // need to include what the connection is being removed from
-          command.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), connection));
-        }
-
-        if (!node.equals(target.getParent())) {
-          command.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), connection));
-        }
-      }
-
-      if (command.canExecute()) {
-        CommandStack.getCommandStack(model).execute(command);
-      }
+    }
+    // remove the node...
+    command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+ 
+    // execute the command if it can be executed and it isn't part of a larger removal
+    if (baseCommand == null && command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
+    }
   }
 
+ 
   /**
    * Clears everything in the given model.
    *
@@ -136,18 +149,13 @@ public class Commands {
 
     final CompoundCommand command = new CompoundCommand();
 
-    List<GConnection> existingConnections = new ArrayList<>(model.getConnections());
-    for (final GConnection connection : existingConnections) {
-      command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
-    }
     List<GNode> existingNodes = new ArrayList<>(model.getNodes());
     for (final GNode node : existingNodes) {
-      command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
+      removeNode(model, node, command);
     }
     if (command.canExecute()) {
       CommandStack.getCommandStack(model).execute(command);
     }
-
   }
 
   /**
@@ -160,42 +168,26 @@ public class Commands {
    */
   public static void clearConnectors(final GModel model, final List<GNode> nodes) {
 
-      final CompoundCommand command = new CompoundCommand();
+    final CompoundCommand command = new CompoundCommand();
 
-      final Set<GConnection> connectionsToRemove = new HashSet<>();
-      final Set<GConnectorPort> connectorsToRemove = new HashSet<>();
+    final Set<GConnection> connectionsToRemove = new HashSet<>();
+    //final Set<GConnectorPort connectorsToRemove = new HashSet<>();
 
-      List<GNode> existingNodes = new ArrayList<>(nodes);
-      for (final GNode node : existingNodes) {
-        List<GConnectorPort> existingConnectors = new ArrayList<>(node.getConnectorPorts());
-        for (GConnectorPort connector : existingConnectors) {
-          command.append(RemoveCommand.create(node, owner -> ((GNode) owner).getConnectorPorts(), connector));
+    List<GNode> existingNodes = new ArrayList<>(model.getNodes());
+    for (final GNode node : existingNodes) {
+      List<GConnectorPort> existingConnectors = new ArrayList<>(node.getConnectorPorts());
+      for (GConnectorPort connector : existingConnectors) {
+        for (final GConnection connection : connector.getConnections()) {
+          if (connection != null && !connectionsToRemove.contains(connection)) {
+            command.append(RemoveCommand.create(connection, owner -> ((GConnectorPort) owner).getConnections(), connection));
+            connectionsToRemove.add(connection);
+          }
         }
-
-        connectorsToRemove.addAll(node.getConnectorPorts());
-
-        for (final GConnectorPort connector : node.getConnectorPorts()) {
-          connectionsToRemove.addAll(connector.getConnections());
-        }
+        command.append(RemoveCommand.create(node, owner -> ((GNode) owner).getConnectorPorts(), connector));
       }
-
-      for (final GConnection connection : connectionsToRemove) {
-        final GConnectorPort source = connection.getSource();
-        final GConnectorPort target = connection.getTarget();
-
-        if (!connectorsToRemove.contains(source)) {
-          command.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), connection));
-        }
-
-        if (!connectorsToRemove.contains(target)) {
-          command.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), connection));
-        }
-        command.append(RemoveCommand.create(model, owner -> model.getConnections(), connection));
-      }
-
-      if (command.canExecute()) {
-        CommandStack.getCommandStack(model).execute(command);
-      
+    }
+    if (command.canExecute()) {
+      CommandStack.getCommandStack(model).execute(command);
     }
   }
 
@@ -215,49 +207,56 @@ public class Commands {
    */
   public static void updateLayoutValues(final CompoundCommand command, final GModel model,
       final SkinLookup skinLookup) {
-      for (final GNode node : model.getNodes()) {
-          final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-          if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
-              final Region nodeRegion = nodeSkin.getRoot();
+    @SuppressWarnings("unchecked")
+    List<GNode> existingNodes = new ArrayList<>(model.getNodes());
+    for (final GNode node : existingNodes) {
+      final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+      if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
+        final Region nodeRegion = nodeSkin.getRoot();
 
-              if (nodeSkin.xProperty().get() != nodeRegion.getLayoutX()) {
-                  command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
-              }
+        if (nodeSkin.xProperty().get() != nodeRegion.getLayoutX()) {
+          command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
+        }
 
-              if (nodeSkin.yProperty().get() != nodeRegion.getLayoutY()) {
-                  command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
-              }
+        if (nodeSkin.yProperty().get() != nodeRegion.getLayoutY()) {
+          command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
+        }
 
-              if (nodeSkin.widthProperty().get() != nodeRegion.getWidth()) {
-                  command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
-              }
+        if (nodeSkin.widthProperty().get() != nodeRegion.getWidth()) {
+          command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
+        }
 
-              if (nodeSkin.heightProperty().get() != nodeRegion.getHeight()) {
-                  command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
-              }
-          }
+        if (nodeSkin.heightProperty().get() != nodeRegion.getHeight()) {
+          command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
+        }
       }
-
-      for (final GConnection connection : model.getConnections()) {
-          updateConnector(connection.getSource(), command, skinLookup);
-          updateConnector(connection.getTarget(), command, skinLookup);
+      for (GConnectorPort connector : node.getConnectorPorts()) {
+        updateConnector(connector, command, skinLookup);  // update the position of all the connectors first, and only once.
+      }
+      for (GConnectorPort connector : node.getConnectorPorts()) {
+       for (final GConnection connection : connector.getConnections()) {
+//          updateConnector(connection.getSource(), command, skinLookup);
+//          updateConnector(connection.getTarget(), command, skinLookup);
 
           for (final GJointSkin jointSkin : skinLookup.lookupConnection(connection).getJointSkins()) {
-              if (jointSkin != null && checkJointChanged(jointSkin)) {
-                  final Region jointRegion = jointSkin.getRoot();
-                  final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
-                  final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
+            if (jointSkin != null && checkJointChanged(jointSkin)) {
+              final Region jointRegion = jointSkin.getRoot();
+              final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
+              final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
 
-                  if (jointSkin.xProperty().get() != x) {
-                      command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
-                  }
-
-                  if (jointSkin.yProperty().get() != y) {
-                      command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
-                  }
+              if (jointSkin.xProperty().get() != x) {
+                command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
               }
+
+              if (jointSkin.yProperty().get() != y) {
+                command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
+              }
+            }
           }
+        }
       }
+    }
+
   }
 
   /**

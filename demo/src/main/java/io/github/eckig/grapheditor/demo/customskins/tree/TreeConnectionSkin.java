@@ -98,7 +98,7 @@ public class TreeConnectionSkin extends GConnectionSkin {
       final Point2D start = points[0];
       final Point2D end = points[1];
 
-      if (getItem().getSource().getDirection() == Direction.OUTPUT) {
+      if (getItem().getSourcePort().getDirection() == Direction.OUTPUT) {
         ArrowUtils.draw(arrow, start, end, OFFSET_FROM_CONNECTOR);
         ArrowUtils.draw(background, start, end, OFFSET_FROM_CONNECTOR);
       } else {

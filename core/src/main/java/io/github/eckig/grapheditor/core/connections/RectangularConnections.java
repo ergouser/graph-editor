@@ -43,7 +43,7 @@ public final class RectangularConnections {
    * @return {@code true} if the segment beginning at this index is horizontal
    */
   public static boolean isSegmentHorizontal(final GConnection connection, final SkinLookup skinLookup, final int i) {
-    GConnectorPort source = connection.getSource();
+    GConnectorPort source = connection.getSourcePort();
     GConnectorSkin connectorSkin = skinLookup.lookupConnector(source);
     final Side side = connectorSkin.getSide();
     final boolean sourceIsLeft = side == Side.LEFT;
@@ -61,8 +61,8 @@ public final class RectangularConnections {
    * @return {@code true} if the joint count is correct
    */
   public static boolean checkJointCount(final GConnectionSkin connectionSkin, final SkinLookup skinLookup) {
-    final Side sourceSide = skinLookup.lookupConnector(connectionSkin.getItem().getSource()).getSide();
-    final Side targetSide = skinLookup.lookupConnector(connectionSkin.getItem().getTarget()).getSide();
+    final Side sourceSide = skinLookup.lookupConnector(connectionSkin.getItem().getSourcePort()).getSide();
+    final Side targetSide = skinLookup.lookupConnector(connectionSkin.getItem().getTargetPort()).getSide();
 
     final boolean bothHorizontal = sourceSide.isHorizontal() && targetSide.isHorizontal();
     final boolean bothVertical = sourceSide.isVertical() && targetSide.isVertical();

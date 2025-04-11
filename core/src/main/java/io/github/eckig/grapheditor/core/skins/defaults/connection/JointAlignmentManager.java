@@ -282,7 +282,7 @@ public class JointAlignmentManager {
      */
     private boolean isNodeStationary(final GJointSkin jointSkin, final boolean source) {
 
-        final GConnectorPort connector = source ? connection.getSource() : connection.getTarget();
+        final GConnectorPort connector = source ? connection.getSourcePort() : connection.getTargetPort();
         final GNode parent = connector.getParent();
 
         final GNodeSkin nodeSkin = skinLookup.lookupNode(parent);

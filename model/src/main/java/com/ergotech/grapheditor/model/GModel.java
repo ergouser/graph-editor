@@ -1,6 +1,7 @@
 package com.ergotech.grapheditor.model;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Represents the model of a graph in the graph editor.
@@ -12,95 +13,102 @@ import java.util.Collection;
  */
 public interface GModel {
 
-    // Nodes
+  // Nodes
 
-    /**
-     * Gets the list of nodes in the model.
-     *
-     * @return a list of {@link GNode} instances contained in the model.
-     */
-    Collection<? extends GNode> getNodes();
+  /**
+   * Gets the list of nodes in the model.
+   *
+   * @return a list of {@link GNode} instances contained in the model.
+   */
+  Collection<? extends GNode> getNodes();
 
-    /**
-     * Adds a node to the model.
-     *
-     * @param node the {@link GNode} instance to add.
-     */
-    void addNode(GNode node);
+  /**
+   * Adds a node to the model.
+   *
+   * @param node the {@link GNode} instance to add.
+   */
+  void addNode(GNode node);
 
-    /**
-     * Removes a node from the model.
-     *
-     * @param node the {@link GNode} instance to remove.
-     */
-    void removeNode(GNode node);
+  /**
+   * Removes a node from the model.
+   *
+   * @param node the {@link GNode} instance to remove.
+   */
+  void removeNode(GNode node);
 
-    // Connections
+  // Connections
 
-    /**
-     * Gets the list of connections in the model.
-     *
-     * @return a list of {@link GConnection} instances contained in the model.
-     */
-    Collection<? extends GConnection> getConnections();
+  // connections are added to ConnectorPorts and have no place here...
+  /**
+   * Gets the list of connections in the model.
+   *
+   * @return a list of {@link GConnection} instances contained in the model.
+   */
+  // default method returns a non-mutable list.
+  default Collection<? extends GConnection> getConnections() {
+    return getNodes().stream()
+        .flatMap(node -> node.getConnectorPorts().stream())
+        .flatMap(port -> port.getConnections().stream())
+        .collect(Collectors.toList());
+  }
+  //
+  //    /**
+  //     * Adds a connection to the model.
+  //     *
+  //     * @param connection the {@link GConnection} instance to add.
+  //     */
+  //    void addConnection(GConnection connection);
+  //
+  //    /**
+  //     * Removes a connection from the model.
+  //     *
+  //     * @param connection the {@link GConnection} instance to remove.
+  //     */
+  //    void removeConnection(GConnection connection);
 
-    /**
-     * Adds a connection to the model.
-     *
-     * @param connection the {@link GConnection} instance to add.
-     */
-    void addConnection(GConnection connection);
+  /**
+   * Gets the type of the model.
+   *
+   * @return the type of the model as a {@link String}.
+   */
+  String getType();
 
-    /**
-     * Removes a connection from the model.
-     *
-     * @param connection the {@link GConnection} instance to remove.
-     */
-    void removeConnection(GConnection connection);
+  /**
+   * Sets the type of the model.
+   *
+   * @param value the type to set for the model.
+   */
+  void setType(String value);
 
-    /**
-     * Gets the type of the model.
-     *
-     * @return the type of the model as a {@link String}.
-     */
-    String getType();
-
-    /**
-     * Sets the type of the model.
-     *
-     * @param value the type to set for the model.
-     */
-    void setType(String value);
-
-//    /**
-//     * Gets the content width of the model.
-//     *
-//     * @return the content width as a double.
-//     */
-//    double getContentWidth();
-//
-//    /**
-//     * Sets the content width of the model.
-//     *
-//     * @param value the content width to set.
-//     */
-//    void setContentWidth(double value);
-//
-//    /**
-//     * Gets the content height of the model.
-//     *
-//     * @return the content height as a double.
-//     */
-//    double getContentHeight();
-//
-//    /**
-//     * Sets the content height of the model.
-//     *
-//     * @param value the content height to set.
-//     */
-//    void setContentHeight(double value);
-//
-    /** Return the graph factory. */
-    GraphFactory getGraphFactory();
+  //    /**
+  //     * Gets the content width of the model.
+  //     *
+  //     * @return the content width as a double.
+  //     */
+  //    double getContentWidth();
+  //
+  //    /**
+  //     * Sets the content width of the model.
+  //     *
+  //     * @param value the content width to set.
+  //     */
+  //    void setContentWidth(double value);
+  //
+  //    /**
+  //     * Gets the content height of the model.
+  //     *
+  //     * @return the content height as a double.
+  //     */
+  //    double getContentHeight();
+  //
+  //    /**
+  //     * Sets the content height of the model.
+  //     *
+  //     * @param value the content height to set.
+  //     */
+  //    void setContentHeight(double value);
+  //
+  /** Return the graph factory. */
+  GraphFactory getGraphFactory();
 
 }

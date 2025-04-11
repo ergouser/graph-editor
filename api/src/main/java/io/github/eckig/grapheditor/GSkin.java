@@ -5,6 +5,7 @@ package io.github.eckig.grapheditor;
 
 import java.util.function.Consumer;
 
+import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.utils.DraggableBox;
@@ -60,6 +61,14 @@ public abstract class GSkin<T extends Selectable> {
     this.item = pItem;
   }
 
+  /**
+   * Initializes the node skin. The default does nothing.
+   *
+   */
+  public void initialize() {
+    
+  }
+  
   /**
    * Sets the graph editor instance that this skin is a part of.
    *

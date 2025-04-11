@@ -163,7 +163,7 @@ public class GraphEditorController<E extends GraphEditor> {
     // Set up listeners on the model's nodes list
     ((ObservableList<? extends GNode>) model.getNodes()).addListener(nodesChangeListener);
     // Set up listeners on the model's connections list
-    ((ObservableList<? extends GConnection>)model.getConnections()).addListener(connectionsChangeListener);
+    //((ObservableList<? extends GConnection>)model.getConnections()).addListener(connectionsChangeListener);
   }
 
   private void removeModelListeners(GModel model) {
@@ -171,7 +171,7 @@ public class GraphEditorController<E extends GraphEditor> {
     ((ObservableList<? extends GNode>) model.getNodes()).removeListener(nodesChangeListener);
 
     // Remove listeners on the model's connections list
-    ((ObservableList<? extends GConnection>) model.getConnections()).removeListener(connectionsChangeListener);
+    //((ObservableList<? extends GConnection>) model.getConnections()).removeListener(connectionsChangeListener);
 
   }
 
@@ -221,7 +221,7 @@ public class GraphEditorController<E extends GraphEditor> {
     mModelLayoutUpdater.addNode(node);
     mSelectionManager.addNode(node);
     markConnectorsDirty(node); // Ensure connectors are marked dirty when a node is added
-
+   // probably should be something done with ConnectorPorts here...
   } 
   private void addNodeListeners(GNode node) {
     // Create listeners
@@ -264,7 +264,13 @@ public class GraphEditorController<E extends GraphEditor> {
     });
   }
 
-  private void modelChanged(final GModel pOldModel, final GModel pNewModel) {
+  /** This action is not undoable and so will also invalidate the
+   * undo stack.
+   * 
+   * @param pOldModel
+   * @param pNewModel
+   */
+   private void modelChanged(final GModel pOldModel, final GModel pNewModel) {
     if (pOldModel != null) {
       // Remove listeners from the old model
       removeModelListeners(pOldModel);
@@ -274,10 +280,10 @@ public class GraphEditorController<E extends GraphEditor> {
         removeNode(node);
       }
 
-      // Remove all connections
-      for (GConnection connection : new ArrayList<>(pOldModel.getConnections())) {
-        removeConnection(connection);
-      }
+      //      // Remove all connections
+      //      for (GConnection connection : new ArrayList<>(pOldModel.getConnections())) {
+      //        removeConnection(connection);
+      //      }
 
       // Clear any remaining skins
       mSkinManager.clear();
@@ -298,10 +304,10 @@ public class GraphEditorController<E extends GraphEditor> {
         addNode(node);
       }
 
-      // Add existing connections
-      for (GConnection connection : pNewModel.getConnections()) {
-        addConnection(connection);
-      }
+      //      // Add existing connections
+      //      for (GConnection connection : pNewModel.getConnections()) {
+      //        addConnection(connection);
+      //      }
 
       // Initialize managers with the new model
       mSelectionManager.initialize(pNewModel);
@@ -389,6 +395,9 @@ public class GraphEditorController<E extends GraphEditor> {
     mSelectionManager.removeNode(node);
     mSkinManager.removeNode(node);
     ((GNodeImpl)node).removeListeners();
+    for (GConnectorPort connector : node.getConnectorPorts()) {
+      removeConnector(connector);
+    }
   }
 
   private void nodePositionChanged(GNode node) {

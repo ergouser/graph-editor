@@ -70,8 +70,8 @@ public final class ModelSanityChecker {
 
     for (final GConnection connection : model.getConnections()) {
 
-      final GConnectorPort source = connection.getSource();
-      final GConnectorPort target = connection.getTarget();
+      final GConnectorPort source = connection.getSourcePort();
+      final GConnectorPort target = connection.getTargetPort();
 
       if (source == null || target == null) {
         LOGGER.error("Connection must have non-null source and target connectors.");

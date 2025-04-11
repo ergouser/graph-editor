@@ -126,8 +126,8 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   }
 
   private void remove(final RemoveContext pRemoveContext, final CompoundCommand pCommand, final GConnection pToDelete) {
-    final GConnectorPort source = pToDelete.getSource();
-    final GConnectorPort target = pToDelete.getTarget();
+    final GConnectorPort source = pToDelete.getSourcePort();
+    final GConnectorPort target = pToDelete.getTargetPort();
 
     // Remove the connection from the model's connections list
     pCommand.append(RemoveCommand.create(model, owner -> model.getConnections(), pToDelete));

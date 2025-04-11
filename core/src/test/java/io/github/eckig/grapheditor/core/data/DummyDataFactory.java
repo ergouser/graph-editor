@@ -55,8 +55,8 @@ public class DummyDataFactory {
     System.out.println("Connections:");
     for (GConnection connection : model.getConnections()) {
       System.out.println("  GConnection:");
-      System.out.println("    source: " + connection.getSource());
-      System.out.println("    target: " + connection.getTarget());
+      System.out.println("    source: " + connection.getSourcePort());
+      System.out.println("    target: " + connection.getTargetPort());
       System.out.println("    joints:");
       for (GJoint joint : connection.getJoints()) {
         System.out.println("      GJoint:");
@@ -209,8 +209,8 @@ public class DummyDataFactory {
     GConnection connection0 = new GConnection();
     GConnectorPort source0 = nodeConnectors.get(0).get(1); // node0's output connector
     GConnectorPort target0 = nodeConnectors.get(1).get(0); // node1's input connector
-    connection0.setSource(source0);
-    connection0.setTarget(target0);
+    connection0.setSourcePort(source0);
+    connection0.setTargetPort(target0);
 
      // Add the connection to the model, source, and target using commands
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection0));
@@ -236,8 +236,8 @@ public class DummyDataFactory {
     GConnection connection1 = new GConnection();
     GConnectorPort source1 = nodeConnectors.get(5).get(1); // node5's output connector
     GConnectorPort target1 = nodeConnectors.get(4).get(0); // node4's input connector
-    connection1.setSource(source1);
-    connection1.setTarget(target1);
+    connection1.setSourcePort(source1);
+    connection1.setTargetPort(target1);
 
     // Add the connection and its associations
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection1));
@@ -261,8 +261,8 @@ public class DummyDataFactory {
     GConnection connection2 = new GConnection();
     GConnectorPort source2 = nodeConnectors.get(1).get(2); // node1's second output connector
     GConnectorPort target2 = nodeConnectors.get(2).get(0); // node2's input connector
-    connection2.setSource(source2);
-    connection2.setTarget(target2);
+    connection2.setSourcePort(source2);
+    connection2.setTargetPort(target2);
 
     // Add the connection and its associations
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection2));
@@ -286,8 +286,8 @@ public class DummyDataFactory {
     GConnection connection3 = new GConnection();
     GConnectorPort source3 = nodeConnectors.get(1).get(1); // node1's first output connector
     GConnectorPort target3 = nodeConnectors.get(3).get(0); // node3's input connector
-    connection3.setSource(source3);
-    connection3.setTarget(target3);
+    connection3.setSourcePort(source3);
+    connection3.setTargetPort(target3);
 
     // Add the connection and its associations
     compoundCommand.append(AddCommand.create(model, owner -> ((GModel) owner).getConnections(), connection3));

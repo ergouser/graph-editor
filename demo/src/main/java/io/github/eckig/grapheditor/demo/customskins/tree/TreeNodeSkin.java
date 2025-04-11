@@ -272,8 +272,8 @@ public class TreeNodeSkin extends GNodeSkin {
     final GConnectionSkin connectionSkin = skinManager.lookupOrCreateConnection(connection);
 
     connectionSkin.setType(TreeSkinConstants.TREE_CONNECTION);
-    connection.setSource(parentOutput);
-    connection.setTarget(input);
+    connection.setSourcePort(parentOutput);
+    connection.setTargetPort(input);
 
     input.addConnection(connection);
 
@@ -283,7 +283,7 @@ public class TreeNodeSkin extends GNodeSkin {
     //command.append(AddCommand.create(editingDomain, model, NODES, childNode));
     command.append(AddCommand.create(model, owner -> model.getNodes(), childNode));
     //command.append(AddCommand.create(editingDomain, model, CONNECTIONS, connection));
-    command.append(AddCommand.create(model, owner -> model.getConnections(), connection));
+    // connections can only be added to connectorports  command.append(AddCommand.create(model, owner -> model.getConnections(), connection));
     //command.append(AddCommand.create(editingDomain, parentOutput, CONNECTOR_CONNECTIONS, connection));  ??????
     command.append(AddCommand.create(parentOutput, owner -> parentOutput.getConnections(), connection));
 

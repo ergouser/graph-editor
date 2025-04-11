@@ -6,6 +6,7 @@ package io.github.eckig.grapheditor.core.view;
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
+import io.github.eckig.grapheditor.GSkin;
 import io.github.eckig.grapheditor.GTailSkin;
 import io.github.eckig.grapheditor.VirtualSkin;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
@@ -104,6 +105,64 @@ public class GraphEditorView extends Region
     {
         mNodeLayer.getChildren().clear();
         mConnectionLayer.getChildren().clear();
+    }
+
+    /**
+     * Adds a skin to the node layer pane.  This is currently only node skins.
+     *
+     * @param pNodeSkin
+     *            the {@link GNodeSkin} instance to be added
+     */
+    public void addNode(final GSkin<?> pNodeSkin)
+    {
+        if (pNodeSkin != null && !(pNodeSkin instanceof VirtualSkin))
+        {
+            mNodeLayer.getChildren().add(pNodeSkin.getRoot());
+        }
+    }
+
+    /**
+     * Removes a skin to the node layer pane.  This is currently only node skins.
+     * Does nothing if the skin is not present.
+     *
+     * @param pNodeSkin
+     *            the {@link GNodeSkin} instance to remove
+     */
+    public void removeNode(final GSkin<?> pNodeSkin)
+    {
+        if (pNodeSkin != null && !(pNodeSkin instanceof VirtualSkin))
+        {
+            mNodeLayer.getChildren().remove(pNodeSkin.getRoot());
+        }
+    }
+
+    /**
+     * Adds a skin to the connection layer pane.  This is Connection skins, tail skins and joints..
+     *
+     * @param pNodeSkin
+     *            the {@link GNodeSkin} instance to be added
+     */
+    public void addConnection(final GSkin<?> pConnectionSkin)
+    {
+        if (pConnectionSkin != null && !(pConnectionSkin instanceof VirtualSkin))
+        {
+          mConnectionLayer.getChildren().add(pConnectionSkin.getRoot());
+        }
+    }
+
+    /**
+     * Adds a skin to the connection layer pane.  This is Connection skins, tail skins and joints..
+     * Does nothing if the skin is not present.
+     *
+     * @param pConnectionSkin
+     *            the {@link GConnectionSkin} instance to remove
+     */
+    public void removeConnection(final GSkin<?> pConnectionSkin)
+    {
+        if (pConnectionSkin != null && !(pConnectionSkin instanceof VirtualSkin))
+        {
+            mConnectionLayer.getChildren().remove(pConnectionSkin.getRoot());
+        }
     }
 
     /**

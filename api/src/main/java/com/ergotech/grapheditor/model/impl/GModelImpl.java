@@ -63,26 +63,26 @@ public class GModelImpl implements GModel {
     // node.setParentModel(null);
   }
 
-  // Connections
-  @Override
-  public ObservableList<GConnection> getConnections() {
-    return connections;
-  }
-
-  @Override
-  public void addConnection(GConnection connection) {
-    connections.add(connection);
-    // If bidirectional, set the parent model in the connection
-    // connection.setParentModel(this);
-  }
-
-  @Override
-  public void removeConnection(GConnection connection) {
-    connections.remove(connection);
-    // If bidirectional, remove the parent model reference
-    // connection.setParentModel(null);
-  }
-
+//  // Connections
+//  @Override
+//  public ObservableList<GConnection> getConnections() {
+//    return connections;
+//  }
+//
+//  @Override
+//  public void addConnection(GConnection connection) {
+//    connections.add(connection);
+//    // If bidirectional, set the parent model in the connection
+//    // connection.setParentModel(this);
+//  }
+//
+//  @Override
+//  public void removeConnection(GConnection connection) {
+//    connections.remove(connection);
+//    // If bidirectional, remove the parent model reference
+//    // connection.setParentModel(null);
+//  }
+//
   // Type Property
   public StringProperty typeProperty() {
     return type;

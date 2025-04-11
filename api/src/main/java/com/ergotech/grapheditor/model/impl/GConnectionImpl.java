@@ -103,7 +103,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    * @return the source node of the connection.
    */
   @Override
-  public GConnectorPort getSource() {
+  public GConnectorPort getSourcePort() {
     return source.get();
   }
 
@@ -114,7 +114,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *          the source node to set.
    */
   @Override
-  public void setSource(GConnectorPort source) {
+  public void setSourcePort(GConnectorPort source) {
     this.source.set(source);
   }
 
@@ -133,7 +133,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    * @return the target node of the connection.
    */
   @Override
-  public GConnectorPort getTarget() {
+  public GConnectorPort getTargetPort() {
     return target.get();
   }
 
@@ -144,7 +144,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
    *          the target node to set.
    */
   @Override
-  public void setTarget(GConnectorPort target) {
+  public void setTargetPort(GConnectorPort target) {
     this.target.set(target);
   }
 

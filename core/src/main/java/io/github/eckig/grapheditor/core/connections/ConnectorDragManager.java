@@ -514,11 +514,11 @@ public class ConnectorDragManager {
       
       final List<Point2D> jointPositions = GeometryUtils.getJointPositions(skinManager.lookupConnection(connection));
       final GConnectorPort newSource;
-      if (connector.equals(connection.getSource())) {
+      if (connector.equals(connection.getSourcePort())) {
         Collections.reverse(jointPositions);
-        newSource = connection.getTarget();
+        newSource = connection.getTargetPort();
       } else {
-        newSource = connection.getSource();
+        newSource = connection.getSourcePort();
       }
 
       ConnectionCommands.removeConnection(model, connection, connectionEventManager);
@@ -555,10 +555,10 @@ public class ConnectorDragManager {
   }
 
   protected GConnectorPort getOpposingConnector(final GConnection pConnection, final GConnectorPort pConnector) {
-    if (!pConnection.getSource().equals(pConnector)) {
-      return pConnection.getSource();
+    if (!pConnection.getSourcePort().equals(pConnector)) {
+      return pConnection.getSourcePort();
     } else {
-      return pConnection.getTarget();
+      return pConnection.getTargetPort();
     }
   }
 
