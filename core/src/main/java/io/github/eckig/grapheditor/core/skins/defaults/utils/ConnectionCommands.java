@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.core.skins.defaults.utils;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,12 @@ public class ConnectionCommands {
     }
 
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of addConnection, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 
@@ -115,7 +121,12 @@ public class ConnectionCommands {
     }
 
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of removeConnection, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
 
   }

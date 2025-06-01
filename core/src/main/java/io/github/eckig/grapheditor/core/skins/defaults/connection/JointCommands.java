@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.core.skins.defaults.connection;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -68,7 +69,11 @@ public class JointCommands {
 
     // Execute the command and add it to the command stack
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch (Exception e) {
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 

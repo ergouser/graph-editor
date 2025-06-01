@@ -42,8 +42,13 @@ public final class RectangularConnections {
    *          an index in the list of the connection's points
    * @return {@code true} if the segment beginning at this index is horizontal
    */
-  public static boolean isSegmentHorizontal(final GConnection connection, final SkinLookup skinLookup, final int i) {
-    GConnectorPort source = connection.getSourcePort();
+  // this assumes a rectangular skin, no longer the case.  This decision should be delegated to the skin.
+  // it happens to work for Bezier connectors currently because they start with a horizontal connection (after adding
+  // additional joints this will continue to be the case if they are added in pairs, otherwise maybe not.
+  // "works" means it will return the correct result for the begining and end and values for other cases. Fortunately
+  // the result in these other cases is probably unimportant.
+  public static boolean isSegmentHorizontal(final GConnectionSkin connectionSkin, final SkinLookup skinLookup, final int i) {
+    GConnectorPort source = connectionSkin.getItem().getSourcePort();
     GConnectorSkin connectorSkin = skinLookup.lookupConnector(source);
     final Side side = connectorSkin.getSide();
     final boolean sourceIsLeft = side == Side.LEFT;

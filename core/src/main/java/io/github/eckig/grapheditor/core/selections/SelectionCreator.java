@@ -211,15 +211,17 @@ public class SelectionCreator {
     if (connectionSkin != null) {
 
       final Node skinRoot = connectionSkin.getRoot();
-      if (!mousePressedHandlers.containsKey(skinRoot)) {
-        final EventHandler<MouseEvent> connectionPressedHandler = event -> handleConnectionPressed(event, connection);
-        skinRoot.addEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
-        mousePressedHandlers.put(skinRoot, connectionPressedHandler);
-      }
-    }
+      if ( skinRoot != null ) {
+        if (!mousePressedHandlers.containsKey(skinRoot)) {
+          final EventHandler<MouseEvent> connectionPressedHandler = event -> handleConnectionPressed(event, connection);
+          skinRoot.addEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
+          mousePressedHandlers.put(skinRoot, connectionPressedHandler);
+        }
 
-    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-      addJoint(jointSkin.getItem());
+        for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+          addJoint(jointSkin.getItem());
+        }
+      }
     }
   }
 
@@ -438,19 +440,20 @@ public class SelectionCreator {
 
     for (GConnection connection: model.getConnections() ) {
       final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-
-      if (isConnectionSelected(connection, isShortcutDown)) {
-        selectionManager.select(connection);
-      } else {
-        selectionManager.clearSelection(connection);
-      }
-
-      for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-        GJoint joint = jointSkin.getItem();
-        if (isJointSelected(joint, isShortcutDown)) {
-          selectionManager.select(joint);
+      if ( connectionSkin != null ) {
+        if (isConnectionSelected(connection, isShortcutDown)) {
+          selectionManager.select(connection);
         } else {
-          selectionManager.clearSelection(joint);
+          selectionManager.clearSelection(connection);
+        }
+
+        for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+          GJoint joint = jointSkin.getItem();
+          if (isJointSelected(joint, isShortcutDown)) {
+            selectionManager.select(joint);
+          } else {
+            selectionManager.clearSelection(joint);
+          }
         }
       }
     }

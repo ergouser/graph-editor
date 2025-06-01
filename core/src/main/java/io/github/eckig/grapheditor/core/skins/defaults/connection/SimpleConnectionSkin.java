@@ -113,7 +113,9 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   @Override
   public Point2D[] update() {
     final Point2D[] points = super.update();
-    checkFirstAndLastJoints(points);
+    if ( points != null ) {
+      checkFirstAndLastJoints(points);
+    }
     return points;
   }
 
@@ -142,7 +144,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
       final DraggableBox nextJoint = jointSkins.get(i + 1).getRoot();
 
-      if (RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, i)) {
+      if (RectangularConnections.isSegmentHorizontal(this, skinLookup, i)) {
         thisJoint.bindLayoutX(null);
         nextJoint.bindLayoutX(null);
       } else {
@@ -162,7 +164,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
       final DraggableBox nextJoint = jointSkins.get(i + 1).getRoot();
 
-      if (RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, i)) {
+      if (RectangularConnections.isSegmentHorizontal(this, skinLookup, i)) {
         thisJoint.bindLayoutX(nextJoint);
         nextJoint.bindLayoutX(thisJoint);
       } else {
@@ -180,8 +182,10 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    */
   protected void checkFirstAndLastJoints(final Point2D[] points) {
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
-    alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, 0), true);
-    alignJoint(points, RectangularConnections.isSegmentHorizontal(getItem(), skinLookup, points.length - 2), false);
+    if ( points.length > 3 ) {
+      alignJoint(points, RectangularConnections.isSegmentHorizontal(this, skinLookup, 0), true);
+      alignJoint(points, RectangularConnections.isSegmentHorizontal(this, skinLookup, points.length - 2), false);
+    }
   }
 
   /**

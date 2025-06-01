@@ -1,5 +1,6 @@
 package io.github.eckig.grapheditor.demo.customskins;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,10 +22,6 @@ import io.github.eckig.grapheditor.core.skins.defaults.DefaultConnectorSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultNodeSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.DefaultTailSkin;
 import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledConnectorSkin;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledNodeSkin;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledSkinConstants;
-import io.github.eckig.grapheditor.demo.customskins.titled.TitledTailSkin;
 import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
 
 /**
@@ -32,121 +29,126 @@ import io.github.eckig.grapheditor.demo.selections.SelectionCopier;
  */
 public class TitledSkinController extends DefaultSkinController {
 
-    /**
-     * Creates a new {@link TitledSkinController} instance.
-     *
-     * @param graphEditor the graph editor on display in this demo
-     * @param graphEditorContainer the graph editor container on display in this demo
-     */
-    public TitledSkinController(final GraphEditor graphEditor, final GraphEditorContainer graphEditorContainer) {
-        super(graphEditor, graphEditorContainer);
-    }
+  /**
+   * Creates a new {@link TitledSkinController} instance.
+   *
+   * @param graphEditor the graph editor on display in this demo
+   * @param graphEditorContainer the graph editor container on display in this demo
+   */
+  public TitledSkinController(final GraphEditor graphEditor, final GraphEditorContainer graphEditorContainer) {
+    super(graphEditor, graphEditorContainer);
+  }
 
-    @Override
-    public void activate() {
-        super.activate();
-        graphEditor.setNodeSkinFactory(this::createSkin);
-        graphEditor.setConnectorSkinFactory(this::createSkin);
-        graphEditor.setTailSkinFactory(this::createTailSkin);
-    }
+  @Override
+  public void activate() {
+    super.activate();
+    graphEditor.setNodeSkinFactory(this::createSkin);
+    graphEditor.setConnectorSkinFactory(this::createSkin);
+    graphEditor.setTailSkinFactory(this::createTailSkin);
+  }
 
-    private GNodeSkin createSkin(final GNode node) {
-        return /*TitledSkinConstants.TITLED_NODE.equals(node.getType()) ? new TitledNodeSkin(node) :*/ new DefaultNodeSkin(node);
-    }
+  private GNodeSkin createSkin(final GNode node) {
+    return /*TitledSkinConstants.TITLED_NODE.equals(node.getType()) ? new TitledNodeSkin(node) :*/ new DefaultNodeSkin(node);
+  }
 
-    private GConnectorSkin createSkin(final GConnectorPort connector) {
-        return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_OUTPUT_CONNECTOR.equals(connector.getType()) ?
+  private GConnectorSkin createSkin(final GConnectorPort connector) {
+    return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_OUTPUT_CONNECTOR.equals(connector.getType()) ?
                 new TitledConnectorSkin(connector) :*/ new DefaultConnectorSkin(connector);
-    }
+  }
 
-    private GTailSkin createTailSkin(final GConnectorPort connector) {
-        return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) ?
+  private GTailSkin createTailSkin(final GConnectorPort connector) {
+    return /*TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) || TitledSkinConstants.TITLED_INPUT_CONNECTOR.equals(connector.getType()) ?
                 new TitledTailSkin(connector) :*/ new DefaultTailSkin(connector);
-    }
+  }
 
-    @Override
-    public void addNode(final double currentZoomFactor) {
+  @Override
+  public void addNode(final double currentZoomFactor) {
 
-        final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
-        final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
-        final GraphFactory factory = graphEditor.getModel().getGraphFactory();
+    final double windowXOffset = graphEditorContainer.getContentX() / currentZoomFactor;
+    final double windowYOffset = graphEditorContainer.getContentY() / currentZoomFactor;
+    final GraphFactory factory = graphEditor.getModel().getGraphFactory();
 
-        final GNode node = factory.create(GNode.class);
-        //node.setY(NODE_INITIAL_Y + windowYOffset);
+    final GNode node = factory.create(GNode.class);
+    //node.setY(NODE_INITIAL_Y + windowYOffset);
 
-        //node.setType(TitledSkinConstants.TITLED_NODE);
-        //node.setX(NODE_INITIAL_X + windowXOffset);
-        node.setId(allocateNewId());
+    //node.setType(TitledSkinConstants.TITLED_NODE);
+    //node.setX(NODE_INITIAL_X + windowXOffset);
+    node.setId(allocateNewId());
 
-        final GConnectorPort input = factory.create(GConnectorPort.class);
-        node.addConnectorPort(input);
-        //input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
+    final GConnectorPort input = factory.create(GConnectorPort.class);
+    node.addConnectorPort(input);
+    //input.setType(TitledSkinConstants.TITLED_INPUT_CONNECTOR);
 
-        final GConnectorPort output = factory.create(GConnectorPort.class);
-        node.addConnectorPort(output);
-        //output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
+    final GConnectorPort output = factory.create(GConnectorPort.class);
+    node.addConnectorPort(output);
+    //output.setType(TitledSkinConstants.TITLED_OUTPUT_CONNECTOR);
 
-        Commands.addNode(graphEditor.getModel(), node);
-    }
+    Commands.addNode(graphEditor.getModel(), node);
+  }
 
-    @Override
-    public void handlePaste(final SelectionCopier selectionCopier) {
-        selectionCopier.paste((nodes, command) -> allocateIds(nodes, command));
-    }
+  @Override
+  public void handlePaste(final SelectionCopier selectionCopier) {
+    selectionCopier.paste((nodes, command) -> allocateIds(nodes, command));
+  }
 
-    /**
-     * Allocates ID's to recently pasted nodes.
-     *
-     * @param nodes the recently pasted nodes
-     * @param command the command responsible for adding the nodes
-     */
-    private void allocateIds(final List<GNode> nodes, final CompoundCommand command) {
+  /**
+   * Allocates ID's to recently pasted nodes.
+   *
+   * @param nodes the recently pasted nodes
+   * @param command the command responsible for adding the nodes
+   */
+  private void allocateIds(final List<GNode> nodes, final CompoundCommand command) {
 
-        for (final GNode node : nodes) {
+    for (final GNode node : nodes) {
 
-            if (checkNeedsNewId(node, nodes)) {
+      if (checkNeedsNewId(node, nodes)) {
 
-                final String id = allocateNewId();
-                final Command setCommand = SetPropertyCommand.create(node, "id", id);
-                //final Command setCommand = SetCommand.create(domain, node, feature, id);
+        final String id = allocateNewId();
+        final Command setCommand = SetPropertyCommand.create(node, "id", id);
+        //final Command setCommand = SetCommand.create(domain, node, feature, id);
 
-                if (setCommand.canExecute()) {
-                    command.appendAndExecute(setCommand);
-                }
-
-                graphEditor.getSkinLookup().lookupNode(node).initialize();
-            }
+        if (setCommand.canExecute()) {
+          try {
+            command.appendAndExecute(setCommand);
+          } catch ( Exception e ) {
+            // keep the default behavior of addConnector, where there is no error handling, but permit it 
+            throw new UndeclaredThrowableException(e);
+          }
         }
+
+        graphEditor.getSkinLookup().lookupNode(node).initialize();
+      }
     }
+  }
 
-    /**
-     * Check the given node needs a new ID, i.e. that it's not already in use.
-     *
-     * @param node the nodes to check
-     * @param pastedNodes the recently-pasted nodes
-     */
-    private boolean checkNeedsNewId(final GNode node, final List<GNode> pastedNodes) {
+  /**
+   * Check the given node needs a new ID, i.e. that it's not already in use.
+   *
+   * @param node the nodes to check
+   * @param pastedNodes the recently-pasted nodes
+   */
+  private boolean checkNeedsNewId(final GNode node, final List<GNode> pastedNodes) {
 
-        final List<GNode> nodes = new ArrayList<>(graphEditor.getModel().getNodes());
-        nodes.removeAll(pastedNodes);
+    final List<GNode> nodes = new ArrayList<>(graphEditor.getModel().getNodes());
+    nodes.removeAll(pastedNodes);
 
-        return nodes.stream().anyMatch(other -> other.getId().equals(node.getId()));
+    return nodes.stream().anyMatch(other -> other.getId().equals(node.getId()));
+  }
+
+  /**
+   * Allocates a new ID corresponding to the largest existing ID + 1.
+   *
+   * @return the new ID
+   */
+  private String allocateNewId() {
+
+    final Collection<? extends GNode> nodes = graphEditor.getModel().getNodes();
+    final OptionalInt max = nodes.stream().mapToInt(node -> Integer.parseInt(node.getId())).max();
+
+    if (max.isPresent()) {
+      return Integer.toString(max.getAsInt() + 1);
     }
-
-    /**
-     * Allocates a new ID corresponding to the largest existing ID + 1.
-     *
-     * @return the new ID
-     */
-    private String allocateNewId() {
-
-        final Collection<? extends GNode> nodes = graphEditor.getModel().getNodes();
-        final OptionalInt max = nodes.stream().mapToInt(node -> Integer.parseInt(node.getId())).max();
-
-        if (max.isPresent()) {
-            return Integer.toString(max.getAsInt() + 1);
-        }
-        // ELSE:
-        return "1"; //$NON-NLS-1$
-    }
+    // ELSE:
+    return "1"; //$NON-NLS-1$
+  }
 }

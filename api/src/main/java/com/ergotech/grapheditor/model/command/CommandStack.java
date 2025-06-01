@@ -117,11 +117,13 @@ public class CommandStack {
    * Executes the given command and adds it to the command stack.
    *
    * @param command the command to execute.
+   * @throws Exception 
    */
-  public void execute(Command command) {
+  public void execute(Command command) throws Exception {
     //System.out.println (top.get() + " Command execute " + command.canUndo() + " " + command.canExecute());
     if (command.canExecute()) {
       command.execute();
+      // don't add the command to the undo stack if the command did not execute
 
       // Remove any commands above the current top
       if (commands.size() > top.get() + 1) {
@@ -135,19 +137,23 @@ public class CommandStack {
 
   /**
    * Undoes the last executed command.
+   * @throws Exception 
    */
-  public void undo() {
+  public void undo() throws Exception {
     if (canUndo()) {
       Command command = commands.get(top.get());
+      // move the  stack position even if the undo fails
+      // otherwise further undos would be inaccessible.
+      top.set(top.get() - 1); 
       command.undo();
-      top.set(top.get() - 1);
     }
   }
 
   /**
    * Redoes the last undone command.
+   * @throws Exception 
    */
-  public void redo() {
+  public void redo() throws Exception {
     if (canRedo()) {
       top.set(top.get() + 1);
       Command command = commands.get(top.get());

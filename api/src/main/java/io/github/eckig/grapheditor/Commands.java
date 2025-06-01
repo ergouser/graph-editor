@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +74,12 @@ public class Commands {
     final Command command = AddCommand.create(model, owner -> model.getNodes(), node);
 
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of addNode, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
 
   }
@@ -93,22 +99,22 @@ public class Commands {
   public static  void removeNode(final GModel model, final GNode node ) {
     removeNode(model, node, null);
   }
-    /**
-     * Removes a node from the model.
-     *
-     * <p>
-     * Also removes any connections that were attached to the node.
-     * </p>
-     *
-     * @param model
-     *          the {@link GModel} from which the node should be removed
-     * @param node
-     *          the {@link GNode} to remove from the model
-     * @param baseCommand
-     *          a command provided as part of a larger removal process (eg clearing the model)
-     *          the command will not be executed by this method if passed in
-     */
-    public static  void removeNode(final GModel model, final GNode node, final CompoundCommand baseCommand) {
+  /**
+   * Removes a node from the model.
+   *
+   * <p>
+   * Also removes any connections that were attached to the node.
+   * </p>
+   *
+   * @param model
+   *          the {@link GModel} from which the node should be removed
+   * @param node
+   *          the {@link GNode} to remove from the model
+   * @param baseCommand
+   *          a command provided as part of a larger removal process (eg clearing the model)
+   *          the command will not be executed by this method if passed in
+   */
+  public static  void removeNode(final GModel model, final GNode node, final CompoundCommand baseCommand) {
 
     final CompoundCommand command;
     if ( baseCommand != null ) {
@@ -131,14 +137,19 @@ public class Commands {
     }
     // remove the node...
     command.append(RemoveCommand.create(model, owner -> model.getNodes(), node));
- 
+
     // execute the command if it can be executed and it isn't part of a larger removal
     if (baseCommand == null && command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of removeNode, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 
- 
+
   /**
    * Clears everything in the given model.
    *
@@ -154,7 +165,12 @@ public class Commands {
       removeNode(model, node, command);
     }
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of clear, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 
@@ -187,7 +203,12 @@ public class Commands {
       }
     }
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of clearConnectors, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 
@@ -234,22 +255,25 @@ public class Commands {
         updateConnector(connector, command, skinLookup);  // update the position of all the connectors first, and only once.
       }
       for (GConnectorPort connector : node.getConnectorPorts()) {
-       for (final GConnection connection : connector.getConnections()) {
-//          updateConnector(connection.getSource(), command, skinLookup);
-//          updateConnector(connection.getTarget(), command, skinLookup);
+        for (final GConnection connection : connector.getConnections()) {
+          //          updateConnector(connection.getSource(), command, skinLookup);
+          //          updateConnector(connection.getTarget(), command, skinLookup);
+          final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+          if ( connectionSkin != null ) {
 
-          for (final GJointSkin jointSkin : skinLookup.lookupConnection(connection).getJointSkins()) {
-            if (jointSkin != null && checkJointChanged(jointSkin)) {
-              final Region jointRegion = jointSkin.getRoot();
-              final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
-              final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
+            for (final GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+              if (jointSkin != null && checkJointChanged(jointSkin)) {
+                final Region jointRegion = jointSkin.getRoot();
+                final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;
+                final double y = jointRegion.getLayoutY() + jointSkin.getHeight() / 2;
 
-              if (jointSkin.xProperty().get() != x) {
-                command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
-              }
+                if (jointSkin.xProperty().get() != x) {
+                  command.append(SetPropertyCommand.create(jointSkin.xProperty(), x));
+                }
 
-              if (jointSkin.yProperty().get() != y) {
-                command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
+                if (jointSkin.yProperty().get() != y) {
+                  command.append(SetPropertyCommand.create(jointSkin.yProperty(), y));
+                }
               }
             }
           }
@@ -277,21 +301,21 @@ public class Commands {
    */
   private static void updateConnector(final GConnectorPort connector, final CompoundCommand command,
       final SkinLookup skinLookup) {
-      final GNode node = connector.getParent();
-      final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
-      final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
-      if (nodeSkin != null && connectorSkin != null) {
-          final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
-          if (checkConnectorChanged(connectorSkin, connectorPosition)) {
-              if (connectorSkin.xProperty().get() != connectorPosition.getX()) {
-                  command.append(SetPropertyCommand.create(connectorSkin.xProperty(), connectorPosition.getX()));
-              }
+    final GNode node = connector.getParent();
+    final GConnectorSkin connectorSkin = skinLookup.lookupConnector(connector);
+    final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
+    if (nodeSkin != null && connectorSkin != null) {
+      final Point2D connectorPosition = nodeSkin.getConnectorPosition(connectorSkin);
+      if (checkConnectorChanged(connectorSkin, connectorPosition)) {
+        if (connectorSkin.xProperty().get() != connectorPosition.getX()) {
+          command.append(SetPropertyCommand.create(connectorSkin.xProperty(), connectorPosition.getX()));
+        }
 
-              if (connectorSkin.yProperty().get() != connectorPosition.getY()) {
-                  command.append(SetPropertyCommand.create(connectorSkin.yProperty(), connectorPosition.getY()));
-              }
-          }
+        if (connectorSkin.yProperty().get() != connectorPosition.getY()) {
+          command.append(SetPropertyCommand.create(connectorSkin.yProperty(), connectorPosition.getY()));
+        }
       }
+    }
   }
 
   /**
@@ -365,7 +389,12 @@ public class Commands {
   public static void undo(final GModel model) {
 
     if (CommandStack.getCommandStack(model).canUndo()) {
-      CommandStack.getCommandStack(model).undo();
+      try {
+        CommandStack.getCommandStack(model).undo();
+      } catch ( Exception e ) {
+        // keep the default behavior of undo, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 
@@ -378,7 +407,12 @@ public class Commands {
   public static void redo(final GModel model) {
 
     if ( CommandStack.getCommandStack(model).canRedo()) {
-      CommandStack.getCommandStack(model).redo();
+      try {
+        CommandStack.getCommandStack(model).redo();
+      } catch ( Exception e ) {
+        // keep the default behavior of redo, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 

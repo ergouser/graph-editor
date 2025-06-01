@@ -125,6 +125,10 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
   public Point2D[] update() {
     final GConnection item = getItem();
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    GConnectorSkin connectorSkin = skinLookup.lookupConnector(item.getTargetPort());  // THIS RETURNS THE WRONG PORT - IT NEEDS to RETURN THE INPORT
+    if ( connectorSkin == null ) { // this is true on delete...
+      return null;
+    }
     if (item == null || skinLookup == null) {
       return null;
     } else if (getJointSkins().isEmpty()) {
@@ -148,7 +152,7 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
       points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSourcePort()), skinLookup);
 
       // End: Target position
-      points[len - 1] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getTargetPort()), skinLookup);
+      points[len - 1] = GeometryUtils.getConnectorPosition(connectorSkin, skinLookup);
 
       return points;
     }

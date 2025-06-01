@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
 
@@ -100,6 +101,7 @@ public class TreeSkinController implements SkinController {
     nodeSkin.setY(TREE_NODE_INITIAL_Y + windowYOffset);
 
     final GConnectorPort output = factory.create(GConnectorPort.class);
+    output.setDirection(Direction.BIDIRECTIONAL);  // is bidirectional always correct?
     final GConnectorSkin outputConnectorSkin = skinManager.lookupOrCreateConnector(output);
     node.addConnectorPort(output);
 

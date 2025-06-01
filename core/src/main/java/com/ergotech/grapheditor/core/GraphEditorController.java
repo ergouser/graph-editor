@@ -1,5 +1,6 @@
 package com.ergotech.grapheditor.core;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -334,7 +335,11 @@ public class GraphEditorController<E extends GraphEditor> {
     final CompoundCommand cmd = new CompoundCommand();
     Commands.updateLayoutValues(cmd, pModel, getSkinLookup());
     if (!cmd.getCommandList().isEmpty() && cmd.canExecute()) {
-      cmd.execute();
+      try {
+        cmd.execute();
+      } catch (Exception e) {
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 

@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.core.model;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,9 +50,9 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   @Override
   public void initialize(final GModel pModel) {
     // Only initialize the editing domain if the model object has actually changed.
-//    if (!pModel.equals(model)) {
-//      initializeEditingDomain(model, pModel);
-//    }
+    //    if (!pModel.equals(model)) {
+    //      initializeEditingDomain(model, pModel);
+    //    }
     model = pModel;
   }
 
@@ -70,14 +71,20 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     final CompoundCommand command = new CompoundCommand();
 
     CommandStack.getCommandStack(model).suspendStackChangeNotifications();
+    try {
+      Commands.updateLayoutValues(command, model, skinLookup);
 
-    Commands.updateLayoutValues(command, model, skinLookup);
-
-    if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      if (command.canExecute()) {
+        try {
+          CommandStack.getCommandStack(model).execute(command);
+        } catch ( Exception e ) {
+          // keep the default behavior of updateLayoutValues, where there is no error handling, but permit it 
+          throw new UndeclaredThrowableException(e);
+        }
+      }
+    } finally {
+      CommandStack.getCommandStack(model).resumeStackChangeNotifications();
     }
-
-    CommandStack.getCommandStack(model).resumeStackChangeNotifications();
   }
 
   @Override
@@ -121,7 +128,12 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     }
 
     if (!command.isEmpty() && command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch ( Exception e ) {
+        // keep the default behavior of remove, where there is no error handling, but permit it 
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 
@@ -141,9 +153,9 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     final Command onRemoved = mOnConnectionRemoved == null ? null
         : mOnConnectionRemoved.apply(pRemoveContext, pToDelete);
     if (onRemoved != null) {
-        pCommand.append(onRemoved);
+      pCommand.append(onRemoved);
     }
-}
+  }
   /**
    * Initializes the editing domain and resource for the new model.
    *
@@ -156,28 +168,28 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   private void initializeEditingDomain(final GModel oldModel, final GModel newModel) throws NoSuchMethodException {
     throw new NoSuchMethodException("initializeEditingDomain not implemented");
     // First remove the listener from the old model, if it exists.
-//    if (oldModel != null) {
-//      final EditingDomain oldDomain = AdapterFactoryEditingDomain.getEditingDomainFor(oldModel);
-//      if (oldDomain != null) {
-//        oldDomain.getCommandStack().removeCommandStackListener(commandStackListener);
-//      }
-//    }
-//
-//    if (newModel.eResource() == null) {
-//      final XMIResourceFactory resourceFactory = new XMIResourceFactory();
-//      final Resource resource = resourceFactory.createResource(DEFAULT_URI);
-//      resource.getContents().add(newModel);
-//    }
-//
-//    editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(newModel);
-//
-//    if (editingDomain == null) {
-//      final Registry registry = ComposedAdapterFactory.Descriptor.Registry.INSTANCE;
-//      final AdapterFactory adapterFactory = new ComposedAdapterFactory(registry);
-//
-//      editingDomain = new AdapterFactoryEditingDomain(adapterFactory, new BasicCommandStack());
-//      editingDomain.getResourceSet().getResources().add(newModel.eResource());
-//    }
+    //    if (oldModel != null) {
+    //      final EditingDomain oldDomain = AdapterFactoryEditingDomain.getEditingDomainFor(oldModel);
+    //      if (oldDomain != null) {
+    //        oldDomain.getCommandStack().removeCommandStackListener(commandStackListener);
+    //      }
+    //    }
+    //
+    //    if (newModel.eResource() == null) {
+    //      final XMIResourceFactory resourceFactory = new XMIResourceFactory();
+    //      final Resource resource = resourceFactory.createResource(DEFAULT_URI);
+    //      resource.getContents().add(newModel);
+    //    }
+    //
+    //    editingDomain = AdapterFactoryEditingDomain.getEditingDomainFor(newModel);
+    //
+    //    if (editingDomain == null) {
+    //      final Registry registry = ComposedAdapterFactory.Descriptor.Registry.INSTANCE;
+    //      final AdapterFactory adapterFactory = new ComposedAdapterFactory(registry);
+    //
+    //      editingDomain = new AdapterFactoryEditingDomain(adapterFactory, new BasicCommandStack());
+    //      editingDomain.getResourceSet().getResources().add(newModel.eResource());
+    //    }
 
- }
+  }
 }

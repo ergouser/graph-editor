@@ -44,6 +44,10 @@ public class GConnectorPortImpl extends SelectableType implements GConnectorPort
     private final BooleanProperty connectionDetachedOnDrag = new SimpleBooleanProperty(this, "connectionDetachedOnDrag", true);
     ObjectProperty<Direction> direction  = new SimpleObjectProperty<>(this, "direction");
     
+    public GConnectorPortImpl() {
+      super();
+    }
+
     /**
      * Gets the parent node to which this connector belongs.
      *

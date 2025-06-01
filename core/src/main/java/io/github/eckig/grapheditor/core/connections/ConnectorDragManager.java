@@ -310,6 +310,7 @@ public class ConnectorDragManager {
     if (pEvent.getButton() != MouseButton.PRIMARY) {
       return;
     }
+    ((Node) pEvent.getSource()).startFullDrag();
 
     final GConnectorPort connector = connectorSkin.getItem();
     if (checkCreatable(connector) && activateGesture(pEvent)) {
@@ -340,6 +341,7 @@ public class ConnectorDragManager {
         detachConnection(event, connectorSkin);
       } else {
         tailManager.updatePosition(event);
+        //System.out.println ("Drag Event " + event.getX() + " "+ event.getY());
       }
       event.consume();
     }
@@ -372,6 +374,8 @@ public class ConnectorDragManager {
       }
     }
 
+    //Visual feedback: add a highlight style or effect
+    connectorSkin.getRoot().setStyle("-fx-border-color: #33cc33; -fx-border-width: 2px; -fx-border-radius: 4px;");
     event.consume();
   }
 
@@ -389,6 +393,8 @@ public class ConnectorDragManager {
 
     tailManager.updatePosition(event);
 
+    // Remove visual highlight
+    connectorSkin.getRoot().setStyle(""); // or set it back to the base style if needed
     event.consume();
   }
 

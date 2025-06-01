@@ -58,7 +58,7 @@ public class SetPropertyCommand<V> implements Command {
   }
 
   @Override
-  public void execute() {
+  public void execute() throws Exception {
     if (canExecute()) {
       oldValue = property.getValue();
       property.setValue(newValue);
@@ -67,7 +67,7 @@ public class SetPropertyCommand<V> implements Command {
   }
 
   @Override
-  public void undo() {
+  public void undo() throws Exception {
     if (canUndo()) {
       property.setValue(oldValue);
       executed = false;

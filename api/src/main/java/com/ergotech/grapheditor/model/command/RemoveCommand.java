@@ -20,7 +20,7 @@ public class RemoveCommand<T> extends AbstractCommand {
   }
 
   @Override
-  public void execute() {
+  public void execute() throws Exception {
     if (!executed && canExecute()) {
       listSupplier.getList(owner).remove(element);
       executed = true;
@@ -28,7 +28,7 @@ public class RemoveCommand<T> extends AbstractCommand {
   }
 
   @Override
-  public void undo() {
+  public void undo() throws Exception {
     if (executed && canUndo()) {
       @SuppressWarnings("unchecked")
       Collection<T> list = (Collection<T>) listSupplier.getList(owner);

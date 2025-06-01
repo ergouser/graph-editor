@@ -19,7 +19,7 @@ public class AddCommand<T> extends AbstractCommand {
   }
 
   @Override
-  public void execute() {
+  public void execute() throws Exception {
       if (!executed && canExecute()) {
         @SuppressWarnings("unchecked")
         Collection<T> list = (Collection<T>) listSupplier.getList(owner);
@@ -29,7 +29,7 @@ public class AddCommand<T> extends AbstractCommand {
   }
 
   @Override
-  public void undo() {
+  public void undo() throws Exception {
       if (executed && canUndo()) {
           listSupplier.getList(owner).remove(element);
           executed = false;

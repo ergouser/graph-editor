@@ -51,7 +51,9 @@ public interface GConnectorValidator {
      *
      * @return a {@link String} specifying the type for the new connection
      */
-    String createConnectionType(GConnectorPort source, GConnectorPort target);
+    default String createConnectionType(GConnectorPort source, GConnectorPort target) {
+      return null;
+    }
 
     /**
      * Creates the 'type' string to be used in the joints inside a new connection.
@@ -61,5 +63,7 @@ public interface GConnectorValidator {
      *
      * @return a {@link String} specifying the type for the new connection
      */
-    String createJointType(GConnectorPort source, GConnectorPort target);
+    default String createJointType(GConnectorPort source, GConnectorPort target) {
+      return null;
+    }
 }

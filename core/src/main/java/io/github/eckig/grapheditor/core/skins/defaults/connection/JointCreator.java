@@ -104,7 +104,9 @@ public class JointCreator {
             }
 
             temporarySelectedJointSkin.getRoot().fireEvent(event);
-            event.consume();
+            if ( !event.isConsumed() ) {
+              event.consume();
+            }
         });
 
         // This handler creates 2 temporary joints which can be dragged around.
@@ -121,8 +123,13 @@ public class JointCreator {
 
           oldJointPositions = GeometryUtils.getJointPositions(connectionSkin);
 
-          final int index = getNewJointLocation(event, root);
+          int index = offsetCalculator.getJointSkinIndex(connectionSkin.getJointSkins());
+          if ( index < 0 ) {
+            index = getNewJointLocation(event, root); // this miscalculate for Bezier connections
+          }
           if (index > -1) {
+
+            calculateJointPosition(event, root, index);
 
             final int oldJointCount = connectionSkin.getJointSkins().size();
 
@@ -154,12 +161,17 @@ public class JointCreator {
             printJoints ("OnMouseReleased");
             // It is important to remove the temporary joints even if we add new joints, otherwise we mess up the
             // undo/redo stack.
+            temporarySelectedJointSkin.getRoot().fireEvent(event);
+            if ( !event.isConsumed() ) {
+              event.consume();
+            }
             removeTemporaryJoints();
 
-            if (checkForNetChange(oldJointPositions, newJointPositions)) {
+            if ( checkForNetChange(oldJointPositions, newJointPositions)) {
                 JointCommands.setNewJoints(graphEditor, newJointPositions, connectionSkin);
             }
-        });
+            event.consume();
+       });
     }
     
     public void printJoints (String title) {
@@ -217,33 +229,43 @@ public class JointCreator {
 
         final int index = offsetCalculator.getNearestSegment(event.getSceneX(), event.getSceneY());
 
-        final double adjacentJointX;
-        final double adjacentJointY;
-
         //final SkinLookup skinLookup = graphEditor.getSkinLookup();
         if (index == -1 || connectionSkin.getJointSkins().isEmpty()) {
         	return -1;
         }
-        else if (index < connectionSkin.getJointSkins().size()) {
-            adjacentJointX = connectionSkin.getJointSkins().get(index).getX();
-            adjacentJointY = connectionSkin.getJointSkins().get(index).getY();
-        } else {
-            adjacentJointX = connectionSkin.getJointSkins().get(index - 1).getX();
-            adjacentJointY = connectionSkin.getJointSkins().get(index - 1).getY();
-        }
-
-        final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
-
-        final SkinLookup skinLookup = graphEditor.getSkinLookup();
-        if (RectangularConnections.isSegmentHorizontal(connectionSkin.getItem(), skinLookup, index)) {
-            newJointX = GeometryUtils.moveOnPixel(clickPositionInParent.getX());
-            newJointY = GeometryUtils.moveOnPixel(adjacentJointY);
-        } else {
-            newJointX = GeometryUtils.moveOnPixel(adjacentJointX);
-            newJointY = GeometryUtils.moveOnPixel(clickPositionInParent.getY());
-        }
+        
+        //calculateJointPosition(event, root, index);
 
         return index;
+    }
+
+    /** This will populate the values or newJointX and newJointY with the suggested values for a new joint.
+     * 
+     * @param event the mouse event object containing cursor information
+     * @param root the root node of the connection skin
+     * @param index the index of the PathElement in the path.  Technically, the index of the joint skin in the jointskin array
+     */
+    protected void calculateJointPosition(final MouseEvent event, final Group root, final int index) {
+      final double adjacentJointX;
+      final double adjacentJointY;
+      if (index < connectionSkin.getJointSkins().size()) {
+          adjacentJointX = connectionSkin.getJointSkins().get(index).getX();
+          adjacentJointY = connectionSkin.getJointSkins().get(index).getY();
+      } else {
+          adjacentJointX = connectionSkin.getJointSkins().get(index - 1).getX();
+          adjacentJointY = connectionSkin.getJointSkins().get(index - 1).getY();
+      }
+
+      final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
+
+      final SkinLookup skinLookup = graphEditor.getSkinLookup();
+      if (RectangularConnections.isSegmentHorizontal(connectionSkin, skinLookup, index)) {
+          newJointX = GeometryUtils.moveOnPixel(clickPositionInParent.getX());
+          newJointY = GeometryUtils.moveOnPixel(adjacentJointY);
+      } else {
+          newJointX = GeometryUtils.moveOnPixel(adjacentJointX);
+          newJointY = GeometryUtils.moveOnPixel(clickPositionInParent.getY());
+      }
     }
 
     /**

@@ -280,7 +280,7 @@ class MinimapNodeGroup extends Parent {
 
     if (model != null) {
       for (GConnection connection : model.getConnections()) {
-         if (connectionFilter != null && !connectionFilter.test(connection)) {
+        if (connectionFilter != null && !connectionFilter.test(connection)) {
           continue;
         }
 
@@ -295,35 +295,37 @@ class MinimapNodeGroup extends Parent {
         gc.moveTo(x, y);
 
         GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-        List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
-        for (int j = 0; j <= jointSkins.size(); j++) {
-          final double newX;
-          final double newY;
-          if (j < jointSkins.size()) {
-            final GJointSkin jointSkin = jointSkins.get(j);
-            newX = scaleSharp(jointSkin.getX(), scaleFactor);
-            newY = scaleSharp(jointSkin.getY(), scaleFactor);
-          } else {
-            final GConnectorPort target = connection.getTargetPort();
-            final GNode parentTarget = target.getParent();
-            GConnectorSkin targetSkin = skinLookup.lookupConnector(source);
-            GNodeSkin parentTargetSkin = skinLookup.lookupNode(parentSource);
-            newX = scaleSharp(targetSkin.getX() + parentTargetSkin.getX(), scaleFactor);
-            newY = scaleSharp(targetSkin.getY() + parentTargetSkin.getY(), scaleFactor);
+        if ( connectionSkin != null ) { // not all connections have skins - only quick-connects (onscreen).
+          List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+          for (int j = 0; j <= jointSkins.size(); j++) {
+            final double newX;
+            final double newY;
+            if (j < jointSkins.size()) {
+              final GJointSkin jointSkin = jointSkins.get(j);
+              newX = scaleSharp(jointSkin.getX(), scaleFactor);
+              newY = scaleSharp(jointSkin.getY(), scaleFactor);
+            } else {
+              final GConnectorPort target = connection.getTargetPort();
+              final GNode parentTarget = target.getParent();
+              GConnectorSkin targetSkin = skinLookup.lookupConnector(source);
+              GNodeSkin parentTargetSkin = skinLookup.lookupNode(parentSource);
+              newX = scaleSharp(targetSkin.getX() + parentTargetSkin.getX(), scaleFactor);
+              newY = scaleSharp(targetSkin.getY() + parentTargetSkin.getY(), scaleFactor);
+            }
+
+            // only draw direct rectangular and sharp lines:
+            if (Math.abs(newX - x) < Math.abs(newY - y)) {
+              gc.lineTo(x, newY);
+            } else {
+              gc.lineTo(newX, y);
+            }
+
+            x = newX;
+            y = newY;
           }
 
-          // only draw direct rectangular and sharp lines:
-          if (Math.abs(newX - x) < Math.abs(newY - y)) {
-            gc.lineTo(x, newY);
-          } else {
-            gc.lineTo(newX, y);
-          }
-
-          x = newX;
-          y = newY;
+          gc.stroke();
         }
-
-        gc.stroke();
       }
 
       for (final Map.Entry<GNode, Node> entry : nodes.entrySet()) {

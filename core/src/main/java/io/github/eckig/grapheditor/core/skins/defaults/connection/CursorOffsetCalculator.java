@@ -4,14 +4,16 @@
 package io.github.eckig.grapheditor.core.skins.defaults.connection;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.ergotech.grapheditor.model.GConnection;
 
-import io.github.eckig.grapheditor.core.connections.RectangularConnections;
+import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.ConnectionSegment;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.ArcTo;
+import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -33,6 +35,11 @@ public class CursorOffsetCalculator {
     private double minOffsetY;
     private double currentX;
     private double currentY;
+    
+    /** The PathElement that is closest to the cursor click as determined by 
+     * calculateOffset
+     */
+    private PathElement pathElement;
 
     /**
      * Creates a new cursor offset calculator instance for a default connection skin.
@@ -50,6 +57,31 @@ public class CursorOffsetCalculator {
         this.connectionSegments = connectionSegments;
     }
 
+    /** Returns the index of the pathElement into the path or -1 if the element is not set or 
+     * there are other issues.
+     * @param jointSkins 
+     */
+    public int getJointSkinIndex (List<GJointSkin> jointSkins) {
+      // if there are 4 path segements there will only be 2 joints, that is, there is no joint at the start or end.
+      // the closest joint is therefore i-1 except for the last path element.
+      int element = -1;
+      for (int i = 1; i < path.getElements().size()-1; i++) {
+        final PathElement pathElement = path.getElements().get(i);
+        if ( Objects.equals(pathElement, this.pathElement)) {
+          element = i-1;
+        }
+      }
+      final PathElement lastPathElement = path.getElements().getLast();
+      if ( Objects.equals(lastPathElement, this.pathElement)) {
+       element = jointSkins.size()-1;  // the last element.
+      }
+      if ( element > jointSkins.size() -1 ) {
+        // should never be...
+        element = jointSkins.size()-1;  // the last element.
+      }
+      return element;
+    }
+ 
     /**
      * Gets the horizontal or vertical offset to the connection for the given cursor position.
      *
@@ -138,6 +170,8 @@ public class CursorOffsetCalculator {
      * @return the index of the nearest connection segment, or -1 if no segments are available
      */
     public int getNearestSegment(final double cursorX, final double cursorY) {
+      // this calculation is wrong for Bezier curves.
+      // fixing it would require replicating code that is already in calculateOffset
         int nearestIndex = -1;
         double nearestDistance = -1;
 
@@ -251,6 +285,7 @@ public class CursorOffsetCalculator {
             if (inRangeX && cursorInRangeY && foundCloser)
             {
                 minOffsetY = possibleMinOffsetY;
+                this.pathElement = pathElement;
             }
 
             currentX = hLineTo.getX();
@@ -260,6 +295,68 @@ public class CursorOffsetCalculator {
             currentX = arcTo.getX();
             currentY = arcTo.getY();
         }
+        else if (pathElement instanceof CubicCurveTo cubic) {
+          // 1) Compute the four “anchor” points of the Bézier in scene‐coords:
+          //    - P0 = “currentX/currentY” is the start of the cubic
+          Point2D p0 = path.localToScene(currentX, currentY);
+
+          //    - P1 = first control handle
+          Point2D p1 = path.localToScene(cubic.getControlX1(), cubic.getControlY1());
+
+          //    - P2 = second control handle
+          Point2D p2 = path.localToScene(cubic.getControlX2(), cubic.getControlY2());
+
+          //    - P3 = end of this cubic segment
+          Point2D p3 = path.localToScene(cubic.getX(), cubic.getY());
+
+          // 2) We’ll sample N points on the curve. Increase N if you need more precision.
+          final int SAMPLES = 300;
+          double bestDist2    = Double.MAX_VALUE;
+          double bestOffsetX  = 0;
+          double bestOffsetY  = 0;
+
+          // Loop over t = 0, 1/SAMPLES, 2/SAMPLES, … , 1
+          for (int i = 0; i <= SAMPLES; i++) {
+              double t  = i / (double) SAMPLES;
+              double mt = 1.0 - t;
+
+              // Standard cubic‐Bezier formula:
+              //    B(t) = (1−t)^3·P0  +  3·(1−t)^2·t·P1  +  3·(1−t)·t^2·P2  +  t^3·P3
+              double x = mt*mt*mt * p0.getX()
+                       + 3 * mt*mt * t * p1.getX()
+                       + 3 * mt * t*t * p2.getX()
+                       +       t*t*t * p3.getX();
+
+              double y = mt*mt*mt * p0.getY()
+                       + 3 * mt*mt * t * p1.getY()
+                       + 3 * mt * t*t * p2.getY()
+                       +       t*t*t * p3.getY();
+
+              // 3) Compute ΔX, ΔY from the cursor position; measure squared‐distance
+              double dx = x - cursorSceneX;
+              double dy = y - cursorSceneY;
+              double dist2 = dx*dx + dy*dy;
+
+              if (dist2 < bestDist2) {
+                  bestDist2   = dist2;
+                  bestOffsetX = dx;
+                  bestOffsetY = dy;
+              }
+          }
+
+          // Only update minOffsetX/minOffsetY if this best point is within offsetBound
+          // (you could compare sqrt(bestDist2) < offsetBound or bestDist2 < offsetBound^2)
+          if (bestDist2 < (offsetBound * offsetBound)) {
+              // Sign is preserved: e.g., bestOffsetX > 0 means curve is to the right of cursor
+              minOffsetX = bestOffsetX;
+              minOffsetY = bestOffsetY;
+              this.pathElement = pathElement;
+          }
+
+          // Finally, advance currentX/currentY to the cubic’s end point (in local coords)
+          currentX = cubic.getX();
+          currentY = cubic.getY();
+      }
         else if (pathElement instanceof VLineTo vLineTo)
         {
             final double nextSceneY = path.localToScene(currentX, vLineTo.getY()).getY();
@@ -272,6 +369,7 @@ public class CursorOffsetCalculator {
             if (cursorInRangeY && cursorInRangeX && foundCloser)
             {
                 minOffsetX = possibleMinOffsetX;
+                this.pathElement = pathElement;
             }
             currentY = vLineTo.getY();
         }
