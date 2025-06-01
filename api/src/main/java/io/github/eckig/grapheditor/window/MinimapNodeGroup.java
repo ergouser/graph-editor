@@ -12,7 +12,6 @@ import java.util.function.Predicate;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
-import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 

@@ -60,8 +60,6 @@ public class ConnectorDragManager {
 
   protected GModel model;
 
-  protected final EventHandler<MouseEvent> mouseExitedHandler = this::handleMouseExited;
-
   /**
    * Consume the Event so the parent container (ResizableBox/DraggableBox) does not move on connection detach
    */
@@ -70,6 +68,8 @@ public class ConnectorDragManager {
   protected final Map<Node, EventHandler<MouseEvent>> mouseEnteredHandlers = new HashMap<>();
 
   protected final Map<Node, EventHandler<MouseEvent>> mouseReleasedHandlers = new HashMap<>();
+  
+  protected final Map<Node, EventHandler<MouseEvent>> mouseExitedHandlers = new HashMap<>();
 
   protected final Map<Node, EventHandler<MouseEvent>> dragDetectedHandlers = new HashMap<>();
 
@@ -154,6 +154,7 @@ public class ConnectorDragManager {
       if (root != null) {
         removeSingleEventHandler(root, mouseEnteredHandlers, MouseEvent.MOUSE_ENTERED);
         removeSingleEventHandler(root, mouseReleasedHandlers, MouseEvent.MOUSE_RELEASED);
+        removeSingleEventHandler(root, mouseExitedHandlers, MouseEvent.MOUSE_RELEASED);
         removeSingleEventHandler(root, dragDetectedHandlers, MouseEvent.DRAG_DETECTED);
         removeSingleEventHandler(root, mouseDraggedHandlers, MouseEvent.MOUSE_DRAGGED);
         removeSingleEventHandler(root, mouseDragEnteredHandlers, MouseDragEvent.MOUSE_DRAG_ENTERED);
@@ -173,7 +174,7 @@ public class ConnectorDragManager {
 
   protected void removeGeneralEventHandlers(final Node node) {
     node.removeEventHandler(MouseEvent.MOUSE_PRESSED, mousePressedHandler);
-    node.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseExitedHandler);
+    //node.removeEventHandler(MouseEvent.MOUSE_EXITED, mouseExitedHandler);
   }
 
   private static <T extends Event> void removeSingleEventHandler(final Node node,
@@ -222,7 +223,8 @@ public class ConnectorDragManager {
       }
 
       final EventHandler<MouseEvent> newMouseEnteredHandler = event -> handleMouseEntered(event, connectorSkin);
-      final EventHandler<MouseEvent> newMouseReleasedHandler = this::handleMouseReleased;
+      final EventHandler<MouseEvent> newMouseReleasedHandler = event -> handleMouseReleased(event, connectorSkin);
+      final EventHandler<MouseEvent> newMouseExitedHandler = event -> handleMouseExited(event, connectorSkin);
 
       final EventHandler<MouseEvent> newDragDetectedHandler = event -> handleDragDetected(event, connectorSkin);
       final EventHandler<MouseEvent> newMouseDraggedHandler = event -> handleMouseDragged(event, connectorSkin);
@@ -232,7 +234,7 @@ public class ConnectorDragManager {
           connectorSkin);
 
       root.addEventHandler(MouseEvent.MOUSE_ENTERED, newMouseEnteredHandler);
-      root.addEventHandler(MouseEvent.MOUSE_EXITED, mouseExitedHandler);
+      root.addEventHandler(MouseEvent.MOUSE_EXITED, newMouseExitedHandler);
       root.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressedHandler);
       root.addEventHandler(MouseEvent.MOUSE_RELEASED, newMouseReleasedHandler);
 
@@ -244,6 +246,7 @@ public class ConnectorDragManager {
 
       mouseEnteredHandlers.put(root, newMouseEnteredHandler);
       mouseReleasedHandlers.put(root, newMouseReleasedHandler);
+      mouseExitedHandlers.put(root, newMouseExitedHandler);
 
       dragDetectedHandlers.put(root, newDragDetectedHandler);
       mouseDraggedHandlers.put(root, newMouseDraggedHandler);
@@ -263,6 +266,7 @@ public class ConnectorDragManager {
    */
   protected void handleMouseEntered(final MouseEvent event, final GConnectorSkin connectorSkin) {
     hoveredConnectorSkin = connectorSkin;
+    connectorSkin.applyStyle(GConnectorStyle.DRAG_OVER_ALLOWED);
     event.consume();
   }
 
@@ -272,8 +276,9 @@ public class ConnectorDragManager {
    * @param event
    *          a mouse-exited event
    */
-  protected void handleMouseExited(final MouseEvent event) {
+  protected void handleMouseExited(final MouseEvent event, final GConnectorSkin connectorSkin) {
     hoveredConnectorSkin = null;
+    connectorSkin.applyStyle(GConnectorStyle.DEFAULT);
     event.consume();
   }
 
@@ -283,7 +288,7 @@ public class ConnectorDragManager {
    * @param event
    *          a mouse-released event
    */
-  protected void handleMouseReleased(final MouseEvent event) {
+  protected void handleMouseReleased(final MouseEvent event, final GConnectorSkin connectorSkin) {
     if (targetConnectorSkin != null && targetConnectorSkin != null) {
       targetConnectorSkin.applyStyle(GConnectorStyle.DEFAULT);
     }
@@ -375,7 +380,7 @@ public class ConnectorDragManager {
     }
 
     //Visual feedback: add a highlight style or effect
-    connectorSkin.getRoot().setStyle("-fx-border-color: #33cc33; -fx-border-width: 2px; -fx-border-radius: 4px;");
+    //connectorSkin.getRoot().setStyle("-fx-border-color: #33cc33; -fx-border-width: 2px; -fx-border-radius: 4px;");
     event.consume();
   }
 
@@ -394,7 +399,7 @@ public class ConnectorDragManager {
     tailManager.updatePosition(event);
 
     // Remove visual highlight
-    connectorSkin.getRoot().setStyle(""); // or set it back to the base style if needed
+    //connectorSkin.getRoot().setStyle(""); // or set it back to the base style if needed
     event.consume();
   }
 

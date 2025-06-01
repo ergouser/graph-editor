@@ -61,7 +61,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
 
   private static final String STYLE_CLASS_BACKGROUND = "default-connection-background";
 
-  private List<GJointSkin> jointSkins;
+  protected List<GJointSkin> jointSkins;
 
   /**
    * Creates a new se connection skin instance.

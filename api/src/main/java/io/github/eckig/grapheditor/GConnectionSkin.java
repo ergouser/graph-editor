@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.beans.property.SimpleStringProperty;
@@ -125,7 +126,8 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
   public Point2D[] update() {
     final GConnection item = getItem();
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
-    GConnectorSkin connectorSkin = skinLookup.lookupConnector(item.getTargetPort());  // THIS RETURNS THE WRONG PORT - IT NEEDS to RETURN THE INPORT
+    GConnectorPort targetPort = item.getTargetPort();  // this could be null, but that would be a major error so we need it to throw.
+    GConnectorSkin connectorSkin = skinLookup.lookupConnector(targetPort); 
     if ( connectorSkin == null ) { // this is true on delete...
       return null;
     }
