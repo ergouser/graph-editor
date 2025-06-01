@@ -1,5 +1,6 @@
 package io.github.eckig.grapheditor.demo.selections;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -278,7 +279,11 @@ public class SelectionCopier {
     }
 
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch (Exception e) {
+        throw new UndeclaredThrowableException(e);
+      }
     }
 
     if (consumer != null) {

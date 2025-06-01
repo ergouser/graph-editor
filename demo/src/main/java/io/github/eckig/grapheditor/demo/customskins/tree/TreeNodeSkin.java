@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.demo.customskins.tree;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -288,7 +289,11 @@ public class TreeNodeSkin extends GNodeSkin {
     command.append(AddCommand.create(parentOutput, owner -> parentOutput.getConnections(), connection));
 
     if (command.canExecute()) {
-      CommandStack.getCommandStack(model).execute(command);
+      try {
+        CommandStack.getCommandStack(model).execute(command);
+      } catch (Exception e) {
+        throw new UndeclaredThrowableException(e);
+      }
     }
   }
 

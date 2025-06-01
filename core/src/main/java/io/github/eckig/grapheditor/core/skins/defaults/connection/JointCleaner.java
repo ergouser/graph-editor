@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.core.skins.defaults.connection;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -71,7 +72,7 @@ public class JointCleaner {
     for (final GJointSkin jointSkin : pJointSkins) {
       final Region jointRegion = jointSkin.getRoot();
 
-      final EventHandler<MouseEvent> newHandler = event -> {
+      final EventHandler<MouseEvent> newHandler = event -> {;
         final Parent parent = jointRegion.getParent();
 
         if (pJointSkins.size() == 2 || !event.getButton().equals(MouseButton.PRIMARY)) {
@@ -91,7 +92,11 @@ public class JointCleaner {
           Commands.updateLayoutValues(command, model, skinLookup);
 
           if (command.canExecute()) {
-            CommandStack.getCommandStack(model).execute(command);
+            try {
+              CommandStack.getCommandStack(model).execute(command);
+            } catch (Exception e) {
+              throw new UndeclaredThrowableException(e);
+            }
           }
         }
 
