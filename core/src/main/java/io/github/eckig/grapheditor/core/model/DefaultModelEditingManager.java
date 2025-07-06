@@ -18,8 +18,8 @@ import com.ergotech.grapheditor.model.command.Command;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CommandStackListener;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.ModelListSupplier;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
-import com.ergotech.grapheditor.model.GModel;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.SkinLookup;
@@ -32,12 +32,12 @@ import io.github.eckig.grapheditor.utils.RemoveContext;
  */
 public class DefaultModelEditingManager implements ModelEditingManager {
 
-  private GModel model;
+  protected GModel model;
 
   private BiFunction<RemoveContext, GConnection, Command> mOnConnectionRemoved;
 
   private BiFunction<RemoveContext, GNode, Command> mOnNodeRemoved;
-
+  
   /**
    * Creates a new model editing manager. Only one instance should exist per {@link DefaultGraphEditor} instance.
    *
@@ -116,7 +116,8 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     // delete the elements and call business logic add-ins:
     for (final Selectable obj : delete) {
       if (obj instanceof GNode) {
-        command.append(RemoveCommand.create(model, owner -> model.getNodes(), (GNode)obj));
+        command.append(createNodeRemoveCommand((GNode) obj));
+        // command.append(RemoveCommand.create(model, owner -> model.getNodes(), (GNode)obj));
 
         final Command onRemoved = mOnNodeRemoved == null ? null : mOnNodeRemoved.apply(editContext, (GNode) obj);
         if (onRemoved != null) {
@@ -137,25 +138,35 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     }
   }
 
+  /**
+   * return a RemoveCommand - the default
+   */
+  protected Command createNodeRemoveCommand(GNode node) {
+    return RemoveCommand.create(model, owner -> model.getNodes(), node);
+  }
+  
   private void remove(final RemoveContext pRemoveContext, final CompoundCommand pCommand, final GConnection pToDelete) {
     final GConnectorPort source = pToDelete.getSourcePort();
     final GConnectorPort target = pToDelete.getTargetPort();
 
-    // Remove the connection from the model's connections list
-    pCommand.append(RemoveCommand.create(model, owner -> model.getConnections(), pToDelete));
+    if ( source != null && target != null ) { // not a GConnection dragged on the screen - 
+      // Remove the connection from the model's connections list
+      //pCommand.append(RemoveCommand.create(model, owner -> model.getConnections(), pToDelete));
 
-    // Remove the connection from the source connector's connections list
-    pCommand.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), pToDelete));
+      // Remove the connection from the source connector's connections list
+      pCommand.append(RemoveCommand.create(source, owner -> ((GConnectorPort) owner).getConnections(), pToDelete));
 
-    // Remove the connection from the target connector's connections list
-    pCommand.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), pToDelete));
+      // Remove the connection from the target connector's connections list
+      //pCommand.append(RemoveCommand.create(target, owner -> ((GConnectorPort) owner).getConnections(), pToDelete));
 
-    final Command onRemoved = mOnConnectionRemoved == null ? null
-        : mOnConnectionRemoved.apply(pRemoveContext, pToDelete);
-    if (onRemoved != null) {
-      pCommand.append(onRemoved);
+      final Command onRemoved = mOnConnectionRemoved == null ? null
+          : mOnConnectionRemoved.apply(pRemoveContext, pToDelete);
+      if (onRemoved != null) {
+        pCommand.append(onRemoved);
+      }
     }
   }
+  
   /**
    * Initializes the editing domain and resource for the new model.
    *
@@ -192,4 +203,5 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     //    }
 
   }
-}
+
+ }

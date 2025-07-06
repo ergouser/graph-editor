@@ -47,13 +47,35 @@ public interface SkinManager extends SkinLookup, GraphEditorSkins
   void removeNode(final GNode pNodeToRemove);
 
   /**
-   * Removes the given {@link GConnectorPort} skin from the view
+   * Removes the given {@link GNode} skin from the view if showing
+   * Removes the node from the Skin map
+   * Disposes the Skin.
    *
-   * @param pConnectorToRemove
-   *            connector to remove
-   * @since 10.02.2016
+   * @param pNodeToRemove
+   *            node to remove
    */
-  void removeConnector(final GConnectorPort pConnectorToRemove);
+ void disposeNode(GNode pNodeToRemove);
+ 
+ /**
+  * Connectors are part of the node so remove does not remove 
+  * them from the node.  
+  * This does remove the transient tailskins
+  *
+  * @param pConnectorToRemove
+  *            connector to remove
+  * @since 10.02.2016
+  */
+ void removeConnector(final GConnectorPort pConnectorToRemove);
+
+ /**
+  * Removes the given {@link GConnectorPort} skin from the Skin map
+  * Disposes the Skin.
+  *
+  * @param pConnectorToRemove
+  *            connector to remove
+  * @since 10.02.2016
+  */
+ void disposeConnector(final GConnectorPort pConnectorToRemove);
 
   /**
    * Removes the given {@link GConnection} skin from the view
@@ -63,6 +85,16 @@ public interface SkinManager extends SkinLookup, GraphEditorSkins
    * @since 10.02.2016
    */
   void removeConnection(final GConnection pConnectionToRemove);
+
+  /**
+   * Removes the given {@link GConnection} skin from the view
+   * Removes the connection from the Skin map
+   * Disposes the Skin.
+   *
+   * @param pConnectionToRemove
+   *            connection to remove
+   */
+  void disposeConnection(final GConnection pConnectionToRemove);
 
   /**
    * Removes the given {@link GJoint} skin from the view

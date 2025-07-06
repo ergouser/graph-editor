@@ -57,7 +57,7 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
   public BezierConnectionSkin(final GConnection connection) {
 
     super(connection);
-
+    setGeometry(Geometry.BEZIER);
     performChecks();
 
     cursorOffsetCalculator = new CursorOffsetCalculator(connection, path, backgroundPath, connectionSegments);

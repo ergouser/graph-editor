@@ -17,6 +17,7 @@ import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SkinLookup;
 import javafx.geometry.Point2D;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -65,6 +66,33 @@ public class GeometryUtils {
   }
 
   /**
+   * offset the position to be the center of the connectorport.
+   */
+  public static Point2D getConnectorCenter(GConnectorSkin connectorSkin, final SkinLookup skinLookup) {
+      //Node connectorRoot = connectorSkin.getRoot();
+      Side side          = connectorSkin.getSide();
+
+      Point2D connectorPosition = getConnectorPosition(connectorSkin, skinLookup);
+
+      double x, y;
+      if (side == Side.LEFT) {
+          x = connectorPosition.getX();
+          y = connectorPosition.getY() + connectorSkin.getHeight() / 2;
+      } else if (side == Side.RIGHT) {
+          x = connectorPosition.getX() + connectorSkin.getWidth();
+          y = connectorPosition.getY() + connectorSkin.getHeight() / 2;
+      } else if (side == Side.TOP) {  // untested
+          x = connectorPosition.getY() + connectorSkin.getWidth() / 2;
+          y = connectorPosition.getY();
+      } else { // Side.BOTTOM - untested
+          x = connectorPosition.getX() + connectorSkin.getWidth() / 2;
+          y = connectorPosition.getY()+connectorSkin.getHeight(); 
+      }
+
+      return new Point2D(x, y);
+  }
+
+ /**
    * Gets the position of the cursor relative to some node.
    *
    * @param event

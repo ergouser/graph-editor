@@ -382,6 +382,16 @@ public class GraphEditorSkinManager implements SkinManager {
   @Override
   public void removeNode(final GNode pNodeToRemove) {
     if (pNodeToRemove != null) {
+      final GNodeSkin removedSkin = mNodeSkins.get(pNodeToRemove);
+      if (removedSkin != null) {
+        mView.remove(removedSkin);
+      }
+    }
+  }
+
+  @Override
+  public void disposeNode(final GNode pNodeToRemove) {
+    if (pNodeToRemove != null) {
       final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
       if (removedSkin != null) {
         mView.remove(removedSkin);
@@ -397,6 +407,21 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public void removeConnector(final GConnectorPort pConnectorToRemove) {
+    // ConnectorPorts are not part of the main graph, they are part of the node
+    // so are not removed from the view here.
+    if (pConnectorToRemove != null) {
+      // remove the tail skins - they are transient views.
+      final GTailSkin removedTailSkin = mTailSkins.remove(pConnectorToRemove);
+      if (removedTailSkin != null) {
+        removedTailSkin.dispose();
+      }
+    }
+  }
+
+  @Override
+  public void disposeConnector(final GConnectorPort pConnectorToRemove) {
+    // ConnectorPorts are not part of the main graph, they are part of the node
+    // so are not removed from the view here.
     if (pConnectorToRemove != null) {
       final GConnectorSkin removedSkin = mConnectorSkins.remove(pConnectorToRemove);
       if (removedSkin != null) {
@@ -411,6 +436,16 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public void removeConnection(final GConnection pConnectionToRemove) {
+    if (pConnectionToRemove != null) {
+      final GConnectionSkin removedSkin = mConnectionSkins.get(pConnectionToRemove);
+      if (removedSkin != null) {
+        mView.remove(removedSkin);
+      }
+    }
+  }
+
+  @Override
+  public void disposeConnection(final GConnection pConnectionToRemove) {
     if (pConnectionToRemove != null) {
       final GConnectionSkin removedSkin = mConnectionSkins.remove(pConnectionToRemove);
       if (removedSkin != null) {
@@ -511,22 +546,36 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public GNodeSkin lookupOrCreateNode(final GNode pNode) {
-    return mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
+    GNodeSkin nodeSkin = mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
+    if (nodeSkin != null && !(nodeSkin instanceof VirtualSkin) && nodeSkin.getRoot().getParent() == null) {
+      mView.add(nodeSkin);
+    }
+    return nodeSkin;
   }
 
   @Override
   public GConnectorSkin lookupOrCreateConnector(final GConnectorPort pConnector) {
-    return mConnectorSkins.computeIfAbsent(pConnector, this::createConnectorSkin);
+    GConnectorSkin connectorSkin = mConnectorSkins.computeIfAbsent(pConnector, this::createConnectorSkin);
+    return connectorSkin;
   }
 
   @Override
   public GConnectionSkin lookupOrCreateConnection(final GConnection pConnection) {
-    return mConnectionSkins.computeIfAbsent(pConnection, this::createConnectionSkin);
+    GConnectionSkin connectionSkin = mConnectionSkins.computeIfAbsent(pConnection, this::createConnectionSkin);
+    if (connectionSkin != null && !(connectionSkin instanceof VirtualSkin)
+        && connectionSkin.getRoot().getParent() == null) {
+      mView.add(connectionSkin);
+    }
+    return connectionSkin;
   }
 
   @Override
   public GJointSkin lookupOrCreateJoint(final GJoint pJoint) {
-    return mJointSkins.computeIfAbsent(pJoint, this::createJointSkin);
+    GJointSkin jointSkin = mJointSkins.computeIfAbsent(pJoint, this::createJointSkin);
+    if (jointSkin != null && !(jointSkin instanceof VirtualSkin) && jointSkin.getRoot().getParent() == null) {
+      mView.add(jointSkin);
+    }
+    return jointSkin;
   }
 
   @Override

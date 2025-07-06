@@ -49,7 +49,7 @@ public class TailManager {
 
             tailSkin = skinLookup.lookupTail(connectorSkin.getItem());
 
-            sourcePosition = GeometryUtils.getConnectorPosition(connectorSkin, skinLookup);
+            sourcePosition = GeometryUtils.getConnectorCenter(connectorSkin, skinLookup);
             final Point2D cursorPosition = getScaledPosition(GeometryUtils.getCursorPosition(event, view));
 
             tailSkin.draw(sourcePosition, cursorPosition);
@@ -74,7 +74,7 @@ public class TailManager {
         GConnectorSkin newSourceSkin = skinLookup.lookupConnector(pNewSource);
         tailSkin = skinLookup.lookupTail(pNewSource);
 
-        sourcePosition = GeometryUtils.getConnectorPosition(newSourceSkin, skinLookup);
+        sourcePosition = GeometryUtils.getConnectorCenter(newSourceSkin, skinLookup);
         final Point2D cursorPosition = getScaledPosition(GeometryUtils.getCursorPosition(pEvent, view));
 
         tailSkin.draw(sourcePosition, cursorPosition, jointPositions);
@@ -111,8 +111,8 @@ public class TailManager {
 
         if (tailSkin != null) {
 
-            final Point2D sourcePosition = GeometryUtils.getConnectorPosition(source, skinLookup);
-            final Point2D targetPosition = GeometryUtils.getConnectorPosition(target, skinLookup);
+            final Point2D sourcePosition = GeometryUtils.getConnectorCenter(source, skinLookup);
+            final Point2D targetPosition = GeometryUtils.getConnectorCenter(target, skinLookup);
 
             if (jointPositions != null) {
                 tailSkin.draw(sourcePosition, targetPosition, jointPositions, target, valid);

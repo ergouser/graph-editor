@@ -10,9 +10,13 @@ import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
 
 import io.github.eckig.grapheditor.utils.GeometryUtils;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.shape.Line;
 
 /**
@@ -30,8 +34,16 @@ import javafx.scene.shape.Line;
  * </p>
  */
 public abstract class GConnectionSkin extends GSkin<GConnection> {
+  
+  public enum Geometry {
+    RECTANGULAR,
+    BEZIER;
+}
 
   protected final StringProperty type = new SimpleStringProperty(this, "type");
+
+  /** stores the current geometry; defaults to RECTANGULAR */
+  protected final ObjectProperty<Geometry> geometry = new SimpleObjectProperty<>(this, "geometry", Geometry.RECTANGULAR);
 
   /**
    * Cache the index of this connection skin inside the list of children of the connection layer. As the graph editor
@@ -128,19 +140,18 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
     GConnectorPort targetPort = item.getTargetPort();  // this could be null, but that would be a major error so we need it to throw.
     GConnectorSkin connectorSkin = skinLookup.lookupConnector(targetPort); 
+    GConnectorSkin sourceConnectorSkin = skinLookup.lookupConnector(item.getSourcePort());
     if ( connectorSkin == null ) { // this is true on delete...
       return null;
     }
-    if (item == null || skinLookup == null) {
-      return null;
-    } else if (getJointSkins().isEmpty()) {
+    if (getJointSkins().isEmpty()) {
       final Point2D[] points = new Point2D[2];
 
       // Start: Source position
-      points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSourcePort()), skinLookup);
+      points[0] = GeometryUtils.getConnectorCenter(sourceConnectorSkin, skinLookup);
 
       // End: Target position
-      points[1] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getTargetPort()), skinLookup);
+      points[1] = GeometryUtils.getConnectorCenter(connectorSkin, skinLookup);
 
       return points;
     } else {
@@ -151,14 +162,15 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
       GeometryUtils.fillJointPositions(this, points);
 
       // Start: Source position
-      points[0] = GeometryUtils.getConnectorPosition(skinLookup.lookupConnector(item.getSourcePort()), skinLookup);
+      points[0] = GeometryUtils.getConnectorCenter(sourceConnectorSkin, skinLookup);
 
       // End: Target position
-      points[len - 1] = GeometryUtils.getConnectorPosition(connectorSkin, skinLookup);
+      points[len - 1] = GeometryUtils.getConnectorCenter(connectorSkin, skinLookup);
 
       return points;
     }
   }
+  
 
   /**
    * @return cached position (index) of this connection skin inside the child-list of the parent connection layer.
@@ -192,6 +204,19 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
    */
   public void setType(String value) {
       type.set(value);
+  }
+
+  /** convenience getter / setter */
+  public Geometry getGeometry() {
+      return geometry.get();
+  }
+  
+  public void setGeometry(Geometry value) {
+      geometry.set(value);
+  }
+  
+  public ObjectProperty<Geometry> geometryProperty() {
+      return geometry;
   }
 
 }

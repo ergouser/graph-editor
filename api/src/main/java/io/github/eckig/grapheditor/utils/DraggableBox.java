@@ -3,6 +3,10 @@
  */
 package io.github.eckig.grapheditor.utils;
 
+import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+import com.ergotech.grapheditor.model.command.SetPropertyCommand;
+
 import io.github.eckig.grapheditor.EditorElement;
 import javafx.event.Event;
 import javafx.geometry.Point2D;
@@ -21,7 +25,7 @@ import javafx.scene.layout.StackPane;
  * via {@code resize(width, height)}, and will not be affected by parent layout.
  * </p>
  */
-public class DraggableBox extends StackPane {
+public abstract class DraggableBox extends StackPane {
 
   private static final double DEFAULT_ALIGNMENT_THRESHOLD = 5;
 
@@ -92,6 +96,9 @@ public class DraggableBox extends StackPane {
       }
     });
   }
+
+  /** Execute the provided command. */
+  public abstract void executeCommand (Command command);
 
   /**
    * Called after the skin (using this box as root node) is removed. Can be overridden for cleanup.
@@ -322,6 +329,7 @@ public class DraggableBox extends StackPane {
 
     final Point2D cursorPosition = GeometryUtils.getCursorPosition(pEvent, getContainer(this));
     handleDrag(cursorPosition.getX(), cursorPosition.getY());
+    //GSkin.this.getItem().
     pEvent.consume();
   }
 
@@ -374,19 +382,23 @@ public class DraggableBox extends StackPane {
     // empty, to be overridden by custom skin logic
   }
 
-  /**
-   * Handles a drag event to the given cursor position.
-   *
-   * @param pX
-   *          the cursor x position relative to the container
-   * @param pY
-   *          the cursor y position relative to the container
-   */
+    /**
+     * Handles a drag event to the given cursor position.
+     *
+     * @param pX
+     *          the cursor x position relative to the container
+     * @param pY
+     *          the cursor y position relative to the container
+     */
   private void handleDrag(final double pX, final double pY) {
-    handleDragX(pX);
-    handleDragY(pY);
+    final CompoundCommand command = new CompoundCommand();
+
+    command.append(handleDragX(pX));
+    command.append(handleDragY(pY));
+    executeCommand(command);
     // notify
-    positionMoved();
+    positionMoved(); 
+    return;
   }
 
   /**
@@ -430,7 +442,7 @@ public class DraggableBox extends StackPane {
    * @param pX
    *          the cursor x position
    */
-  private void handleDragX(final double pX) {
+  private Command handleDragX(final double pX) {
     final double maxParentWidth = getParent().getLayoutBounds().getWidth();
 
     final double minLayoutX = getWestBoundValue();
@@ -456,8 +468,7 @@ public class DraggableBox extends StackPane {
     } else if (newLayoutX > maxLayoutX) {
       newLayoutX = maxLayoutX;
     }
-
-    setLayoutX(newLayoutX);
+    return commandLayoutX(newLayoutX);
     // if (dependencyX != null)
     // {
     // dependencyX.setLayoutX(newLayoutX);
@@ -470,7 +481,7 @@ public class DraggableBox extends StackPane {
    * @param pY
    *          the cursor y position
    */
-  private void handleDragY(final double pY) {
+  private Command handleDragY(final double pY) {
     final double maxParentHeight = getParent().getLayoutBounds().getHeight();
 
     final double minLayoutY = getNorthBoundValue();
@@ -497,7 +508,8 @@ public class DraggableBox extends StackPane {
       newLayoutY = maxLayoutY;
     }
 
-    setLayoutY(newLayoutY);
+    //setLayoutY(newLayoutY);
+    return commandLayoutY(newLayoutY);
     // if (dependencyY != null)
     // {
     // dependencyY.setLayoutY(newLayoutY);
@@ -569,4 +581,27 @@ public class DraggableBox extends StackPane {
     }
     return position;
   }
+  
+  /** Create an undoable command to set the layoutY. 
+   * 
+   * @param newLayoutY  the new location
+   * @return the required command to execute the change.
+   */
+  public Command commandLayoutY(double newLayoutY) {
+    // create a command to call setLayoutY(newLayoutY);
+    SetPropertyCommand<Number> setPropertyCommand = new SetPropertyCommand<Number> (layoutYProperty(),newLayoutY) ;
+    return setPropertyCommand;
+  }
+  
+  /** Create an undoable command to set the layoutX. 
+   * 
+   * @param newLayoutX  the new location
+   * @return the required command to execute the change.
+   */
+  public Command commandLayoutX(double newLayoutX) {
+    // create a command to call setLayoutX(newLayoutX);
+    SetPropertyCommand<Number> setPropertyCommand = new SetPropertyCommand<Number> (layoutXProperty(),newLayoutX) ;
+    return setPropertyCommand;
+  }
+
 }

@@ -20,20 +20,25 @@ public class AddCommand<T> extends AbstractCommand {
 
   @Override
   public void execute() throws Exception {
-      if (!executed && canExecute()) {
+      if (!isExecuted() && canExecute()) {
         @SuppressWarnings("unchecked")
         Collection<T> list = (Collection<T>) listSupplier.getList(owner);
         list.add(element);
-          executed = true;
+        setExecuted(true);
       }
   }
 
   @Override
   public void undo() throws Exception {
-      if (executed && canUndo()) {
+      if (isExecuted() && canUndo()) {
           listSupplier.getList(owner).remove(element);
-          executed = false;
+          setExecuted(false);
       }
+  }
+
+  @Override
+  public String toString() {
+    return "AddCommand [element=" + element + " executed=" + isExecuted() + "]";
   }
 
 }

@@ -4,11 +4,10 @@ import javafx.beans.property.Property;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
 
-public class SetPropertyCommand<V> implements Command {
+public class SetPropertyCommand<V> extends AbstractCommand {
   private final Property<V> property;
   private final V newValue;
   private V oldValue;
-  private boolean executed = false;
 
   /** Convenience method to create the set property command. */
   public static <S> SetPropertyCommand<S> create(Property<S> property, S newValue) {
@@ -62,7 +61,7 @@ public class SetPropertyCommand<V> implements Command {
     if (canExecute()) {
       oldValue = property.getValue();
       property.setValue(newValue);
-      executed = true;
+      setExecuted(true);
     }
   }
 
@@ -70,24 +69,25 @@ public class SetPropertyCommand<V> implements Command {
   public void undo() throws Exception {
     if (canUndo()) {
       property.setValue(oldValue);
-      executed = false;
+      setExecuted(false);
     }
   }
 
   @Override
   public boolean canExecute() {
-    return !executed; //&& !property.getValue().equals(newValue);
+      return !isExecuted() ;
   }
 
   @Override
   public boolean canUndo() {
-    return executed;
+      return isExecuted() ;
   }
+
 
   @Override
   public String toString() {
     return "SetPropertyCommand [property=" + property + ", newValue=" + newValue + ", oldValue=" + oldValue
-        + ", executed=" + executed + "]";
+        + ", executed=" + isExecuted() + "]";
   }
   
 }

@@ -4,8 +4,7 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ergotech.grapheditor.model.GModel;
-
+import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -23,10 +22,10 @@ import javafx.collections.ObservableList;
 public class CommandStack {
 
   /** The singleton command stack. */
-  protected static Map<GModel,CommandStack> commandStacks = new HashMap<>();
+  protected static Map<Object,CommandStack> commandStacks = new HashMap<>();
 
-  /** Return the command stack (currently a singleton). */
-  public static CommandStack getCommandStack(GModel model) {
+  /** Return the command stack for the current editing domain.  This is likely a GModel. */
+  public static CommandStack getCommandStack(Object model) {
     CommandStack basicCommandStack = commandStacks.get(model);
     if ( basicCommandStack == null ) {
       basicCommandStack = new CommandStack();
@@ -37,7 +36,7 @@ public class CommandStack {
   /**
    * The list of executed commands.
    */
-  protected final ObservableList<Command> commands = FXCollections.observableArrayList();
+  protected final ObservableList<Command> commands;
 
   /**
    * The index of the last executed command in the commands list.
@@ -62,14 +61,21 @@ public class CommandStack {
   ListChangeListener<Command> listChangeListener = change -> {
     if (!stackChangeNotificationsSuspended && listener != null ) {
       while (change.next()) {
+        if (change.wasRemoved()) {
+          for (Command removedCmd : change.getRemoved()) {
+            removedCmd.dispose();
+          }
+        }
+        if (change.wasAdded() || change.wasRemoved()) {
+          // Create an event and pass it to the listener
+          EventObject event = new EventObject(change);
+          listener.commandStackChanged(event);
+        }
+        if (change.wasUpdated()) {
+          // some command’s executedProperty changed
+          updateCanUndoRedo();
+        }
       }
-      // You can add more specific conditions here if needed
-      if (change.wasAdded() || change.wasRemoved()) {
-        // Create an event and pass it to the listener
-        EventObject event = new EventObject(change);
-        listener.commandStackChanged(event);
-      }
-
     }
   };
 
@@ -77,6 +83,8 @@ public class CommandStack {
    * Constructs a CommandStack and sets up listeners for property changes.
    */
   protected CommandStack() {
+    commands = FXCollections.observableArrayList(cmd -> new Observable[]{cmd.executedProperty()});
+
     // Update canUndo and canRedo whenever 'top' changes
     top.addListener((observable, oldValue, newValue) -> {
       updateCanUndoRedo();
@@ -144,8 +152,11 @@ public class CommandStack {
       Command command = commands.get(top.get());
       // move the  stack position even if the undo fails
       // otherwise further undos would be inaccessible.
-      top.set(top.get() - 1); 
+      try {
       command.undo();
+      } finally {
+        top.set(top.get() - 1); 
+      }
     }
   }
 
@@ -155,9 +166,12 @@ public class CommandStack {
    */
   public void redo() throws Exception {
     if (canRedo()) {
-      top.set(top.get() + 1);
-      Command command = commands.get(top.get());
-      command.execute();
+      Command command = commands.get(top.get()+1);
+      try {
+        command.redo();
+      } finally {
+        top.set(top.get() + 1);
+      }
     }
   }
 
@@ -208,12 +222,24 @@ public class CommandStack {
    * Updates the canUndo and canRedo properties based on the current state.
    */
   private void updateCanUndoRedo() {
+    // this will be called because there has been a change to executed before the command has been added to the stack.
     Command command = null;
+    if ( commands.size() > 0 && top.get() >= 0 ) { 
+      boolean enoughCommands = top.get() >= 0;
+      boolean wasExecuted = commands.get(top.get()).canUndo();
+    }
     canUndo.set(top.get() >= 0 && (command=commands.get(top.get())).canUndo());
     //    if ( command != null ) {
     //      System.out.println (top.get() + " Command undo " + command.canUndo() + " " + command.canExecute());
     //      command = null;
     //    }
+    if ( commands.size() > 0 && top.get() >= 0 ) { 
+      boolean enoughCommands = top.get() + 1 < commands.size();
+      if ( enoughCommands ) {
+        command = commands.get(top.get() + 1);
+        boolean isExecutable = command.canExecute();
+      }
+    }
     canRedo.set(top.get() + 1 < commands.size() && (command=commands.get(top.get() + 1)).canExecute());  // why +1 ?? 
     //canRedo.set(top.get() >= 0 && (command=commands.get(top.get())).canExecute());
     //System.out.println (top.get() + " Command redo " + canRedo.get() + " " + canUndo.get());

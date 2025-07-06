@@ -73,6 +73,12 @@ public class Commands {
 
     final Command command = AddCommand.create(model, owner -> model.getNodes(), node);
 
+    executeCommand(model, command);
+
+  }
+
+  /** Execute the provided command through the command Stack .*/
+  public static void executeCommand(final GModel model, final Command command) {
     if (command.canExecute()) {
       try {
         CommandStack.getCommandStack(model).execute(command);
@@ -81,7 +87,6 @@ public class Commands {
         throw new UndeclaredThrowableException(e);
       }
     }
-
   }
 
   /**

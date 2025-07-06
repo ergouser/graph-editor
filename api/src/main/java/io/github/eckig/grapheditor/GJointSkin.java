@@ -3,7 +3,11 @@
  */
 package io.github.eckig.grapheditor;
 
+import java.lang.reflect.UndeclaredThrowableException;
+
 import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CommandStack;
 
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import javafx.beans.property.DoubleProperty;
@@ -24,7 +28,7 @@ import javafx.beans.property.StringProperty;
  * </p>
  */
 public abstract class GJointSkin extends GSkin<GJoint> {
-
+  
   protected final DoubleProperty x = new SimpleDoubleProperty(this, "x", 0);
 
   protected final DoubleProperty y = new SimpleDoubleProperty(this, "y", 0);
@@ -41,6 +45,16 @@ public abstract class GJointSkin extends GSkin<GJoint> {
     public final void positionMoved() {
       super.positionMoved();
       GJointSkin.this.impl_positionMoved();
+    }
+
+    @Override
+    public void executeCommand(Command command) {
+      CommandStack commandStack = CommandStack.getCommandStack(GJointSkin.this.getGraphEditor().getModel());
+      try {
+        commandStack.execute(command);
+      } catch (Exception e) {
+        throw new UndeclaredThrowableException(e);
+      }
     }
   };
 

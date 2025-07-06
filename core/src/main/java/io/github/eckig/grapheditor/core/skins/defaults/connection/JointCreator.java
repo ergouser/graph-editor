@@ -16,6 +16,7 @@ import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.SkinManager;
+import io.github.eckig.grapheditor.core.skins.defaults.DefaultJointSkin;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -130,6 +131,8 @@ public class JointCreator {
           if (index > -1) {
 
             calculateJointPosition(event, root, index);
+            final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
+            System.out.println("Joint X: " + newJointX + " Y: " + newJointY + " click position: " + clickPositionInParent);
 
             final int oldJointCount = connectionSkin.getJointSkins().size();
 
@@ -181,7 +184,7 @@ public class JointCreator {
 
       // Print each element in the copied list
       for (GJointSkin jointSkin : jointSkinsCopy) {
-        System.out.println(jointSkin);
+        System.out.println("Joint Skin: " + jointSkin);
       }
 
     }
@@ -246,25 +249,31 @@ public class JointCreator {
      * @param index the index of the PathElement in the path.  Technically, the index of the joint skin in the jointskin array
      */
     protected void calculateJointPosition(final MouseEvent event, final Group root, final int index) {
-      final double adjacentJointX;
-      final double adjacentJointY;
-      if (index < connectionSkin.getJointSkins().size()) {
+      final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
+      if ( connectionSkin.getGeometry() == GConnectionSkin.Geometry.RECTANGULAR ) {
+        final double adjacentJointX;
+        final double adjacentJointY;
+        if (index < connectionSkin.getJointSkins().size()) {
           adjacentJointX = connectionSkin.getJointSkins().get(index).getX();
           adjacentJointY = connectionSkin.getJointSkins().get(index).getY();
-      } else {
+        } else {
           adjacentJointX = connectionSkin.getJointSkins().get(index - 1).getX();
           adjacentJointY = connectionSkin.getJointSkins().get(index - 1).getY();
-      }
+        }
 
-      final Point2D clickPositionInParent = root.localToParent(event.getX(), event.getY());
 
-      final SkinLookup skinLookup = graphEditor.getSkinLookup();
-      if (RectangularConnections.isSegmentHorizontal(connectionSkin, skinLookup, index)) {
+        final SkinLookup skinLookup = graphEditor.getSkinLookup();
+        if (RectangularConnections.isSegmentHorizontal(connectionSkin, skinLookup, index)) {
           newJointX = GeometryUtils.moveOnPixel(clickPositionInParent.getX());
           newJointY = GeometryUtils.moveOnPixel(adjacentJointY);
-      } else {
+        } else {
           newJointX = GeometryUtils.moveOnPixel(adjacentJointX);
           newJointY = GeometryUtils.moveOnPixel(clickPositionInParent.getY());
+        }
+      }
+      else {  // bezier curves create joint at the mouse click position...
+        newJointX = GeometryUtils.moveOnPixel(clickPositionInParent.getX());
+        newJointY = GeometryUtils.moveOnPixel(clickPositionInParent.getY());
       }
     }
 
@@ -283,26 +292,54 @@ public class JointCreator {
      * @param y the y position for the new joints
      */
     private void addTemporaryJoints(final int index, final double x, final double y) {
+      // some of these methods should be delegated to the skin...
+      if ( connectionSkin.getGeometry() == GConnectionSkin.Geometry.RECTANGULAR ) {
 
-      final GJoint firstNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
-      final GJoint secondNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
+        final GJoint firstNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
+        final GJoint secondNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
 
-      final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
-      GJointSkin firstNewJointSkin = skinManager.lookupOrCreateJoint(firstNewJoint);
-      firstNewJointSkin.setX(x);
-      firstNewJointSkin.setY(y);
+        final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
+        GJointSkin firstNewJointSkin = skinManager.lookupOrCreateJoint(firstNewJoint);
+        firstNewJointSkin.setX(x);
+        firstNewJointSkin.setY(y);
 
-      GJointSkin secondNewJointSkin = skinManager.lookupOrCreateJoint(secondNewJoint);
-      secondNewJointSkin.setX(x);
-      secondNewJointSkin.setY(y);
+        GJointSkin secondNewJointSkin = skinManager.lookupOrCreateJoint(secondNewJoint);
+        secondNewJointSkin.setX(x);
+        secondNewJointSkin.setY(y);
 
-      temporaryJoints = new ArrayList<>();
+        temporaryJoints = new ArrayList<>();
 
-      temporaryJoints.add(firstNewJointSkin);
-      temporaryJoints.add(secondNewJointSkin);
+        temporaryJoints.add(firstNewJointSkin);
+        temporaryJoints.add(secondNewJointSkin);
+        // mostly useful for debugging...
+        if ( firstNewJointSkin instanceof DefaultJointSkin defaultJointSkin ) {
+          defaultJointSkin.setTemporary(true);
+        }
+        if ( secondNewJointSkin instanceof DefaultJointSkin defaultJointSkin ) {
+          defaultJointSkin.setTemporary(true);
+        }
 
-      connectionSkin.getJointSkins().add(index, secondNewJointSkin);
-      connectionSkin.getJointSkins().add(index, firstNewJointSkin);
+        connectionSkin.getJointSkins().add(index, secondNewJointSkin);
+        connectionSkin.getJointSkins().add(index, firstNewJointSkin);
+      } else {
+        // create only one joint
+        final GJoint firstNewJoint = graphEditor.getModel().getGraphFactory().create(GJoint.class);
+
+        final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
+        GJointSkin firstNewJointSkin = skinManager.lookupOrCreateJoint(firstNewJoint);
+        firstNewJointSkin.setX(x);
+        firstNewJointSkin.setY(y);
+
+        temporaryJoints = new ArrayList<>();
+
+        temporaryJoints.add(firstNewJointSkin);
+        // mostly useful for debugging...
+        if ( firstNewJointSkin instanceof DefaultJointSkin defaultJointSkin ) {
+          defaultJointSkin.setTemporary(true);
+        }
+
+        connectionSkin.getJointSkins().add(index, firstNewJointSkin);
+      }
 
       //skinManager.updateJoints(connectionSkin);
       graphEditor.reload();

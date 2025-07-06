@@ -48,14 +48,17 @@ public final class RectangularConnections {
   // "works" means it will return the correct result for the begining and end and values for other cases. Fortunately
   // the result in these other cases is probably unimportant.
   public static boolean isSegmentHorizontal(final GConnectionSkin connectionSkin, final SkinLookup skinLookup, final int i) {
-    GConnectorPort source = connectionSkin.getItem().getSourcePort();
-    GConnectorSkin connectorSkin = skinLookup.lookupConnector(source);
-    final Side side = connectorSkin.getSide();
-    final boolean sourceIsLeft = side == Side.LEFT;
-    final boolean sourceIsRight = side == Side.RIGHT;
-    final boolean firstSegmentHorizontal = sourceIsLeft || sourceIsRight;
+    if ( connectionSkin.getGeometry() == GConnectionSkin.Geometry.RECTANGULAR ) {
+      GConnectorPort source = connectionSkin.getItem().getSourcePort();
+      GConnectorSkin connectorSkin = skinLookup.lookupConnector(source);
+      final Side side = connectorSkin.getSide();
+      final boolean sourceIsLeft = side == Side.LEFT;
+      final boolean sourceIsRight = side == Side.RIGHT;
+      final boolean firstSegmentHorizontal = sourceIsLeft || sourceIsRight;
 
-    return firstSegmentHorizontal == ((i & 1) == 0);
+      return firstSegmentHorizontal == ((i & 1) == 0);
+    } 
+    return false;  // no horizontal sections for Bezier curves...
   }
 
   /**

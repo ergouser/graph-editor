@@ -233,10 +233,10 @@ public class SelectionCreator {
       if (connectionPressedHandler != null) {
         connectionSkin.getRoot().removeEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
       }
-    }
 
-    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-      removeJoint(jointSkin.getItem());
+      for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+        removeJoint(jointSkin.getItem());
+      }
     }
   }
 

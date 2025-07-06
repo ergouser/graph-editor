@@ -6,7 +6,6 @@ public class RemoveCommand<T> extends AbstractCommand {
   private final Object owner;
   private final ModelListSupplier<T> listSupplier;
   private final T element;
-  private boolean executed = false;
 
   /** Convenience method to create the remove command. */
   public static <S> RemoveCommand<S> create(Object owner, ModelListSupplier<S> listSupplier, S element) {
@@ -21,20 +20,27 @@ public class RemoveCommand<T> extends AbstractCommand {
 
   @Override
   public void execute() throws Exception {
-    if (!executed && canExecute()) {
+    if (!isExecuted() && canExecute()) {
       listSupplier.getList(owner).remove(element);
-      executed = true;
+      setExecuted(true);
     }
   }
 
   @Override
   public void undo() throws Exception {
-    if (executed && canUndo()) {
+    if (isExecuted() && canUndo()) {
       @SuppressWarnings("unchecked")
       Collection<T> list = (Collection<T>) listSupplier.getList(owner);
       list.add(element);
-      executed = false;
+      setExecuted(false);
     }
   }
+  
+  @Override
+  public String toString() {
+    return "RemoveCommand [element=" + element + " executed=" + isExecuted() + "]";
+  }
+
+
 }
 

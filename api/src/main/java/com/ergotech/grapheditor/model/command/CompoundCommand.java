@@ -95,12 +95,12 @@ public class CompoundCommand implements Command {
 
   @Override
   public boolean canExecute() {
-    return !isExecuted() && commands.stream().allMatch(Command::canExecute);
+    return !isExecuted() && commands.size() != 0 && commands.stream().allMatch(Command::canExecute);
   }
 
   @Override
   public boolean canUndo() {
-    return isExecuted() && commands.stream().allMatch(Command::canUndo);
+    return isExecuted() && commands.size() != 0 && commands.stream().allMatch(Command::canUndo);
   }
 
   public boolean isExecuted() {

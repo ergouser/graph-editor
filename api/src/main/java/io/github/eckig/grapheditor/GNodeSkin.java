@@ -3,9 +3,12 @@
  */
 package io.github.eckig.grapheditor;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 
 import com.ergotech.grapheditor.model.GNode;
+import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CommandStack;
 
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.ResizableBox;
@@ -136,6 +139,16 @@ public abstract class GNodeSkin extends GSkin<GNode> {
             {
                 super.positionMoved();
                 GNodeSkin.this.impl_positionMoved();
+            }
+            
+            @Override
+            public void executeCommand(Command command) {
+              CommandStack commandStack = CommandStack.getCommandStack(GNodeSkin.this.getGraphEditor().getModel());
+              try {
+                commandStack.execute(command);
+              } catch (Exception e) {
+                throw new UndeclaredThrowableException(e);
+              }
             }
         };
     }

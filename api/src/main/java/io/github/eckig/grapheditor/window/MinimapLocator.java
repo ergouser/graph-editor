@@ -3,6 +3,8 @@
  */
 package io.github.eckig.grapheditor.window;
 
+import com.ergotech.grapheditor.model.command.Command;
+
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.GraphEditorProperties;
 
@@ -47,5 +49,10 @@ class MinimapLocator extends DraggableBox
     {
         // we want the minimap to be movable at all times because it is not really editing
         return true;
+    }
+
+    @Override
+    public void executeCommand(Command command) {
+      // nothing required for the mini-map      
     }
 }
