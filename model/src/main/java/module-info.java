@@ -3,4 +3,5 @@
  */
 module com.ergotech.grapheditor.model {
   exports com.ergotech.grapheditor.model;
+  requires javafx.base;
 }

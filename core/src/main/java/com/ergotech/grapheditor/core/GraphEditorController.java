@@ -207,12 +207,13 @@ public class GraphEditorController<E extends GraphEditor> {
     };
 
     // Use the GConnection's method to add listeners
-    ((GConnectionImpl)connection).addListeners(sourceListener, targetListener, typeListener, bidirectionalListener, jointsListener);
+    ((GConnectionImpl)connection).addListeners(sourceListener, targetListener, typeListener, bidirectionalListener);
 
     GConnectionSkin connectionSkin = mSkinManager.lookupConnection(connection);
+    connectionSkin.getJoints().addListener(jointsListener);
     // Process existing joints
-    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-      addJoint(jointSkin.getItem(),connection);
+    for (GJoint joint : connectionSkin.getJoints()) {
+      addJoint(joint,connection);
     }
   }
 
@@ -390,8 +391,8 @@ public class GraphEditorController<E extends GraphEditor> {
     GConnectionSkin connectionSkin = mSkinManager.lookupConnection(connection);
     mSelectionManager.removeConnection(connection);
     mSkinManager.removeConnection(connection);
-    for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-      removeJoint(jointSkin.getItem());
+    for (GJoint joint : connectionSkin.getJoints()) {
+      removeJoint(joint);
     }
     ((GConnectionImpl)connection).removeListeners();
   }

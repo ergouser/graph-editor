@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
@@ -315,20 +316,23 @@ public class ConnectorDragManager {
     if (pEvent.getButton() != MouseButton.PRIMARY) {
       return;
     }
-    ((Node) pEvent.getSource()).startFullDrag();
+    try {
+      ((Node) pEvent.getSource()).startFullDrag();
 
-    final GConnectorPort connector = connectorSkin.getItem();
-    if (checkCreatable(connector) && activateGesture(pEvent)) {
-      sourceConnectorSkin = skinManager.lookupOrCreateConnector(connector);
-      connectorSkin.getRoot().startFullDrag();
-      tailManager.cleanUp();
-      tailManager.create(connectorSkin, pEvent);
-    } else if (checkRemovable(connector) && activateGesture(pEvent)) {
-      removalConnectorSkin = skinManager.lookupOrCreateConnector(connector);
-      connectorSkin.getRoot().startFullDrag();
+      final GConnectorPort connector = connectorSkin.getItem();
+      if (checkCreatable(connector) && activateGesture(pEvent)) {
+        sourceConnectorSkin = skinManager.lookupOrCreateConnector(connector);
+        connectorSkin.getRoot().startFullDrag();
+        tailManager.cleanUp();
+        tailManager.create(connectorSkin, pEvent);
+      } else if (checkRemovable(connector) && activateGesture(pEvent)) {
+        removalConnectorSkin = skinManager.lookupOrCreateConnector(connector);
+        connectorSkin.getRoot().startFullDrag();
+      }
+
+    } finally {
+      pEvent.consume();
     }
-
-    pEvent.consume();
   }
 
   /**
@@ -341,14 +345,17 @@ public class ConnectorDragManager {
    */
   protected void handleMouseDragged(final MouseEvent event, final GConnectorSkin connectorSkin) {
     if (repositionAllowed && activateGesture(event)) {
-      // Case for when the mouse first exits a connector during a drag gesture.
-      if (removalConnectorSkin != null && !removalConnectorSkin.equals(hoveredConnectorSkin)) {
-        detachConnection(event, connectorSkin);
-      } else {
-        tailManager.updatePosition(event);
-        //System.out.println ("Drag Event " + event.getX() + " "+ event.getY());
+      try {
+        // Case for when the mouse first exits a connector during a drag gesture.
+        if (removalConnectorSkin != null && !removalConnectorSkin.equals(hoveredConnectorSkin)) {
+          detachConnection(event, connectorSkin);
+        } else {
+          tailManager.updatePosition(event);
+          //System.out.println ("Drag Event " + event.getX() + " "+ event.getY());
+        }
+      } finally {
+        event.consume();
       }
-      event.consume();
     }
   }
 
@@ -365,23 +372,26 @@ public class ConnectorDragManager {
       return;
     }
 
-    final GConnectorPort connector = connectorSkin.getItem();
-    if (validator.prevalidate(sourceConnectorSkin.getItem(), connector)) {
-      final boolean valid = validator.validate(sourceConnectorSkin.getItem(), connector);
-      tailManager.snapPosition(sourceConnectorSkin, connectorSkin, valid);
+    try {
+      final GConnectorPort connector = connectorSkin.getItem();
+      if (validator.prevalidate(sourceConnectorSkin.getItem(), connector)) {
+        final boolean valid = validator.validate(sourceConnectorSkin.getItem(), connector);
+        tailManager.snapPosition(sourceConnectorSkin, connectorSkin, valid);
 
-      repositionAllowed = false;
+        repositionAllowed = false;
 
-      if (valid) {
-        connectorSkin.applyStyle(GConnectorStyle.DRAG_OVER_ALLOWED);
-      } else {
-        connectorSkin.applyStyle(GConnectorStyle.DRAG_OVER_FORBIDDEN);
+        if (valid) {
+          connectorSkin.applyStyle(GConnectorStyle.DRAG_OVER_ALLOWED);
+        } else {
+          connectorSkin.applyStyle(GConnectorStyle.DRAG_OVER_FORBIDDEN);
+        }
       }
-    }
 
-    //Visual feedback: add a highlight style or effect
-    //connectorSkin.getRoot().setStyle("-fx-border-color: #33cc33; -fx-border-width: 2px; -fx-border-radius: 4px;");
-    event.consume();
+      //Visual feedback: add a highlight style or effect
+      //connectorSkin.getRoot().setStyle("-fx-border-color: #33cc33; -fx-border-width: 2px; -fx-border-radius: 4px;");
+    } finally {
+      event.consume();
+    }
   }
 
   /**
@@ -393,6 +403,7 @@ public class ConnectorDragManager {
    *          the {@link GConnectorSkin} on which this event occurred
    */
   protected void handleDragExited(final MouseEvent event, final GConnectorSkin connectorSkin) {
+    try {
     connectorSkin.applyStyle(GConnectorStyle.DEFAULT);
     repositionAllowed = true;
 
@@ -400,7 +411,9 @@ public class ConnectorDragManager {
 
     // Remove visual highlight
     //connectorSkin.getRoot().setStyle(""); // or set it back to the base style if needed
+  } finally {
     event.consume();
+  }
   }
 
   /**
@@ -523,7 +536,10 @@ public class ConnectorDragManager {
       }
       final GConnectorPort opposingConnector = getOpposingConnector(connection, connector);
       
-      final List<Point2D> jointPositions = GeometryUtils.getJointPositions(skinManager.lookupConnection(connection));
+      List<GJointSkin> jointSkins = skinManager.lookupConnection(connection).getJoints().stream()
+          .map(joint -> skinManager.lookupJoint(joint))
+          .collect(Collectors.toList());
+      final List<Point2D> jointPositions = GeometryUtils.getJointPositions(jointSkins);
       final GConnectorPort newSource;
       if (connector.equals(connection.getSourcePort())) {
         Collections.reverse(jointPositions);

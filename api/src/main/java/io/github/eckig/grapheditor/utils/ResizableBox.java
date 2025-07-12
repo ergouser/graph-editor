@@ -5,8 +5,7 @@ package io.github.eckig.grapheditor.utils;
 
 import com.ergotech.grapheditor.model.command.Command;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
-import com.ergotech.grapheditor.model.command.SetHeightCommand;
-import com.ergotech.grapheditor.model.command.SetWidthCommand;
+import com.ergotech.grapheditor.model.command.SetCommand;
 
 import io.github.eckig.grapheditor.EditorElement;
 import javafx.geometry.Point2D;
@@ -232,13 +231,8 @@ public abstract class ResizableBox extends DraggableBox {
       newHeight = minResizeHeight;
     }
 
-    //setLayoutY(newLayoutY);
-    //setHeight(newHeight);
-    final CompoundCommand command = new CompoundCommand();
-
-    command.append(commandLayoutY(newLayoutY));
-    command.append(commandHeight(newHeight));
-    executeCommand(command);
+    setLayoutY(newLayoutY);
+    setHeight(newHeight);
   }
 
   /**
@@ -274,8 +268,7 @@ public abstract class ResizableBox extends DraggableBox {
       newHeight = minResizeHeight;
     }
 
-    //setHeight(newHeight);
-    executeCommand(commandHeight(newHeight));
+    setHeight(newHeight);
   }
 
   /**
@@ -311,8 +304,7 @@ public abstract class ResizableBox extends DraggableBox {
       newWidth = minResizeWidth;
     }
 
-    //setWidth(newWidth);
-    executeCommand(commandWidth(newWidth));
+    setWidth(newWidth);
 
   }
 
@@ -354,11 +346,8 @@ public abstract class ResizableBox extends DraggableBox {
       newWidth = minResizeWidth;
     }
 
-    final CompoundCommand command = new CompoundCommand();
-
-    command.append(commandLayoutX(newLayoutX));
-    command.append(commandWidth(newWidth));
-    executeCommand(command);
+    setLayoutX(newLayoutX);
+    setWidth(newWidth);
   }
 
   /**
@@ -462,30 +451,6 @@ public abstract class ResizableBox extends DraggableBox {
   private enum RectangleMouseRegion {
 
     NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST, INSIDE, OUTSIDE;
-  }
-
-  /**
-   * Create an undoable command to set the width.
-   * 
-   * @param newWidth
-   *          the new location
-   * @return the required command to execute the change.
-   */
-  public Command commandWidth(double newWidth) {
-    // create a command to call setWidth(newWidth);
-    return new SetWidthCommand(this::getWidth, this::setWidth, newWidth);
-  }
-
-  /**
-   * Create an undoable command to set the Height.
-   * 
-   * @param newHeight
-   *          the new location
-   * @return the required command to execute the change.
-   */
-  public Command commandHeight(double newHeight) {
-    // create a command to call setHeight(newHeight);
-    return new SetHeightCommand(this::getHeight, this::setHeight, newHeight);
   }
 
 }

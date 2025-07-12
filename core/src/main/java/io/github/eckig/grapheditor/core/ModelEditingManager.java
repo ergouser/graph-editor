@@ -73,5 +73,6 @@ public interface ModelEditingManager
      * @param pToRemove
      *            elements to remove
      */
-    void remove(final Collection<Selectable> pToRemove);
+    void remove(final Collection<Selectable> pToRemove, final SkinLookup skinLookup);
+
 }

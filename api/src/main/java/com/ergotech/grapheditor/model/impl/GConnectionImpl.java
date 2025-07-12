@@ -39,7 +39,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
 
   private final ObjectProperty<GConnectorPort> target = new SimpleObjectProperty<>(this, "target");
 
-  private final ObservableList<GJoint> joints = FXCollections.observableArrayList();
+  //private final ObservableList<GJoint> joints = FXCollections.observableArrayList();
 
   private final BooleanProperty bidirectional = new SimpleBooleanProperty(this, "bidirectional", false);
 
@@ -52,7 +52,6 @@ public class GConnectionImpl extends SelectableType implements GConnection {
 
   private ChangeListener<Boolean> bidirectionalListener;
 
-  private ListChangeListener<GJoint> jointsListener;
 
   public GConnectionImpl() {
     super();
@@ -60,22 +59,19 @@ public class GConnectionImpl extends SelectableType implements GConnection {
 
   // Listener management methods
   public void addListeners(ChangeListener<GConnectorPort> sourceListener, ChangeListener<GConnectorPort> targetListener,
-      ChangeListener<String> typeListener, ChangeListener<Boolean> bidirectionalListener,
-      ListChangeListener<GJoint> jointsListener) {
+      ChangeListener<String> typeListener, ChangeListener<Boolean> bidirectionalListener) {
     removeListeners(); // if there are any.
     // Store strong references
     this.sourceListener = sourceListener;
     this.targetListener = targetListener;
     this.typeListener = typeListener;
     this.bidirectionalListener = bidirectionalListener;
-    this.jointsListener = jointsListener;
 
     // Attach listeners using WeakListeners
     sourceProperty().addListener(sourceListener);
     targetProperty().addListener(targetListener);
     //typeProperty().addListener(typeListener);
     bidirectionalProperty().addListener(bidirectionalListener);
-    ((ObservableList<GJoint>) getJoints()).addListener(jointsListener);
   }
 
   public void removeListeners() {
@@ -84,7 +80,6 @@ public class GConnectionImpl extends SelectableType implements GConnection {
       targetProperty().removeListener(targetListener);
       //typeProperty().removeListener(typeListener);
       bidirectionalProperty().removeListener(bidirectionalListener);
-      ((ObservableList<GJoint>) getJoints()).removeListener(jointsListener);
     }
   }
 
@@ -148,17 +143,17 @@ public class GConnectionImpl extends SelectableType implements GConnection {
     this.target.set(target);
   }
 
-  /**
-   * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
-   * that define the path of the connection.
-   *
-   * @return the list of joints as an ObservableList.
-   */
-  @Override
-  public List<GJoint> getJoints() {
-    return joints;
-  }
-
+//  /**
+//   * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
+//   * that define the path of the connection.
+//   *
+//   * @return the list of joints as an ObservableList.
+//   */
+//  @Override
+//  public List<GJoint> getJoints() {
+//    return joints;
+//  }
+//
   //  /**
   //   * Adds a joint to the connection. This method also sets the connection property of the joint to this connection.
   //   *
@@ -218,7 +213,7 @@ public class GConnectionImpl extends SelectableType implements GConnection {
 
   @Override
   public String toString() {
-    return "GConnection [id=" + getId() + ", source=" + source.getName() + ", target=" + target.getName() + ", joints=" + joints.size()
+    return "GConnection [id=" + getId() + ", source=" + source.getName() + ", target=" + target.getName() 
     + ", bidirectional=" + isBidirectional() + "]";
   }
 

@@ -6,6 +6,7 @@ package io.github.eckig.grapheditor.core.skins.defaults.connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 
@@ -61,8 +62,6 @@ public class SimpleConnectionSkin extends GConnectionSkin {
 
   private static final String STYLE_CLASS_BACKGROUND = "default-connection-background";
 
-  protected List<GJointSkin> jointSkins;
-
   /**
    * Creates a new se connection skin instance.
    *
@@ -90,25 +89,27 @@ public class SimpleConnectionSkin extends GConnectionSkin {
     return root;
   }
 
-  @Override
+//  @Override
   public List<GJointSkin> getJointSkins() {
-    if ( jointSkins == null ) {
-      jointSkins = new ArrayList<>();
-    }
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    GConnectionSkin connectionSkin = skinLookup.lookupConnection(getItem());
+    List<GJointSkin> jointSkins = connectionSkin.getJoints().stream()
+      .map(joint -> skinLookup.lookupJoint(joint))
+      .collect(Collectors.toList());
     return jointSkins;
-  }
-
-  @Override
-  public void setJointSkins(final List<GJointSkin> jointSkins) {
-
-    if (this.jointSkins != null) {
-      removeOldRectangularConstraints();
-    }
-
-    this.jointSkins = jointSkins;
-
-    addRectangularConstraints();
-  }
+}
+//
+//  @Override
+//  public void setJointSkins(final List<GJointSkin> jointSkins) {
+//
+//    if (this.jointSkins != null) {
+//      removeOldRectangularConstraints();
+//    }
+//
+//    this.jointSkins = jointSkins;
+//
+//    addRectangularConstraints();
+//  }
 
   @Override
   public Point2D[] update() {
@@ -140,6 +141,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
    */
   protected void removeOldRectangularConstraints() {
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    List<GJointSkin> jointSkins = getJointSkins();
     for (int i = 0; i < jointSkins.size() - 1; i++) {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
       final DraggableBox nextJoint = jointSkins.get(i + 1).getRoot();
@@ -160,6 +162,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   protected void addRectangularConstraints() {
     // Our rectangular connection logic assumes an even number of joints.
     final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    List<GJointSkin> jointSkins = getJointSkins();
     for (int i = 0; i < jointSkins.size() - 1; i++) {
       final DraggableBox thisJoint = jointSkins.get(i).getRoot();
       final DraggableBox nextJoint = jointSkins.get(i + 1).getRoot();
@@ -201,6 +204,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   protected void alignJoint(final Point2D[] points, final boolean vertical, final boolean start) {
     final int targetPositionIndex = start ? 0 : points.length - 1;
     final int jointPositionIndex = start ? 1 : points.length - 2;
+    List<GJointSkin> jointSkins = getJointSkins();
     final GJointSkin jointSkin = jointSkins.get(start ? 0 : jointSkins.size() - 1);
 
     if (vertical) {

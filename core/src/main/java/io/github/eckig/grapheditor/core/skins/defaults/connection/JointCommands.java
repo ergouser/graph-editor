@@ -51,10 +51,10 @@ public class JointCommands {
     final CompoundCommand command = new CompoundCommand();
 
     // Remove existing joints
-    List<GJointSkin> existingJointSkins = new ArrayList<>(connectionSkin.getJointSkins());
-    for (GJointSkin jointSkin : existingJointSkins) {
-      command.append(RemoveCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), jointSkin));
-    }
+//    List<GJointSkin> existingJointSkins = new ArrayList<>(connectionSkin.getJointSkins());
+//    for (GJointSkin jointSkin : existingJointSkins) {
+//      command.append(RemoveCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), jointSkin));
+//    }
 
     final SkinManager skinManager = (SkinManager)graphEditor.getSkinLookup();
     // Create and add new joints
@@ -64,7 +64,7 @@ public class JointCommands {
       newJointSkin.setX(position.getX());
       newJointSkin.setY(position.getY());
 
-      command.append(AddCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), newJointSkin));
+      command.append(AddCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJoints(), newJoint));
     }
 
     // Execute the command and add it to the command stack
@@ -92,10 +92,10 @@ public class JointCommands {
    *          the connection whose joints are to be removed
    */
   public static void removeJoints(final CompoundCommand command, final BitSet indices, final GConnectionSkin connectionSkin) {
-    for (int i = 0; i < connectionSkin.getJointSkins().size(); i++) {
+    for (int i = 0; i < connectionSkin.getJoints().size(); i++) {
       if (indices.get(i)) {
-        final GJointSkin jointSkin = connectionSkin.getJointSkins().get(i);
-        command.append(RemoveCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJointSkins(), jointSkin));
+        final GJoint joint = connectionSkin.getJoints().get(i);
+        command.append(RemoveCommand.create(connectionSkin, owner -> ((GConnectionSkin) owner).getJoints(), joint));
       }
     }
     // not executed, presumably after the return...

@@ -150,8 +150,8 @@ public class GeometryUtils {
    * @param pTarget
    *          the array where to write the points to
    */
-  public static void fillJointPositions(final GConnectionSkin connectionSkin, final Point2D[] pTarget) {
-    List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+  public static void fillJointPositions(final List<GJointSkin> jointSkins, final Point2D[] pTarget) {
+    //List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
     for (int i = 0; i < jointSkins.size(); i++) {
       pTarget[i + 1] = getJointPosition(jointSkins.get(i));
     }
@@ -170,11 +170,11 @@ public class GeometryUtils {
    *
    * @return a {@link List} of {@link Point2D} objects containing joint x and y values
    */
-  public static List<Point2D> getJointPositions(final GConnectionSkin connectionSkin) {
-    return connectionSkin.getJointSkins().stream()
-        .map(jointSkin -> getJointPosition(jointSkin))
-        .collect(Collectors.toList());
-  }
+//  public static List<Point2D> getJointPositions(final GConnectionSkin connectionSkin) {
+//    return connectionSkin.getJointSkins().stream()
+//        .map(jointSkin -> getJointPosition(jointSkin))
+//        .collect(Collectors.toList());
+//  }
   
   /**
    * Gets the layout x and y values from all joints within a connection.

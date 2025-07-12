@@ -60,7 +60,7 @@ public class ConnectionCommands {
         .map(joint -> skinManager.lookupJoint(joint))
         .collect(Collectors.toList());
     GConnectionSkin gConnectionSkin = skinManager.lookupOrCreateConnection(connection);
-    gConnectionSkin.getJointSkins().addAll(jointSkins);
+    gConnectionSkin.getJoints().addAll(joints);
 
     // attributes that involve other members of the model, are modified through commands:
     //command.append(AddCommand.create(editingDomain, model, GraphPackage.Literals.GMODEL__CONNECTIONS, connection));

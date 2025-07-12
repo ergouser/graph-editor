@@ -175,7 +175,7 @@ public class DefaultGraphEditor implements GraphEditor {
 
   @Override
   public void delete(Collection<Selectable> pItems) {
-    getModelEditingManager().remove(pItems);
+    getModelEditingManager().remove(pItems,mSkinManager);
   }
 
   private ModelEditingManager getModelEditingManager() {

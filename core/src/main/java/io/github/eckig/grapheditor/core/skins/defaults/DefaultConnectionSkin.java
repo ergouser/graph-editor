@@ -65,15 +65,6 @@ public class DefaultConnectionSkin extends SimpleConnectionSkin {
         jointAlignmentManager.setSkinLookup(graphEditor.getSkinLookup());
     }
 
-    @Override
-    public void setJointSkins(final List<GJointSkin> jointSkins) {
-
-        super.setJointSkins(jointSkins);
-
-        jointCleaner.addCleaningHandlers(jointSkins);
-        jointAlignmentManager.addAlignmentHandlers(jointSkins);
-    }
-
     /**
      * Checks that the connection has the correct values to be displayed using this skin.
      */

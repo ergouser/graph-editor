@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
@@ -294,8 +295,10 @@ class MinimapNodeGroup extends Parent {
         gc.moveTo(x, y);
 
         GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-        if ( connectionSkin != null ) { // not all connections have skins - only quick-connects (onscreen).
-          List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+        List<GJointSkin> jointSkins = connectionSkin.getJoints().stream()
+            .map(joint -> skinLookup.lookupJoint(joint))
+            .collect(Collectors.toList());
+       if ( connectionSkin != null && connection.getTargetPort() != null ) { // not all connections have skins - only quick-connects (onscreen).
           for (int j = 0; j <= jointSkins.size(); j++) {
             final double newX;
             final double newY;

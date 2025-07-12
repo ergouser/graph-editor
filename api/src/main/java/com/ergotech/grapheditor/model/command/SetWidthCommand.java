@@ -1,7 +1,6 @@
 package com.ergotech.grapheditor.model.command;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class SetWidthCommand extends AbstractCommand {
   private final Consumer<Double> setter;
@@ -11,8 +10,8 @@ public class SetWidthCommand extends AbstractCommand {
   private final double newWidth;
 
   /** Convenience method to create the remove command. */
-  public static SetWidthCommand create(Supplier<Double> getter, Consumer<Double> setter, double newWidth) {
-    return new SetWidthCommand(getter, setter, newWidth);
+  public static SetWidthCommand create(double oldWidth, Consumer<Double> setter, double newWidth) {
+    return new SetWidthCommand(oldWidth, setter, newWidth);
   }
 
   /**
@@ -23,10 +22,10 @@ public class SetWidthCommand extends AbstractCommand {
    * @param newWidth
    *          the width to set on execute()
    */
-  public SetWidthCommand(Supplier<Double> getter, Consumer<Double> setter, double newWidth) {
+  public SetWidthCommand(double oldWidth, Consumer<Double> setter, double newWidth) {
     this.setter = setter;
     this.newWidth = newWidth;
-    this.oldWidth = getter.get();
+    this.oldWidth = oldWidth;
   }
 
   @Override

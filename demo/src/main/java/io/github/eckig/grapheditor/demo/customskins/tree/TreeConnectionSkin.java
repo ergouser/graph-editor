@@ -82,16 +82,6 @@ public class TreeConnectionSkin extends GConnectionSkin {
   }
 
   @Override
-  public List<GJointSkin> getJointSkins() {
-    return new ArrayList<GJointSkin>();
-  }
-
-  @Override
-  public void setJointSkins(final List<GJointSkin> jointSkins) {
-    // This skin is not intended to show joints.
-  }
-
-  @Override
   public void draw(final Map<GConnectionSkin, Point2D[]> allPoints) {
     final Point2D[] points = allPoints == null ? null : allPoints.get(this);
     if (points != null && points.length == 2) {

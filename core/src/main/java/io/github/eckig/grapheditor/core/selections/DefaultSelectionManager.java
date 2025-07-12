@@ -184,9 +184,9 @@ public class DefaultSelectionManager implements SelectionManager
             {
                 getSelectedItems().add(connection);
                 GConnectionSkin gConnectionSkin = skinLookup.lookupConnection(connection); 
-                for (final GJointSkin jointSkin : gConnectionSkin.getJointSkins())
+                for (final GJoint joint : gConnectionSkin.getJoints())
                 {
-                    getSelectedItems().add(jointSkin.getItem());
+                    getSelectedItems().add(joint);
                 }
             }
         }

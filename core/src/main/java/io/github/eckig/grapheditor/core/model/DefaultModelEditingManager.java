@@ -7,10 +7,13 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
@@ -18,10 +21,10 @@ import com.ergotech.grapheditor.model.command.Command;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CommandStackListener;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
-import com.ergotech.grapheditor.model.command.ModelListSupplier;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
 
 import io.github.eckig.grapheditor.Commands;
+import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
 import io.github.eckig.grapheditor.core.ModelEditingManager;
@@ -88,17 +91,34 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   }
 
   @Override
-  public void remove(final Collection<Selectable> pToRemove) {
+  public void remove(final Collection<Selectable> pToRemove, final SkinLookup skinLookup ) {
     if (pToRemove == null || pToRemove.isEmpty()) {
       return;
     }
 
     final CompoundCommand command = new CompoundCommand();
     final RemoveContext editContext = new RemoveContext();
-    final List<Selectable> delete = new ArrayList<>(pToRemove.size());
+    
+    // remove all the joints that are referenced in pToRemove
+    // that are also part of a Connection that is about to be deleted.
+    Collection<Selectable> filteredToRemove = pToRemove.stream()
+        .filter(sel -> {
+            if (!(sel instanceof GJoint)) return true;
+
+            GJoint joint = (GJoint) sel;
+
+            return pToRemove.stream()
+                .filter(c -> c instanceof GConnection)
+                .map(c -> skinLookup.lookupConnection((GConnection) c))
+                .filter(Objects::nonNull)
+                .noneMatch(connectionSkin -> connectionSkin.getJoints().contains(joint));
+        })
+        .collect(Collectors.toList());
+
+    final List<Selectable> delete = new ArrayList<>(filteredToRemove.size());
 
     // pre-fill the RemoveContext with all elements to be removed:
-    for (final Selectable obj : pToRemove) {
+    for (final Selectable obj : filteredToRemove) {
       if (obj instanceof GNode n && editContext.canRemove(obj)) {
         delete.add(obj);
         for (final GConnectorPort connector : n.getConnectorPorts()) {
@@ -108,7 +128,11 @@ public class DefaultModelEditingManager implements ModelEditingManager {
             }
           }
         }
-      } else if (obj instanceof GConnection && editContext.canRemove(obj)) {
+      } else if (obj instanceof GConnection connection && editContext.canRemove(obj)) {
+        delete.add(obj);
+        GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
+        delete.addAll(connectionSkin.getJoints());
+      } else if (obj instanceof GJoint && editContext.canRemove(obj)) {
         delete.add(obj);
       }
     }
@@ -125,8 +149,20 @@ public class DefaultModelEditingManager implements ModelEditingManager {
         }
       } else if (obj instanceof GConnection) {
         remove(editContext, command, (GConnection) obj);
+      } else if (obj instanceof GJoint joint) {
+        // find the matching connection...
+        GConnectionSkin matchingSkin = model.getNodes().stream()
+            .flatMap(node -> node.getConnectorPorts().stream())
+            .flatMap(port -> port.getConnections().stream())
+            .map(connection -> skinLookup.lookupConnection(connection))
+            .filter(Objects::nonNull)
+            .filter(connectionSkin -> connectionSkin.getJoints().contains(joint))
+            .findFirst()
+            .orElse(null);
+        command.append(RemoveCommand.create(matchingSkin, owner -> matchingSkin.getJoints(), joint));
       }
     }
+    
 
     if (!command.isEmpty() && command.canExecute()) {
       try {

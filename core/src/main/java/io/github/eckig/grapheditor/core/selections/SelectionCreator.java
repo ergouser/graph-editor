@@ -218,8 +218,8 @@ public class SelectionCreator {
           mousePressedHandlers.put(skinRoot, connectionPressedHandler);
         }
 
-        for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-          addJoint(jointSkin.getItem());
+        for (GJoint joint : connectionSkin.getJoints()) {
+          addJoint(joint);
         }
       }
     }
@@ -234,8 +234,8 @@ public class SelectionCreator {
         connectionSkin.getRoot().removeEventHandler(MouseEvent.MOUSE_PRESSED, connectionPressedHandler);
       }
 
-      for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-        removeJoint(jointSkin.getItem());
+      for (GJoint joint : connectionSkin.getJoints()) {
+        removeJoint(joint);
       }
     }
   }
@@ -447,8 +447,7 @@ public class SelectionCreator {
           selectionManager.clearSelection(connection);
         }
 
-        for (GJointSkin jointSkin : connectionSkin.getJointSkins()) {
-          GJoint joint = jointSkin.getItem();
+        for (GJoint joint : connectionSkin.getJoints()) {
           if (isJointSelected(joint, isShortcutDown)) {
             selectionManager.select(joint);
           } else {

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,10 @@ import com.ergotech.grapheditor.model.command.Command;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
+import com.ergotech.grapheditor.model.command.SetCommand;
 import com.ergotech.grapheditor.model.command.SetPropertyCommand;
 
+import io.github.eckig.grapheditor.utils.DraggableBox;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Region;
 
@@ -238,22 +241,26 @@ public class Commands {
     for (final GNode node : existingNodes) {
       final GNodeSkin nodeSkin = skinLookup.lookupNode(node);
       if (nodeSkin != null && checkNodeChanged(node, nodeSkin)) {
-        final Region nodeRegion = nodeSkin.getRoot();
+        final DraggableBox nodeRegion = nodeSkin.getRoot();
 
         if (nodeSkin.xProperty().get() != nodeRegion.getLayoutX()) {
-          command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
+          //command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
+          command.append(SetCommand.create (nodeSkin.xProperty().get(),nodeRegion::setLayoutX,nodeRegion.getLayoutX()));
         }
 
         if (nodeSkin.yProperty().get() != nodeRegion.getLayoutY()) {
-          command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
+          //command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
+          command.append(SetCommand.create (nodeSkin.yProperty().get(),nodeRegion::setLayoutY,nodeRegion.getLayoutY()));
         }
 
         if (nodeSkin.widthProperty().get() != nodeRegion.getWidth()) {
-          command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
+          //command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
+          command.append(SetCommand.create (nodeSkin.widthProperty().get(),nodeRegion::setBoxWidth,nodeRegion.getWidth()));
         }
 
         if (nodeSkin.heightProperty().get() != nodeRegion.getHeight()) {
-          command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
+          //command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
+          command.append(SetCommand.create (nodeSkin.heightProperty().get(),nodeRegion::setBoxHeight,nodeRegion.getHeight()));
         }
       }
       for (GConnectorPort connector : node.getConnectorPorts()) {
@@ -266,7 +273,10 @@ public class Commands {
           final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
           if ( connectionSkin != null ) {
 
-            for (final GJointSkin jointSkin : connectionSkin.getJointSkins()) {
+            List<GJointSkin> jointSkins = connectionSkin.getJoints().stream()
+                .map(joint -> skinLookup.lookupJoint(joint))
+                .collect(Collectors.toList());
+            for (final GJointSkin jointSkin : jointSkins) {
               if (jointSkin != null && checkJointChanged(jointSkin)) {
                 final Region jointRegion = jointSkin.getRoot();
                 final double x = jointRegion.getLayoutX() + jointSkin.getWidth() / 2;

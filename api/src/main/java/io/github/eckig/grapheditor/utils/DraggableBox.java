@@ -3,10 +3,6 @@
  */
 package io.github.eckig.grapheditor.utils;
 
-import com.ergotech.grapheditor.model.command.Command;
-import com.ergotech.grapheditor.model.command.CompoundCommand;
-import com.ergotech.grapheditor.model.command.SetPropertyCommand;
-
 import io.github.eckig.grapheditor.EditorElement;
 import javafx.event.Event;
 import javafx.geometry.Point2D;
@@ -25,7 +21,7 @@ import javafx.scene.layout.StackPane;
  * via {@code resize(width, height)}, and will not be affected by parent layout.
  * </p>
  */
-public abstract class DraggableBox extends StackPane {
+public class DraggableBox extends StackPane {
 
   private static final double DEFAULT_ALIGNMENT_THRESHOLD = 5;
 
@@ -96,9 +92,6 @@ public abstract class DraggableBox extends StackPane {
       }
     });
   }
-
-  /** Execute the provided command. */
-  public abstract void executeCommand (Command command);
 
   /**
    * Called after the skin (using this box as root node) is removed. Can be overridden for cleanup.
@@ -391,11 +384,10 @@ public abstract class DraggableBox extends StackPane {
      *          the cursor y position relative to the container
      */
   private void handleDrag(final double pX, final double pY) {
-    final CompoundCommand command = new CompoundCommand();
 
-    command.append(handleDragX(pX));
-    command.append(handleDragY(pY));
-    executeCommand(command);
+    handleDragX(pX);
+    handleDragY(pY);
+    
     // notify
     positionMoved(); 
     return;
@@ -442,7 +434,7 @@ public abstract class DraggableBox extends StackPane {
    * @param pX
    *          the cursor x position
    */
-  private Command handleDragX(final double pX) {
+  private void handleDragX(final double pX) {
     final double maxParentWidth = getParent().getLayoutBounds().getWidth();
 
     final double minLayoutX = getWestBoundValue();
@@ -468,7 +460,7 @@ public abstract class DraggableBox extends StackPane {
     } else if (newLayoutX > maxLayoutX) {
       newLayoutX = maxLayoutX;
     }
-    return commandLayoutX(newLayoutX);
+    setLayoutX(newLayoutX);
     // if (dependencyX != null)
     // {
     // dependencyX.setLayoutX(newLayoutX);
@@ -481,7 +473,7 @@ public abstract class DraggableBox extends StackPane {
    * @param pY
    *          the cursor y position
    */
-  private Command handleDragY(final double pY) {
+  private void handleDragY(final double pY) {
     final double maxParentHeight = getParent().getLayoutBounds().getHeight();
 
     final double minLayoutY = getNorthBoundValue();
@@ -508,8 +500,7 @@ public abstract class DraggableBox extends StackPane {
       newLayoutY = maxLayoutY;
     }
 
-    //setLayoutY(newLayoutY);
-    return commandLayoutY(newLayoutY);
+    setLayoutY(newLayoutY);
     // if (dependencyY != null)
     // {
     // dependencyY.setLayoutY(newLayoutY);
@@ -582,26 +573,14 @@ public abstract class DraggableBox extends StackPane {
     return position;
   }
   
-  /** Create an undoable command to set the layoutY. 
-   * 
-   * @param newLayoutY  the new location
-   * @return the required command to execute the change.
-   */
-  public Command commandLayoutY(double newLayoutY) {
-    // create a command to call setLayoutY(newLayoutY);
-    SetPropertyCommand<Number> setPropertyCommand = new SetPropertyCommand<Number> (layoutYProperty(),newLayoutY) ;
-    return setPropertyCommand;
+  /** Required for undo/redo. */
+  public void setBoxWidth (double width) {
+    setWidth(width);
   }
   
-  /** Create an undoable command to set the layoutX. 
-   * 
-   * @param newLayoutX  the new location
-   * @return the required command to execute the change.
-   */
-  public Command commandLayoutX(double newLayoutX) {
-    // create a command to call setLayoutX(newLayoutX);
-    SetPropertyCommand<Number> setPropertyCommand = new SetPropertyCommand<Number> (layoutXProperty(),newLayoutX) ;
-    return setPropertyCommand;
+  /** Required for undo/redo. */
+  public void setBoxHeight (double height) {
+    setHeight(height);
   }
-
+  
 }

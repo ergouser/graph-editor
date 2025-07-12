@@ -6,25 +6,23 @@ import java.beans.SimpleBeanInfo;
 
 public class GConnectionBeanInfo extends SimpleBeanInfo {
 
-    private final static Class<GConnectionImpl> beanClass = GConnectionImpl.class;
+  private final static Class<GConnectionImpl> beanClass = GConnectionImpl.class;
 
-    @Override
-    public PropertyDescriptor[] getPropertyDescriptors() {
-        try {
-            PropertyDescriptor id = new PropertyDescriptor("id", beanClass, "getId", "setId");
-            PropertyDescriptor type = new PropertyDescriptor("type", beanClass, "getType", "setType");
-            PropertyDescriptor source = new PropertyDescriptor("source", beanClass, "getSource", "setSource");
-            PropertyDescriptor target = new PropertyDescriptor("target", beanClass, "getTarget", "setTarget");
-            PropertyDescriptor bidirectional = new PropertyDescriptor(
-                    "bidirectional", beanClass, "isBidirectional", "setBidirectional");
-            PropertyDescriptor joints = new PropertyDescriptor("joints", beanClass, "getJoints", null);
+  @Override
+  public PropertyDescriptor[] getPropertyDescriptors() {
+    try {
+      PropertyDescriptor id = new PropertyDescriptor("id", beanClass, "getId", "setId");
+      PropertyDescriptor type = new PropertyDescriptor("type", beanClass, "getType", "setType");
+      PropertyDescriptor source = new PropertyDescriptor("source", beanClass, "getSource", "setSource");
+      PropertyDescriptor target = new PropertyDescriptor("target", beanClass, "getTarget", "setTarget");
+      PropertyDescriptor bidirectional = new PropertyDescriptor(
+          "bidirectional", beanClass, "isBidirectional", "setBidirectional");
+      //PropertyDescriptor joints = new PropertyDescriptor("joints", beanClass, "getJoints", null);
 
-            return new PropertyDescriptor[] {
-                id, type, source, target, bidirectional, joints
-            };
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
-            return null;
-        }
+      return new PropertyDescriptor[] {id, type, source, target, bidirectional };
+    } catch (IntrospectionException e) {
+      e.printStackTrace();
+      return null;
     }
+  }
 }

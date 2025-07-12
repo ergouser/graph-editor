@@ -53,14 +53,14 @@ public interface GConnection extends Selectable {
    */
   public void setTargetPort(GConnectorPort target);
 
-  /**
-   * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
-   * that define the path of the connection.  IS THIS AN ATTRIBUTE OF THE CONNECTION OR THE SKIN?????
-   *
-   * @return the list of joints as an ObservableList.
-   */
-  public List<? extends GJoint> getJoints();
-
+//  /**
+//   * Gets the list of joints (control points) along the connection. Joints can represent intermediate control points
+//   * that define the path of the connection.  IS THIS AN ATTRIBUTE OF THE CONNECTION OR THE SKIN?????
+//   *
+//   * @return the list of joints as an ObservableList.
+//   */
+//  public List<? extends GJoint> getJoints();
+//
   //  /**
   //   * Adds a joint to the connection. This method also sets the connection property of the joint to this connection.
   //   *

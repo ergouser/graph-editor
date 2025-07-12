@@ -50,9 +50,4 @@ class MinimapLocator extends DraggableBox
         // we want the minimap to be movable at all times because it is not really editing
         return true;
     }
-
-    @Override
-    public void executeCommand(Command command) {
-      // nothing required for the mini-map      
-    }
 }

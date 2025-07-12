@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.command.AddCommand;
@@ -138,9 +140,8 @@ public class SelectionCopier {
 
     for (final GConnection pastedConnection : pastedConnections) {
       final GConnectionSkin connectionSkin = skinLookup.lookupConnection(pastedConnection);
-      final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
-      for (final GJointSkin jointSkin : jointSkins) {
-        selectionManager.select(jointSkin.getItem());
+      for (GJoint joint : connectionSkin.getJoints()) {
+        selectionManager.select(joint);
       }
     }
 
@@ -194,7 +195,8 @@ public class SelectionCopier {
 
     for (final GConnection connection : pastedConnections) {
       final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-      final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+      List<GJointSkin> jointSkins = connectionSkin.getJoints().stream().map(joint -> skinLookup.lookupJoint(joint))
+          .collect(Collectors.toList());
       for (final GJointSkin jointSkin : jointSkins) {
         jointSkin.setX(jointSkin.getX() + pasteOffset.getX());
         jointSkin.setY(jointSkin.getY() + pasteOffset.getY());
@@ -246,7 +248,8 @@ public class SelectionCopier {
 
         for (final GConnection connection : pastedConnections) {
           final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-          final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+          List<GJointSkin> jointSkins = connectionSkin.getJoints().stream().map(joint -> skinLookup.lookupJoint(joint))
+              .collect(Collectors.toList());
           for (final GJointSkin jointSkin : jointSkins) {
             jointSkin.setX(jointSkin.getX() + xCorrection);
             jointSkin.setY(jointSkin.getY() + yCorrection);
@@ -402,7 +405,8 @@ public class SelectionCopier {
 
     for (final GConnection connection : connections) {
       final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-      final List<GJointSkin> jointSkins = connectionSkin.getJointSkins();
+      List<GJointSkin> jointSkins = connectionSkin.getJoints().stream().map(joint -> skinLookup.lookupJoint(joint))
+          .collect(Collectors.toList());
       for (final GJointSkin jointSkin : jointSkins) {
 
         if (jointSkin.getX() < contentBounds.startX) {

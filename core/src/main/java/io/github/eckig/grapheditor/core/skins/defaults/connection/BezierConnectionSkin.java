@@ -21,6 +21,7 @@ import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.shape.CubicCurveTo;
 import javafx.scene.shape.MoveTo;
 
@@ -74,15 +75,27 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
 
     // Whenever defaultStyle changes, remove the old style‐class and add the new one:
     defaultStyle.addListener((obs, oldStyle, newStyle) -> {
-      if (!isSelected()) {  // don't update the style 
-        if (oldStyle != null && path.getStyleClass().contains(oldStyle)) {
-          path.getStyleClass().remove(oldStyle);
-        }
-        if (newStyle != null && !path.getStyleClass().contains(newStyle)) {
-          path.getStyleClass().add(newStyle);
-        }
-      }
+      updateDefaultStyle(oldStyle, newStyle);
+      //      if (!isSelected()) {  // don't update the style 
+      //        if (oldStyle != null && path.getStyleClass().contains(oldStyle)) {
+      //          path.getStyleClass().remove(oldStyle);
+      //        }
+      //        if (newStyle != null && !path.getStyleClass().contains(newStyle)) {
+      //          path.getStyleClass().add(newStyle);
+      //        }
+      //      }
     });
+  }
+
+  public void updateDefaultStyle(final String oldStyle, final String newStyle) {
+    String defaultStyleClass = oldStyle;
+    if (defaultStyleClass != null) {
+      getStyleClass().remove(defaultStyleClass);
+    }
+    defaultStyleClass = newStyle;
+    if (!getStyleClass().contains("bezier-connection-selected")) {
+      getStyleClass().add(defaultStyleClass);
+    }
   }
 
   @Override
@@ -95,14 +108,14 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
     jointAlignmentManager.setSkinLookup(graphEditor.getSkinLookup());
   }
 
-  @Override
-  public void setJointSkins(final List<GJointSkin> jointSkins) {
-
-    super.setJointSkins(jointSkins);
-
-    jointCleaner.addCleaningHandlers(jointSkins);
-    jointAlignmentManager.addAlignmentHandlers(jointSkins);
-  }
+  //  @Override
+  //  public void setJointSkins(final List<GJointSkin> jointSkins) {
+  //
+  //    super.setJointSkins(jointSkins);
+  //
+  //    jointCleaner.addCleaningHandlers(jointSkins);
+  //    jointAlignmentManager.addAlignmentHandlers(jointSkins);
+  //  }
 
   /**
    * Checks that the connection has the correct values to be displayed using this skin.
@@ -137,6 +150,7 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
   protected void checkFirstAndLastJoints(final Point2D[] points) {
     // We need at least two “end” joints: one immediately after the source
     // port and one immediately before the target port.
+    List<GJointSkin> jointSkins = getJointSkins();
     if (points.length < 3 || jointSkins == null || jointSkins.size() < 2) {
       return;
     }
@@ -231,15 +245,22 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
   }
 
   @Override
+  protected Node getStylableNode() {
+    return path;
+  }
+
+  @Override
   protected void selectionChanged(boolean isSelected) {
     super.selectionChanged(isSelected);
     if (isSelected) {
-      path.getStyleClass().remove(getDefaultStyle());
-      path.getStyleClass().add("bezier-connection-selected");
+      getStyleClass().remove(getDefaultStyle());
+      getStyleClass().add("bezier-connection-selected");
     } else {
-      path.getStyleClass().remove("bezier-connection-selected");
-      path.getStyleClass().add(getDefaultStyle());
-   }
+      getStyleClass().remove("bezier-connection-selected");
+      if (getDefaultStyle() != null && !getStyleClass().contains(getDefaultStyle())) {
+        getStyleClass().add(getDefaultStyle());
+      }
+    }
   }
 
   /** Call this to change the style at runtime: */

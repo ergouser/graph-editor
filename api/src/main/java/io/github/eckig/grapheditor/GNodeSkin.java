@@ -141,16 +141,7 @@ public abstract class GNodeSkin extends GSkin<GNode> {
                 GNodeSkin.this.impl_positionMoved();
             }
             
-            @Override
-            public void executeCommand(Command command) {
-              CommandStack commandStack = CommandStack.getCommandStack(GNodeSkin.this.getGraphEditor().getModel());
-              try {
-                commandStack.execute(command);
-              } catch (Exception e) {
-                throw new UndeclaredThrowableException(e);
-              }
-            }
-        };
+         };
     }
     
     /**

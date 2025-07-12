@@ -4,11 +4,10 @@
 package io.github.eckig.grapheditor.core.skins.defaults;
 
 import com.ergotech.grapheditor.model.GJoint;
+import com.ergotech.grapheditor.model.impl.GJointImpl;
 
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.utils.DraggableBox;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Point2D;
 
@@ -32,9 +31,6 @@ public class DefaultJointSkin extends GJointSkin {
 
   private static final Point2D SNAP_OFFSET = new Point2D(-5, -5);
 
-  /** Sets the joint to be a temporary joint. */
-  protected final BooleanProperty temporaryProperty = new SimpleBooleanProperty(this, "temporary", false);
-
   /**
    * Creates a new default join instance.
    *
@@ -45,9 +41,11 @@ public class DefaultJointSkin extends GJointSkin {
     super(joint);
 
     // whenever joint.temporary changes, flip the pseudo-class
-    temporaryProperty.addListener((obs, wasTemp, isNowTemp) -> {
+    if ( joint instanceof GJointImpl impl ) {
+      impl.temporaryProperty().addListener((obs, wasTemp, isNowTemp) -> {
       getRoot().pseudoClassStateChanged(TEMPORARY_PSEUDO_CLASS, isNowTemp);
     });
+    }
 
     getRoot().resize(SIZE, SIZE);
     getRoot().getStyleClass().setAll(STYLE_CLASS);
@@ -76,17 +74,7 @@ public class DefaultJointSkin extends GJointSkin {
 
   @Override
   public String toString() {
-    return "DefaultJointSkin [getX()=" + getX() + ", getY()=" + getY() + ", isSelected()=" + isSelected() + ", isTemporary()=" + isTemporary()
+    return "DefaultJointSkin [getX()=" + getX() + ", getY()=" + getY() + ", isSelected()=" + isSelected() + ", isTemporary()=" + getItem().isTemporary()
         + ", getItem()=" + getItem() + "]";
-  }
-
-  /** Return true if the skin is temporary. */
-  public boolean isTemporary () {
-    return temporaryProperty.get();
-  }
-  
-  /**Set the skin to be temporary. */
-  public void setTemporary (boolean temporary ) {
-    temporaryProperty.set(temporary);
   }
 }

@@ -5,15 +5,19 @@ package io.github.eckig.grapheditor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GJoint;
 
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -52,6 +56,11 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
   private int mConnectionIndex;
 
   /**
+   * The List of joints. This is used only at development time and  just affects the way the connector is drawn.
+   * That is, joints are an attribute of the skin, not the connection.
+   */
+  private final ObservableList<GJoint> joints = FXCollections.observableArrayList();
+  /**
    * Creates a new {@link GConnectionSkin}.
    */
   public GConnectionSkin() {}
@@ -66,27 +75,27 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
     super(connection);
   }
 
-  /**
-   * Gets the skin objects for all joints inside the connection.
-   *
-   *
-   * @return the list of all {@link GJointSkin} instances associated to the connection
-   */
-  public abstract List<GJointSkin> getJointSkins();
+//  /**
+//   * Gets the skin objects for all joints inside the connection.
+//   *
+//   *
+//   * @return the list of all {@link GJointSkin} instances associated to the connection
+//   */
+//  public abstract List<GJointSkin> getJointSkins();
 
-  /**
-   * Sets the skin objects for all joints inside the connection.
-   *
-   * <p>
-   * This will be called as the connection skin is created. The connection skin can manipulate its joint skins if it
-   * chooses. For example a 'rectangular' connection skin may restrict the movement of the first and last joints to the
-   * x direction only.
-   * </p>
-   *
-   * @param jointSkins
-   *          the list of all {@link GJointSkin} instances associated to the connection
-   */
-  public abstract void setJointSkins(final List<GJointSkin> jointSkins);
+//  /**
+//   * Sets the skin objects for all joints inside the connection.
+//   *
+//   * <p>
+//   * This will be called as the connection skin is created. The connection skin can manipulate its joint skins if it
+//   * chooses. For example a 'rectangular' connection skin may restrict the movement of the first and last joints to the
+//   * x direction only.
+//   * </p>
+//   *
+//   * @param jointSkins
+//   *          the list of all {@link GJointSkin} instances associated to the connection
+//   */
+//  public abstract void setJointSkins(final List<GJointSkin> jointSkins);
 
   /**
    * Draws the connection skin. This is called every time the connection's position could change, for example if one of
@@ -144,7 +153,7 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
     if ( connectorSkin == null ) { // this is true on delete...
       return null;
     }
-    if (getJointSkins().isEmpty()) {
+    if (getJoints().isEmpty()) {
       final Point2D[] points = new Point2D[2];
 
       // Start: Source position
@@ -155,11 +164,14 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
 
       return points;
     } else {
-      final int len = getJointSkins().size() + 2;
+      final int len = getJoints().size() + 2;
       final Point2D[] points = new Point2D[len];
 
       // Middle: joint positions
-      GeometryUtils.fillJointPositions(this, points);
+      List<GJointSkin> jointSkins = getJoints().stream()
+          .map(joint -> skinLookup.lookupJoint(joint))
+          .collect(Collectors.toList());
+      GeometryUtils.fillJointPositions(jointSkins, points);
 
       // Start: Source position
       points[0] = GeometryUtils.getConnectorCenter(sourceConnectorSkin, skinLookup);
@@ -218,5 +230,16 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
   public ObjectProperty<Geometry> geometryProperty() {
       return geometry;
   }
+
+  // joints are an attribute of the connection skin
+  /**
+   * Get the Joint List
+   *
+   * @return the list of joints
+   */
+  public ObservableList<GJoint> getJoints() {
+    return joints;
+  }
+
 
 }

@@ -9,7 +9,6 @@ import com.ergotech.grapheditor.model.GConnectorPort;
 import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.SkinLookup;
-import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
 import javafx.geometry.Side;
 
 /**
@@ -76,9 +75,9 @@ public final class RectangularConnections {
     final boolean bothVertical = sourceSide.isVertical() && targetSide.isVertical();
 
     if (bothHorizontal || bothVertical) {
-      return (connectionSkin.getJointSkins().size() & 1) == 0;
+      return (connectionSkin.getJoints().size() & 1) == 0;
     } else {
-      return (connectionSkin.getJointSkins().size() & 1) == 1;
+      return (connectionSkin.getJoints().size() & 1) == 1;
     }
   }
 }

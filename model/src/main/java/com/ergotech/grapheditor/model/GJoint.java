@@ -20,7 +20,13 @@ package com.ergotech.grapheditor.model;
  */
 public interface GJoint extends Selectable {
 
-//  /**
+  /**Set the joint to be temporary. */
+  void setTemporary(boolean temporary);
+
+  /** Return true if the joint is temporary. */
+  boolean isTemporary();
+
+  //  /**
 //   * Returns the connection to which this joint belongs.
 //   *
 //   * @return the GConnection this joint is part of.
