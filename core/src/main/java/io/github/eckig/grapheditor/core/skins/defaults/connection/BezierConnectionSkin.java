@@ -38,10 +38,10 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BezierConnectionSkin.class);
 
-  private final JointCreator jointCreator;
-  private final JointCleaner jointCleaner;
-  private final JointAlignmentManager jointAlignmentManager;
-  private final CursorOffsetCalculator cursorOffsetCalculator;
+  protected JointCreator jointCreator;
+  protected JointCleaner jointCleaner;
+  protected JointAlignmentManager jointAlignmentManager;
+  protected CursorOffsetCalculator cursorOffsetCalculator;
 
   protected static final String BEZIER_STYLE_CLASS = "bezier-connection";
 
@@ -87,6 +87,10 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
     });
   }
 
+  public BezierConnectionSkin() {
+    super();
+  }
+
   public void updateDefaultStyle(final String oldStyle, final String newStyle) {
     String defaultStyleClass = oldStyle;
     if (defaultStyleClass != null) {
@@ -128,6 +132,25 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
         LOGGER.error("Joint count not compatible with source and target connector types.");
       }
     }
+  }
+
+  @Override
+  public void setItem(GConnection item) {
+    super.setItem(item);
+    cursorOffsetCalculator = new CursorOffsetCalculator(item, path, backgroundPath, connectionSegments);
+    jointCreator = new JointCreator(this, cursorOffsetCalculator);
+    jointCleaner = new JointCleaner(this);
+    jointAlignmentManager = new JointAlignmentManager(item);
+
+    jointCreator.addJointCreationHandler(root);
+  }
+
+
+  /**
+   * @return item represented by this skin
+   */
+  public GConnection getItem() {
+    return item;
   }
 
   /**

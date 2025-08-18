@@ -233,7 +233,7 @@ public abstract class GSkin<T extends Selectable> {
   /**
    * @return item represented by this skin
    */
-  public final T getItem() {
+  public T getItem() {
     return item;
   }
 
@@ -243,7 +243,7 @@ public abstract class GSkin<T extends Selectable> {
    * @param item
    *          the item to set
    */
-  public final void setItem(T item) {
+  public void setItem(T item) {
     this.item = item;
   }
 

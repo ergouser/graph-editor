@@ -84,6 +84,10 @@ public class SimpleConnectionSkin extends GConnectionSkin {
     path.getStyleClass().setAll(STYLE_CLASS);
   }
 
+  public SimpleConnectionSkin() {
+    super();
+  }
+
   @Override
   public Node getRoot() {
     return root;
@@ -98,10 +102,9 @@ public class SimpleConnectionSkin extends GConnectionSkin {
       .collect(Collectors.toList());
     return jointSkins;
 }
-//
-//  @Override
-//  public void setJointSkins(final List<GJointSkin> jointSkins) {
-//
+
+  public void setJointSkins(final List<GJointSkin> jointSkins) {
+
 //    if (this.jointSkins != null) {
 //      removeOldRectangularConstraints();
 //    }
@@ -109,7 +112,7 @@ public class SimpleConnectionSkin extends GConnectionSkin {
 //    this.jointSkins = jointSkins;
 //
 //    addRectangularConstraints();
-//  }
+  }
 
   @Override
   public Point2D[] update() {

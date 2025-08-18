@@ -12,7 +12,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Point2D;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 
 /**
  * The skin class for a {@link GConnectorPortImpl}. Responsible for visualizing connectors in the graph editor.
@@ -227,5 +229,112 @@ public abstract class GConnectorSkin extends GSkin<GConnectorPort> {
     sideProperty().set(side);
   }
 
+  /**
+   * Returns the connection point for this connector skin based on its side.
+   * 
+   * If the side is:
+   * - LEFT: returns center-left
+   * - RIGHT: returns center-right
+   * - TOP: returns top-center
+   * - BOTTOM: returns bottom-center
+   *
+   * @return the connection point as a {@link Point2D}
+   */
+  public Point2D getConnectionPoint() {
+      // Grab the connector’s rendered bounds
+//      Bounds b = getRoot().getBoundsInLocal();
+//      double x0 = b.getMinX();
+//      double x1 = b.getMaxX();
+//      double y0 = b.getMinY();
+//      double y1 = b.getMaxY();
+//      double midX = (x0 + x1) / 2.0;
+//      double midY = (y0 + y1) / 2.0;
+//      midY = getHeight();
+//      switch (getSide()) {
+//        case LEFT:
+//          return new Point2D(x0, midY);
+//        case RIGHT:
+//          return new Point2D(x1, midY);
+//        case TOP:
+//          return new Point2D(midX, y0);
+//        case BOTTOM:
+//          return new Point2D(midX, y1);
+//        default:
+//          // center
+//          return new Point2D(midX, midY);
+//      }
+    double x = getX();
+    double y = getY();
+    double width = getWidth();
+    double height = getHeight();
+
+    switch (getSide()) {
+      case LEFT:
+        return new Point2D(x, y + height / 2.0);
+      case RIGHT:
+        return new Point2D(x + width, y + height / 2.0);
+      case TOP:
+        return new Point2D(x + width / 2.0, y);
+      case BOTTOM:
+        return new Point2D(x + width / 2.0, y + height);
+      default:
+        // Default to center if side is null or unknown
+        return new Point2D(x + width / 2.0, y + height / 2.0);
+    }
+  }
+
+  /**
+   * Returns the connection point in scene coordinates.
+   *
+   * This is useful when performing hit tests or drawing connections that span multiple nodes.
+   *
+   * @return the connection point in scene coordinates as a {@link Point2D}
+   */
+ // public Point2D getConnectionPointInScene() {
+//    Node root = getRoot();
+//    if (root == null) {
+//      return getConnectionPoint(); // Fallback to local coordinates if root is not yet available
+//    }
+//    return root.localToScene(getConnectionPoint());
+//    Point2D localPt = getConnectionPoint();
+//    return getRoot().localToScene(localPt);
+//  }
+  public Point2D getConnectionPointInScene() {
+    // Since getConnectionPoint() is already in **parent** coords,
+    // we can convert it up to scene with one call:
+    return getRoot().localToScene(getConnectionPoint());
+//        .subtract(
+//        getRoot().getLayoutX(), getRoot().getLayoutY()));
+}
+  /**
+   * Returns the connection point in screen coordinates.
+   *
+   * This is useful for placing popups, tooltips, or drag visuals relative to the screen.
+   *
+   * @return the connection point in screen coordinates as a {@link Point2D}
+   */
+  public Point2D getConnectionPointInScreen() {
+    Node root = getRoot();
+    if (root == null) {
+      return getConnectionPoint(); // Fallback to local coordinates if root is not yet available
+    }
+    return root.localToScreen(getConnectionPoint());
+  }
+
+  /**
+   * Returns the connection point of this connector skin converted to the local coordinates of the specified node.
+   *
+   * @param targetNode the node to which the connection point should be converted
+   * @return the connection point relative to the given node's local coordinate space
+   */
+  public Point2D getConnectionPointInLocalOf(Node target) {
+    return target.sceneToLocal(getConnectionPointInScene());
+}
+// public Point2D getConnectionPointInLocalOf(Node targetNode) {
+//    if (targetNode == null || getRoot() == null) {
+//      return getConnectionPoint(); // fallback
+//    }
+//    return targetNode.sceneToLocal(getConnectionPointInScene());
+//  }
 
 }
