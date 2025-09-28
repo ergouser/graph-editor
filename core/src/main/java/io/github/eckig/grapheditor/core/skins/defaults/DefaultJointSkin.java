@@ -21,11 +21,11 @@ import javafx.geometry.Point2D;
 public class DefaultJointSkin extends GJointSkin {
 
   // define the pseudo-class for temporary.
-  private static final PseudoClass TEMPORARY_PSEUDO_CLASS = PseudoClass.getPseudoClass("temporary");
+  public static final PseudoClass TEMPORARY_PSEUDO_CLASS = PseudoClass.getPseudoClass("temporary");
 
-  private static final String STYLE_CLASS = "default-joint";
+  public static final String STYLE_CLASS = "default-joint";
 
-  private static final PseudoClass PSEUDO_CLASS_SELECTED = PseudoClass.getPseudoClass("selected");
+  public static final PseudoClass PSEUDO_CLASS_SELECTED = PseudoClass.getPseudoClass("selected");
 
   private static final double SIZE = 12;
 
@@ -43,8 +43,8 @@ public class DefaultJointSkin extends GJointSkin {
     // whenever joint.temporary changes, flip the pseudo-class
     if ( joint instanceof GJointImpl impl ) {
       impl.temporaryProperty().addListener((obs, wasTemp, isNowTemp) -> {
-      getRoot().pseudoClassStateChanged(TEMPORARY_PSEUDO_CLASS, isNowTemp);
-    });
+        getRoot().pseudoClassStateChanged(TEMPORARY_PSEUDO_CLASS, isNowTemp);
+      });
     }
 
     getRoot().resize(SIZE, SIZE);

@@ -47,9 +47,6 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
 
   protected static final String BEZIER_STYLE_CLASS_BACKGROUND = "bezier-connection-background";
 
-  /** The default style‐class for the connection based on the last value. */
-  protected final StringProperty defaultStyle = new SimpleStringProperty("connection-novalue");
-
   /**
    * Creates a new default connection skin instance.
    *
@@ -265,38 +262,6 @@ public class BezierConnectionSkin extends SimpleConnectionSkin {
     // Copy elements to background path
     backgroundPath.getElements().clear();
     backgroundPath.getElements().addAll(path.getElements());
-  }
-
-  @Override
-  protected Node getStylableNode() {
-    return path;
-  }
-
-  @Override
-  protected void selectionChanged(boolean isSelected) {
-    super.selectionChanged(isSelected);
-    if (isSelected) {
-      getStyleClass().remove(getDefaultStyle());
-      getStyleClass().add("bezier-connection-selected");
-    } else {
-      getStyleClass().remove("bezier-connection-selected");
-      if (getDefaultStyle() != null && !getStyleClass().contains(getDefaultStyle())) {
-        getStyleClass().add(getDefaultStyle());
-      }
-    }
-  }
-
-  /** Call this to change the style at runtime: */
-  public void setDefaultStyle(String cssClassName) {
-    defaultStyle.set(cssClassName);
-  }
-
-  public String getDefaultStyle() {
-    return defaultStyle.get();
-  }
-
-  public StringProperty defaultStyleProperty() {
-    return defaultStyle;
   }
 
   @Override

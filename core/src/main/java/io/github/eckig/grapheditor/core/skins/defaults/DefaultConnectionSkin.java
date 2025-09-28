@@ -3,14 +3,11 @@
  */
 package io.github.eckig.grapheditor.core.skins.defaults;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ergotech.grapheditor.model.GConnection;
 
-import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
@@ -29,58 +26,76 @@ import io.github.eckig.grapheditor.core.skins.defaults.connection.SimpleConnecti
  */
 public class DefaultConnectionSkin extends SimpleConnectionSkin {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionSkin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionSkin.class);
 
-    private final JointCreator jointCreator;
-    private final JointCleaner jointCleaner;
-    private final JointAlignmentManager jointAlignmentManager;
-    private final CursorOffsetCalculator cursorOffsetCalculator;
+  protected JointCreator jointCreator;
+  protected JointCleaner jointCleaner;
+  protected JointAlignmentManager jointAlignmentManager;
+  protected CursorOffsetCalculator cursorOffsetCalculator;
 
-    /**
-     * Creates a new default connection skin instance.
-     *
-     * @param connection the {@link GConnection} the skin is being created for
-     */
-    public DefaultConnectionSkin(final GConnection connection) {
+  /** Required no-arg constructor for serialization. */
+  public DefaultConnectionSkin() {
+    super();
+  }
 
-        super(connection);
+  /**
+   * Creates a new default connection skin instance.
+   *
+   * @param connection the {@link GConnection} the skin is being created for
+   */
+  public DefaultConnectionSkin(final GConnection connection) {
+    super(connection);
+    updateConnectionHelpers(connection);
+  }
 
-        performChecks();
+  protected void updateConnectionHelpers(final GConnection connection) {
+    if ( connection != null  && cursorOffsetCalculator == null ) {
+      performChecks();
+      cursorOffsetCalculator = new CursorOffsetCalculator(connection, path, backgroundPath, connectionSegments);
+      jointCreator = new JointCreator(this, cursorOffsetCalculator);
+      jointCleaner = new JointCleaner(this);
+      jointAlignmentManager = new JointAlignmentManager(connection);
 
-        cursorOffsetCalculator = new CursorOffsetCalculator(connection, path, backgroundPath, connectionSegments);
-        jointCreator = new JointCreator(this, cursorOffsetCalculator);
-        jointCleaner = new JointCleaner(this);
-        jointAlignmentManager = new JointAlignmentManager(connection);
-
-        jointCreator.addJointCreationHandler(root);
-    }
-
-    @Override
-    public void setGraphEditor(final GraphEditor graphEditor) {
-
-        super.setGraphEditor(graphEditor);
-
+      jointCreator.addJointCreationHandler(root);
+      if ( graphEditor != null ) {
         jointCreator.setGraphEditor(graphEditor);
         jointCleaner.setGraphEditor(graphEditor);
         jointAlignmentManager.setSkinLookup(graphEditor.getSkinLookup());
-    }
-
-    /**
-     * Checks that the connection has the correct values to be displayed using this skin.
-     */
-    private void performChecks() {
-      final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
-
-      if ( skinLookup != null ) {
-        if (!RectangularConnections.checkJointCount(this, skinLookup)) {
-          LOGGER.error("Joint count not compatible with source and target connector types.");
-        }
       }
     }
+  }
 
-    @Override
-    public String toString() {
-      return "DefaultConnectionSkin [isSelected()=" + isSelected() + ", getItem()=" + getItem() + "]";
+  /** Ensure connection helpers are created.
+   * 
+   */
+  @Override
+  public void setItem(GConnection item) {
+    super.setItem(item);
+    updateConnectionHelpers(item);
+  }
+
+  @Override
+  public void setGraphEditor(final GraphEditor graphEditor) {
+    super.setGraphEditor(graphEditor);
+    updateConnectionHelpers(item);
+  }
+
+  /**
+   * Checks that the connection has the correct values to be displayed using this skin.
+   */
+  private void performChecks() {
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+
+    if ( skinLookup != null ) {
+      if (!RectangularConnections.checkJointCount(this, skinLookup)) {
+        LOGGER.error("Joint count not compatible with source and target connector types.");
+      }
     }
-    
+  }
+
+  @Override
+  public String toString() {
+    return "DefaultConnectionSkin [isSelected()=" + isSelected() + ", getItem()=" + getItem() + "]";
+  }
+
 }

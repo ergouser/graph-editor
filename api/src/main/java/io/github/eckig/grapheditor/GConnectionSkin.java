@@ -59,7 +59,7 @@ public abstract class GConnectionSkin extends GSkin<GConnection> {
    * The List of joints. This is used only at development time and  just affects the way the connector is drawn.
    * That is, joints are an attribute of the skin, not the connection.
    */
-  private final ObservableList<GJoint> joints = FXCollections.observableArrayList();
+  protected final ObservableList<GJoint> joints = FXCollections.observableArrayList();
   /**
    * Creates a new {@link GConnectionSkin}.
    */

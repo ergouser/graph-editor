@@ -802,9 +802,12 @@ public class GraphEditorSkinManager implements SkinManager {
           if (skin instanceof GNodeSkin gNodeSkin) {
               //  add to mNodeSkins
               mNodeSkins.put(gNodeSkin.getItem(), gNodeSkin);
+          } else if (skin instanceof GJointSkin gJointSkin) {
+            //  add to mConnectionSkins
+            mJointSkins.put(gJointSkin.getItem(), gJointSkin);
           } else if (skin instanceof GConnectionSkin gConnectionSkin) {
-              //  add to mConnectionSkins
-              mConnectionSkins.put(gConnectionSkin.getItem(), gConnectionSkin);
+            //  add to mConnectionSkins
+            mConnectionSkins.put(gConnectionSkin.getItem(), gConnectionSkin);
           } else if (skin instanceof GConnectorSkin gConnectorSkin) {
               // add to mConnectorSkins
               mConnectorSkins.put(gConnectorSkin.getItem(), gConnectorSkin);

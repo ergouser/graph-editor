@@ -19,6 +19,8 @@ import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.Detour
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.GappedConnectionSegment;
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -61,6 +63,9 @@ public class SimpleConnectionSkin extends GConnectionSkin {
   private static final String STYLE_CLASS = "default-connection";
 
   private static final String STYLE_CLASS_BACKGROUND = "default-connection-background";
+
+  /** The default style‐class for the connection based on the last value. */
+  protected final StringProperty defaultStyle = new SimpleStringProperty("connection-novalue");
 
   /**
    * Creates a new se connection skin instance.
@@ -283,10 +288,38 @@ public class SimpleConnectionSkin extends GConnectionSkin {
 
     return showDetours;
   }
+  
+  @Override
+  protected Node getStylableNode() {
+    return path;
+  }
 
   @Override
   protected void selectionChanged(boolean isSelected) {
-    // Not implemented
+    if (isSelected) {
+      getStyleClass().remove(getDefaultStyle());
+      getStyleClass().add("rectangular-connection-selected");
+    } else {
+      getStyleClass().remove("rectangular-connection-selected");
+      if (getDefaultStyle() != null && !getStyleClass().contains(getDefaultStyle())) {
+        getStyleClass().add(getDefaultStyle());
+      }
+    }
   }
+
+  /** Call this to change the style at runtime: */
+  public void setDefaultStyle(String cssClassName) {
+    defaultStyle.set(cssClassName);
+  }
+
+  public String getDefaultStyle() {
+    return defaultStyle.get();
+  }
+
+  public StringProperty defaultStyleProperty() {
+    return defaultStyle;
+  }
+
+
 
 }
