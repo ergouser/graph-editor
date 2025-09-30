@@ -91,7 +91,17 @@ public class SimpleConnectionSkin extends GConnectionSkin {
 
   public SimpleConnectionSkin() {
     super();
-  }
+    root.setManaged(false);
+
+    // Background path is invisible and used only to capture hover events.
+    root.getChildren().add(backgroundPath);
+    root.getChildren().add(path);
+
+    path.setMouseTransparent(true);
+
+    backgroundPath.getStyleClass().setAll(STYLE_CLASS_BACKGROUND);
+    path.getStyleClass().setAll(STYLE_CLASS);
+ }
 
   @Override
   public Node getRoot() {

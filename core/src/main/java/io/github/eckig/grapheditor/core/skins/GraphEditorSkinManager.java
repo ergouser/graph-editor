@@ -166,6 +166,14 @@ public class GraphEditorSkinManager implements SkinManager {
     mConnectionLayouter = pConnectionLayouter;
   }
 
+  /** Return the GraphEditor. 
+   * 
+   * @return the graph editor for this skin manager
+   */
+  public GraphEditor getGraphEditor() {
+    return mGraphEditor;
+  }
+
   /**
    * Registers a factory for creating skins for a specific type of graph component and skin type.
    * <p>
