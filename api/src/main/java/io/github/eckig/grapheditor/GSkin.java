@@ -102,14 +102,6 @@ public abstract class GSkin<T extends Selectable> {
   }
 
   /**
-   * Initializes the node skin. The default does nothing.
-   *
-   */
-  public void initialize() {
-
-  }
-
-  /**
    * Sets the graph editor instance that this skin is a part of.
    *
    * @param pGraphEditor

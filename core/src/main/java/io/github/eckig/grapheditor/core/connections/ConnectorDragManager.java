@@ -38,6 +38,7 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -93,6 +94,14 @@ public class ConnectorDragManager {
   protected GConnectorSkin removalConnectorSkin;
 
   protected boolean repositionAllowed;
+  
+  /**
+   * Optional modifier key for drag gestures.
+   * If null, no modifier is required.
+   * For example, to use ALT set to  KeyCode.ALT;
+   */
+  protected KeyCode dragModifier = null; //
+
 
   /**
    * Creates a new {@link ConnectorDragManager}. Only one instance should exist per {@link DefaultGraphEditor} instance.
@@ -316,6 +325,11 @@ public class ConnectorDragManager {
     if (pEvent.getButton() != MouseButton.PRIMARY) {
       return;
     }
+    // Require modifier if set
+    if (dragModifier != null && !isModifierDown(pEvent, dragModifier)) {
+        return;
+    }
+
     try {
       ((Node) pEvent.getSource()).startFullDrag();
 
@@ -334,7 +348,19 @@ public class ConnectorDragManager {
       pEvent.consume();
     }
   }
-
+  
+  /**
+   * Utility to check if the given modifier is pressed.
+   */
+  private boolean isModifierDown(MouseEvent e, KeyCode modifier) {
+      switch (modifier) {
+          case ALT:     return e.isAltDown();
+          case CONTROL: return e.isControlDown();
+          case SHIFT:   return e.isShiftDown();
+          case META:    return e.isMetaDown();
+          default:      return true; // Unknown key: treat as no check
+      }
+  }
   /**
    * Handles mouse-dragged events on the given connector.
    *
@@ -603,4 +629,22 @@ public class ConnectorDragManager {
       eventManager.finishGesture(GraphInputGesture.CONNECT, this);
     }
   }
+  
+  /**
+   * Set the required modifier key for drag gestures.
+   * Pass null to disable modifier requirement.
+   */
+  public void setDragModifier(KeyCode modifier) {
+      this.dragModifier = modifier;
+  }
+
+  /**
+   * Return the current required modifier key for drag gestures.
+   * This may be null if no modifier is requred.
+   */
+ public KeyCode getDragModifier() {
+      return dragModifier;
+  }
+
+
 }
