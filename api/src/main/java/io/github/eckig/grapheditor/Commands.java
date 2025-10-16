@@ -245,22 +245,22 @@ public class Commands {
 
         if (nodeSkin.xProperty().get() != nodeRegion.getLayoutX()) {
           //command.append(SetPropertyCommand.create(nodeSkin.xProperty(), nodeRegion.getLayoutX()));
-          command.append(SetCommand.create (nodeSkin.xProperty().get(),nodeRegion::setLayoutX,nodeRegion.getLayoutX()));
+          command.append(SetCommand.create (nodeSkin.xProperty().get(),nodeSkin::setX,nodeRegion.getLayoutX()));
         }
 
         if (nodeSkin.yProperty().get() != nodeRegion.getLayoutY()) {
           //command.append(SetPropertyCommand.create(nodeSkin.yProperty(), nodeRegion.getLayoutY()));
-          command.append(SetCommand.create (nodeSkin.yProperty().get(),nodeRegion::setLayoutY,nodeRegion.getLayoutY()));
+          command.append(SetCommand.create (nodeSkin.yProperty().get(),nodeSkin::setY,nodeRegion.getLayoutY()));
         }
 
         if (nodeSkin.widthProperty().get() != nodeRegion.getWidth()) {
           //command.append(SetPropertyCommand.create(nodeSkin.widthProperty(), nodeRegion.getWidth()));
-          command.append(SetCommand.create (nodeSkin.widthProperty().get(),nodeRegion::setBoxWidth,nodeRegion.getWidth()));
+          command.append(SetCommand.create (nodeSkin.widthProperty().get(),nodeSkin::setWidth,nodeRegion.getWidth()));
         }
 
         if (nodeSkin.heightProperty().get() != nodeRegion.getHeight()) {
           //command.append(SetPropertyCommand.create(nodeSkin.heightProperty(), nodeRegion.getHeight()));
-          command.append(SetCommand.create (nodeSkin.heightProperty().get(),nodeRegion::setBoxHeight,nodeRegion.getHeight()));
+          command.append(SetCommand.create (nodeSkin.heightProperty().get(),nodeSkin::setHeight,nodeRegion.getHeight()));
         }
       }
       for (GConnectorPort connector : node.getConnectorPorts()) {
