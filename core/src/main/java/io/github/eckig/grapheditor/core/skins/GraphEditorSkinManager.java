@@ -47,11 +47,66 @@ public class GraphEditorSkinManager implements SkinManager {
   /** The map of class factories.*/
   private final Map<SkinFactoryKey, Callback<?, ?>> factoryMap = new HashMap<>();
 
-  private final ObservableMap<GNode, GNodeSkin> mNodeSkins = FXCollections.observableHashMap();
+  /**
+   * Internal backing map for node skins. This reference allows direct manipulation
+   * of the map contents without triggering ObservableMap change notifications.
+   * 
+   * <p>Use {@link #mNodeSkins} for normal operations that should notify listeners.
+   * Use this field directly only for internal operations that must bypass notification,
+   * such as {@link #replaceNode(GNode, GNode)}.
+   * 
+   * @see #mNodeSkins
+   * @see #replaceNode(GNode, GNode)
+   */
+  private final Map<GNode, GNodeSkin> mNodeSkinsInternal = new HashMap<>();
 
-  private final ObservableMap<GConnection, GConnectionSkin> mConnectionSkins = FXCollections.observableHashMap();
+  /**
+   * Observable map of graph nodes to their visual skin representations.
+   * External listeners can be registered on this map to receive notifications
+   * of node skin additions, removals, and updates.
+   * 
+   * <p>This map wraps {@link #mNodeSkinsInternal} and fires change events for
+   * all modifications made through this reference.
+   * 
+   * @see #mNodeSkinsInternal
+   */
+  private final ObservableMap<GNode, GNodeSkin> mNodeSkins = FXCollections.observableMap(mNodeSkinsInternal);
 
-  // private final Map<GNode, GNodeSkin> mNodeSkins = new HashMap<>();
+  /**
+   * Internal backing map for connection skins. This reference allows direct manipulation
+   * of the map contents without triggering ObservableMap change notifications.
+   * 
+   * <p>Use {@link #mConnectionSkins} for normal operations that should notify listeners.
+   * Use this field directly only for internal operations that must bypass notification,
+   * such as {@link #removeConnectionSilently(GConnection)} and 
+   * {@link #restoreConnectionSilently(GConnection, GConnectionSkin)}.
+   * 
+   * @see #mConnectionSkins
+   * @see #removeConnectionSilently(GConnection)
+   * @see #restoreConnectionSilently(GConnection, GConnectionSkin)
+   */
+  private final Map<GConnection, GConnectionSkin> mConnectionSkinsInternal = new HashMap<>();
+
+  /**
+   * Observable map of graph connections to their visual skin representations.
+   * External listeners can be registered on this map to receive notifications
+   * of connection skin additions, removals, and updates.
+   * 
+   * <p>This map wraps {@link #mConnectionSkinsInternal} and fires change events for
+   * all modifications made through this reference.
+   * 
+   * @see #mConnectionSkinsInternal
+   */
+  private final ObservableMap<GConnection, GConnectionSkin> mConnectionSkins = 
+      FXCollections.observableMap(mConnectionSkinsInternal);
+
+  /**
+   * Map of connector ports to their visual skin representations.
+   * This is a plain HashMap without observable notification capabilities.
+   * 
+   * @see #removeConnectorSilently(GConnectorPort)
+   * @see #restoreConnectorSilently(GConnectorPort, GConnectorSkin)
+   */
   private final Map<GConnectorPort, GConnectorSkin> mConnectorSkins = new HashMap<>();
 
   // private final Map<GConnection, GConnectionSkin> mConnectionSkins = new HashMap<>();
@@ -824,5 +879,165 @@ public class GraphEditorSkinManager implements SkinManager {
           }
       }
   }
+  
+  /**
+   * Replaces a node in the skin map without triggering change notifications.
+   * 
+   * <p>This method removes the skin associated with {@code oldNode} and associates
+   * it with {@code newNode} instead. The operation is performed directly on the
+   * backing map, bypassing the ObservableMap's change notification mechanism.
+   * 
+   * <p><b>Use case:</b> This is useful when the node's identity changes but the
+   * visual representation (skin) should remain the same, and listeners should not
+   * be notified of this internal state transition.
+   * 
+   * <p><b>Thread safety:</b> This method is not thread-safe. It should only be
+   * called from the JavaFX Application Thread.
+   * 
+   * @param oldNode the node whose skin should be transferred; must not be null
+   * @param newNode the node to receive the skin; must not be null
+   * @return the skin that was transferred from {@code oldNode} to {@code newNode},
+   *         or {@code null} if {@code oldNode} had no associated skin
+   * @throws NullPointerException if either {@code oldNode} or {@code newNode} is null
+   * 
+   * @see #mNodeSkins
+   * @see #mNodeSkinsInternal
+   */
+  public GNodeSkin replaceNodeInSkin(GNode oldNode, GNode newNode) {
+      // Direct access to internal map - no notifications fired
+      GNodeSkin skin = mNodeSkinsInternal.remove(oldNode);
+      if (skin != null) {
+          mNodeSkinsInternal.put(newNode, skin);
+      }
+      return skin;
+  }
+  
+  /**
+   * Removes a connection skin from the map without triggering change notifications.
+   * 
+   * <p>This method removes the skin associated with {@code connection} directly from
+   * the backing map, bypassing the ObservableMap's change notification mechanism.
+   * The removed skin can later be restored using 
+   * {@link #restoreConnectionSilently(GConnection, GConnectionSkin)}.
+   * 
+   * <p><b>Typical usage pattern:</b>
+   * <pre>{@code
+   * GConnectionSkin skin = removeConnectionSilently(connection);
+   * // ... perform operations ...
+   * restoreConnectionSilently(connection, skin);
+   * }</pre>
+   * 
+   * <p><b>Thread safety:</b> This method is not thread-safe. It should only be
+   * called from the JavaFX Application Thread.
+   * 
+   * @param connection the connection whose skin should be removed; must not be null
+   * @return the skin that was removed, or {@code null} if no skin was associated
+   *         with the connection
+   * @throws NullPointerException if {@code connection} is null
+   * 
+   * @see #restoreConnectionSilently(GConnection, GConnectionSkin)
+   * @see #mConnectionSkinsInternal
+   */
+  public GConnectionSkin removeConnectionSilently(GConnection connection) {
+      return mConnectionSkinsInternal.remove(connection);
+  }
+
+  /**
+   * Restores a connection skin to the map without triggering change notifications.
+   * 
+   * <p>This method adds the skin for {@code connection} directly to the backing map,
+   * bypassing the ObservableMap's change notification mechanism. This is typically
+   * used to restore a skin that was previously removed using
+   * {@link #removeConnectionSilently(GConnection)}.
+   * 
+   * <p><b>Typical usage pattern:</b>
+   * <pre>{@code
+   * GConnectionSkin skin = removeConnectionSilently(connection);
+   * // ... perform operations ...
+   * restoreConnectionSilently(connection, skin);
+   * }</pre>
+   * 
+   * <p><b>Thread safety:</b> This method is not thread-safe. It should only be
+   * called from the JavaFX Application Thread.
+   * 
+   * @param connection the connection to associate with the skin; must not be null
+   * @param skin the skin to restore; if null, this method does nothing
+   * @throws NullPointerException if {@code connection} is null
+   * 
+   * @see #removeConnectionSilently(GConnection)
+   * @see #mConnectionSkinsInternal
+   */
+  public void restoreConnectionSilently(GConnection connection, GConnectionSkin skin) {
+      if (skin != null) {
+          mConnectionSkinsInternal.put(connection, skin);
+      }
+  }
+
+  /**
+   * Removes a connector skin from the map without triggering change notifications.
+   * 
+   * <p>This method removes the skin associated with {@code port}. Since
+   * {@link #mConnectorSkins} is a plain HashMap, this operation never triggers
+   * notifications, but this method provides API consistency with the connection
+   * skin management methods.
+   * 
+   * <p>The removed skin can later be restored using 
+   * {@link #restoreConnectorSilently(GConnectorPort, GConnectorSkin)}.
+   * 
+   * <p><b>Typical usage pattern:</b>
+   * <pre>{@code
+   * GConnectorSkin skin = removeConnectorSilently(port);
+   * // ... perform operations ...
+   * restoreConnectorSilently(port, skin);
+   * }</pre>
+   * 
+   * <p><b>Thread safety:</b> This method is not thread-safe. It should only be
+   * called from the JavaFX Application Thread.
+   * 
+   * @param port the connector port whose skin should be removed; must not be null
+   * @return the skin that was removed, or {@code null} if no skin was associated
+   *         with the port
+   * @throws NullPointerException if {@code port} is null
+   * 
+   * @see #restoreConnectorSilently(GConnectorPort, GConnectorSkin)
+   * @see #mConnectorSkins
+   */
+  public GConnectorSkin removeConnectorSilently(GConnectorPort port) {
+      return mConnectorSkins.remove(port);
+  }
+
+  /**
+   * Restores a connector skin to the map without triggering change notifications.
+   * 
+   * <p>This method adds the skin for {@code port}. Since {@link #mConnectorSkins}
+   * is a plain HashMap, this operation never triggers notifications, but this method
+   * provides API consistency with the connection skin management methods.
+   * 
+   * <p>This is typically used to restore a skin that was previously removed using
+   * {@link #removeConnectorSilently(GConnectorPort)}.
+   * 
+   * <p><b>Typical usage pattern:</b>
+   * <pre>{@code
+   * GConnectorSkin skin = removeConnectorSilently(port);
+   * // ... perform operations ...
+   * restoreConnectorSilently(port, skin);
+   * }</pre>
+   * 
+   * <p><b>Thread safety:</b> This method is not thread-safe. It should only be
+   * called from the JavaFX Application Thread.
+   * 
+   * @param port the connector port to associate with the skin; must not be null
+   * @param skin the skin to restore; if null, this method does nothing
+   * @throws NullPointerException if {@code port} is null
+   * 
+   * @see #removeConnectorSilently(GConnectorPort)
+   * @see #mConnectorSkins
+   */
+  public void restoreConnectorSilently(GConnectorPort port, GConnectorSkin skin) {
+      if (skin != null) {
+          mConnectorSkins.put(port, skin);
+      }
+  }
+
 
 }

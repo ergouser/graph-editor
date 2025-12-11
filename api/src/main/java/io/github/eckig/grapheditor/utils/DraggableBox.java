@@ -23,44 +23,44 @@ import javafx.scene.layout.StackPane;
  */
 public class DraggableBox extends StackPane {
 
-  private static final double DEFAULT_ALIGNMENT_THRESHOLD = 5;
+  protected  static final double DEFAULT_ALIGNMENT_THRESHOLD = 5;
 
-  private final EditorElement mType;
+  protected  final EditorElement mType;
 
   /**
    * stored value of {@link #getLayoutX()}, see {@link #storeClickValuesForDrag(double, double)}
    */
-  double lastLayoutX;
+  protected double lastLayoutX;
 
   /**
    * stored value of {@link #getLayoutY()}, see {@link #storeClickValuesForDrag(double, double)}
    */
-  double lastLayoutY;
+  protected double lastLayoutY;
 
   /**
    * stored mouse position, see {@link #storeClickValuesForDrag(double, double)}
    */
-  double lastMouseX;
+  protected double lastMouseX;
 
   /**
    * stored mouse position, see {@link #storeClickValuesForDrag(double, double)}
    */
-  double lastMouseY;
+  protected double lastMouseY;
 
-  private GraphEditorProperties editorProperties;
+  protected  GraphEditorProperties editorProperties;
 
   // Note that ResizableBox subclass currently pays no attention to alignment targets!
-  private double[] alignmentTargetsX;
+  protected  double[] alignmentTargetsX;
 
-  private double[] alignmentTargetsY;
+  protected  double[] alignmentTargetsY;
 
-  private double alignmentThreshold = DEFAULT_ALIGNMENT_THRESHOLD;
+  protected  double alignmentThreshold = DEFAULT_ALIGNMENT_THRESHOLD;
 
-  private Point2D snapToGridOffset = Point2D.ZERO;
+  protected  Point2D snapToGridOffset = Point2D.ZERO;
 
-  private DraggableBox dependencyX;
+  protected  DraggableBox dependencyX;
 
-  private DraggableBox dependencyY;
+  protected  DraggableBox dependencyY;
 
   /**
    * Creates an empty draggable box.
@@ -278,7 +278,7 @@ public class DraggableBox extends StackPane {
   /**
    * activate the given {@link GraphInputGesture}
    */
-  boolean activateGesture(final GraphInputGesture pGesture, final Event pEvent) {
+  protected boolean activateGesture(final GraphInputGesture pGesture, final Event pEvent) {
     if (editorProperties != null) {
       return editorProperties.activateGesture(pGesture, pEvent, this);
     }
@@ -288,7 +288,7 @@ public class DraggableBox extends StackPane {
   /**
    * deactivate the given {@link GraphInputGesture}
    */
-  boolean finishGesture(final GraphInputGesture pGesture) {
+  protected boolean finishGesture(final GraphInputGesture pGesture) {
     return editorProperties == null || editorProperties.finishGesture(pGesture, this);
   }
 
@@ -383,7 +383,7 @@ public class DraggableBox extends StackPane {
      * @param pY
      *          the cursor y position relative to the container
      */
-  private void handleDrag(final double pX, final double pY) {
+  protected void handleDrag(final double pX, final double pY) {
 
     handleDragX(pX);
     handleDragY(pY);
@@ -434,7 +434,7 @@ public class DraggableBox extends StackPane {
    * @param pX
    *          the cursor x position
    */
-  private void handleDragX(final double pX) {
+  protected void handleDragX(final double pX) {
     final double maxParentWidth = getParent().getLayoutBounds().getWidth();
 
     final double minLayoutX = getWestBoundValue();
@@ -473,7 +473,7 @@ public class DraggableBox extends StackPane {
    * @param pY
    *          the cursor y position
    */
-  private void handleDragY(final double pY) {
+  protected void handleDragY(final double pY) {
     final double maxParentHeight = getParent().getLayoutBounds().getHeight();
 
     final double minLayoutY = getNorthBoundValue();
@@ -514,7 +514,7 @@ public class DraggableBox extends StackPane {
    *          a JavaFX {@link Node}
    * @return the node's closest ancestor that is a subclass of {@link Region}, or {@code null} if none exists
    */
-  Region getContainer(final Node node) {
+  protected Region getContainer(final Node node) {
     //printParentDimensions(node);
     final Parent parent = node.getParent();
     if (parent == null) {
@@ -564,7 +564,7 @@ public class DraggableBox extends StackPane {
    *          the list of the alignment values
    * @return the new position after alignment
    */
-  private double align(final double position, final double[] alignmentValues) {
+  protected double align(final double position, final double[] alignmentValues) {
     for (final double alignmentValue : alignmentValues) {
       if (Math.abs(alignmentValue - position) <= alignmentThreshold) {
         return alignmentValue;

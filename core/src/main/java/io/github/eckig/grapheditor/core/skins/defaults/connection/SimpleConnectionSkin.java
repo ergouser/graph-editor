@@ -17,11 +17,13 @@ import io.github.eckig.grapheditor.core.connections.RectangularConnections;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.ConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.DetouredConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.GappedConnectionSegment;
+import io.github.eckig.grapheditor.core.skins.defaults.tail.RectangularPathCreator;
 import io.github.eckig.grapheditor.utils.DraggableBox;
 import io.github.eckig.grapheditor.utils.GeometryUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
+import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.shape.MoveTo;
@@ -224,7 +226,14 @@ public class SimpleConnectionSkin extends GConnectionSkin {
     final int jointPositionIndex = start ? 1 : points.length - 2;
     List<GJointSkin> jointSkins = getJointSkins();
     final GJointSkin jointSkin = jointSkins.get(start ? 0 : jointSkins.size() - 1);
-
+    List<Point2D> calculatedPath = RectangularPathCreator.createPath(points[0], points[points.length-1], Side.RIGHT, Side.LEFT);
+    // the calculated path could have more, or less points than the points array...  This should be managed better.
+    // likely by returning the new "points"
+    // for now, we'll just ignore this
+    // Also need to cover the case where the user repositioned the joints, but since that doesn't currently work, that's also ignored
+    for ( int counter = 1 ; counter < points.length-1 ; counter++ ) {
+      points[counter] = calculatedPath.get(counter-1);
+    }
     if (vertical) {
       final double newJointY = points[targetPositionIndex].getY();
       final double newJointLayoutY = GeometryUtils.moveOnPixel(newJointY - jointSkin.getHeight() / 2);
