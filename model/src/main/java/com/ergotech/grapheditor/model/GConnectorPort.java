@@ -78,7 +78,7 @@ public interface GConnectorPort extends Selectable {
    *
    * @return the connections as an ObservableList.
    */
-  public Collection<GConnection> getConnections();
+  public Collection<? extends GConnection> getConnections();
   
   /**
    * Adds a connection to the connector.
