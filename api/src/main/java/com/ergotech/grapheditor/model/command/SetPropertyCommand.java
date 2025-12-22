@@ -1,5 +1,9 @@
 package com.ergotech.grapheditor.model.command;
 
+import java.beans.PropertyChangeListener;
+import java.util.Objects;
+import java.util.function.BiFunction;
+
 import javafx.beans.property.Property;
 import javafx.beans.property.adapter.JavaBeanObjectProperty;
 import javafx.beans.property.adapter.JavaBeanObjectPropertyBuilder;
@@ -9,85 +13,164 @@ public class SetPropertyCommand<V> extends AbstractCommand {
   private final V newValue;
   private V oldValue;
 
+  // Optional, for temporary binding during execute/undo
+  private final Object listenerTarget;
+  private final PropertyChangeListener listener;
+  private final BiFunction<Object, PropertyChangeListener, Runnable> listenerBinder;
+
   /** Convenience method to create the set property command. */
   public static <S> SetPropertyCommand<S> create(Property<S> property, S newValue) {
     return new SetPropertyCommand<>(property, newValue);
   }
-  //public class CommandFactory {
 
-    /**
-     * Creates a {@link SetPropertyCommand} for a specified object and attribute.
-     * <p>
-     * This method uses JavaFX's {@link JavaBeanObjectProperty} to create a {@link Property}
-     * that is directly tied to the JavaBean-style property (getter/setter methods) of the object.
-     * The returned {@link SetPropertyCommand} can be used to update the property to a new value.
-     * </p>
-     *
-     * @param <T> the type of the object containing the attribute
-     * @param <V> the type of the attribute value
-     * @param object the object instance containing the attribute to be updated
-     * @param attributeName the name of the attribute (e.g., "Width", "Height")
-     * @param newValue the new value to set for the attribute
-     * @return a {@link SetPropertyCommand} that can be executed to update the object's attribute to the specified value
-     * @throws RuntimeException if there is an issue creating the command, such as if the JavaBean property cannot be accessed
-     */
-    public static <T, V> SetPropertyCommand<V> create(T object, String attributeName, V newValue) {
-      try {
-        // Use JavaFX's JavaBeanObjectProperty to link to the JavaBean-style property
-        @SuppressWarnings("unchecked")
-        JavaBeanObjectProperty<V> property = JavaBeanObjectPropertyBuilder
-            .create()
-            .bean(object)
-            .name(attributeName)
-            .build();
+  /**
+   * Convenience method to create the command with a temporary add/remove of a listener
+   * during execute() and undo().
+   *
+   * binder must: add the listener and return an unbind Runnable that removes it.
+   */
+  public static <S, T> SetPropertyCommand<S> create(
+      Property<S> property,
+      S newValue,
+      T listenerTarget,
+      PropertyChangeListener listener,
+      BiFunction<? super T, ? super PropertyChangeListener, Runnable> binder) {
 
-        // Return the SetPropertyCommand
-        return new SetPropertyCommand<>(property, newValue);
+    @SuppressWarnings("unchecked")
+    BiFunction<Object, PropertyChangeListener, Runnable> erased =
+        (BiFunction<Object, PropertyChangeListener, Runnable>) (BiFunction<?, ?, ?>) binder;
 
-      } catch (NoSuchMethodException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Failed to create SetPropertyCommand: unable to access JavaBean property", e);
-      }
+    return new SetPropertyCommand<>(property, newValue, listenerTarget, listener, erased);
+  }
+
+  /**
+   * Creates a {@link SetPropertyCommand} for a specified object and attribute.
+   */
+  public static <T, V> SetPropertyCommand<V> create(T object, String attributeName, V newValue) {
+    try {
+      @SuppressWarnings("unchecked")
+      JavaBeanObjectProperty<V> property = JavaBeanObjectPropertyBuilder
+          .create()
+          .bean(object)
+          .name(attributeName)
+          .build();
+
+      return new SetPropertyCommand<>(property, newValue);
+
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Failed to create SetPropertyCommand: unable to access JavaBean property", e);
     }
-  //}
+  }
+
+  /**
+   * Creates a {@link SetPropertyCommand} for a specified object and attribute, with temporary
+   * listener add/remove during execute() and undo().
+   */
+  public static <T, V> SetPropertyCommand<V> create(
+      T object,
+      String attributeName,
+      V newValue,
+      PropertyChangeListener listener,
+      BiFunction<? super T, ? super PropertyChangeListener, Runnable> binder) {
+
+    try {
+      @SuppressWarnings("unchecked")
+      JavaBeanObjectProperty<V> property = JavaBeanObjectPropertyBuilder
+          .create()
+          .bean(object)
+          .name(attributeName)
+          .build();
+
+      @SuppressWarnings("unchecked")
+      BiFunction<Object, PropertyChangeListener, Runnable> erased =
+          (BiFunction<Object, PropertyChangeListener, Runnable>) (BiFunction<?, ?, ?>) binder;
+
+      return new SetPropertyCommand<>(property, newValue, object, listener, erased);
+
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Failed to create SetPropertyCommand: unable to access JavaBean property", e);
+    }
+  }
 
   public SetPropertyCommand(Property<V> property, V newValue) {
-    this.property = property;
+    this(property, newValue, null, null, null);
+  }
+
+  private SetPropertyCommand(
+      Property<V> property,
+      V newValue,
+      Object listenerTarget,
+      PropertyChangeListener listener,
+      BiFunction<Object, PropertyChangeListener, Runnable> listenerBinder) {
+
+    this.property = Objects.requireNonNull(property, "property");
     this.newValue = newValue;
+    this.listenerTarget = listenerTarget;
+    this.listener = listener;
+    this.listenerBinder = listenerBinder;
   }
 
   @Override
   public void execute() throws Exception {
-    if (canExecute()) {
-      oldValue = property.getValue();
+    if (!canExecute()) {
+      return;
+    }
+
+    oldValue = property.getValue();
+
+    // Add listener -> mutate -> remove listener
+    Runnable unbind = bindListenerIfConfigured();
+    try {
       property.setValue(newValue);
       setExecuted(true);
+    } finally {
+      if (unbind != null) {
+        unbind.run();
+      }
     }
   }
 
   @Override
   public void undo() throws Exception {
-    if (canUndo()) {
+    if (!canUndo()) {
+      return;
+    }
+
+    // Add listener -> mutate -> remove listener
+    Runnable unbind = bindListenerIfConfigured();
+    try {
       property.setValue(oldValue);
       setExecuted(false);
+    } finally {
+      if (unbind != null) {
+        unbind.run();
+      }
     }
+  }
+
+  private Runnable bindListenerIfConfigured() {
+    if (listenerBinder == null || listenerTarget == null || listener == null) {
+      return null;
+    }
+    Runnable unbind = listenerBinder.apply(listenerTarget, listener);
+    return (unbind != null) ? unbind : () -> {};
   }
 
   @Override
   public boolean canExecute() {
-      return !isExecuted() ;
+    return !isExecuted();
   }
 
   @Override
   public boolean canUndo() {
-      return isExecuted() ;
+    return isExecuted();
   }
-
 
   @Override
   public String toString() {
     return "SetPropertyCommand [property=" + property + ", newValue=" + newValue + ", oldValue=" + oldValue
         + ", executed=" + isExecuted() + "]";
   }
-  
 }
