@@ -1,5 +1,6 @@
 package io.github.eckig.grapheditor.core.view.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,22 +45,20 @@ public class DefaultConnectionLayouter implements ConnectionLayouter {
 
   @Override
   public void draw() {
-    if (mModel == null || mModel.getConnections().isEmpty()) {
+    if (mModel == null /*|| mModel.getConnections().isEmpty()*/) {
       return;
     }
 
     try {
-      if (!mModel.getConnections().isEmpty()) {
-        redrawAllConnections();
-      }
+      redrawAllConnections(mModel.getConnections());
     } catch (Exception e) {
       LOGGER.debug("Could not redraw Connections: ", e); //$NON-NLS-1$
     }
   }
 
-  private void redrawAllConnections() {
+  private void redrawAllConnections(Collection<? extends GConnection> connections ) {
     final Map<GConnectionSkin, Point2D[]> connectionPoints = new HashMap<>();
-    for (final GConnection connection : mModel.getConnections()) {
+    for (final GConnection connection : connections) {
       final GConnectionSkin connectionSkin = mSkinLookup.lookupConnection(connection);
       if (connectionSkin != null) {
         final Point2D[] points = connectionSkin.update();
