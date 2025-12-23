@@ -5,17 +5,16 @@ package io.github.eckig.grapheditor.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GNode;
 
-import io.github.eckig.grapheditor.GConnectionSkin;
 import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SkinLookup;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -69,29 +68,34 @@ public class GeometryUtils {
    * offset the position to be the center of the connectorport.
    */
   public static Point2D getConnectorCenter(GConnectorSkin connectorSkin, final SkinLookup skinLookup) {
-      //Node connectorRoot = connectorSkin.getRoot();
-      Side side          = connectorSkin.getSide();
+    Side side = connectorSkin.getSide();
+    Point2D connectorPosition = getConnectorPosition(connectorSkin, skinLookup);
 
-      Point2D connectorPosition = getConnectorPosition(connectorSkin, skinLookup);
+    if ( connectorPosition == null ) {
+      return null;
+    }
+    Bounds rootBounds = connectorSkin.getRoot().getLayoutBounds();
+    double width = rootBounds.getWidth();
+    double height = rootBounds.getHeight();
 
-      double x, y;
-      if (side == Side.LEFT) {
-          x = connectorPosition.getX();
-          y = connectorPosition.getY() + connectorSkin.getHeight() / 2;
-      } else if (side == Side.RIGHT) {
-          x = connectorPosition.getX() + connectorSkin.getWidth();
-          y = connectorPosition.getY() + connectorSkin.getHeight() / 2;
-      } else if (side == Side.TOP) {  // untested
-          x = connectorPosition.getY() + connectorSkin.getWidth() / 2;
-          y = connectorPosition.getY();
-      } else { // Side.BOTTOM - untested
-          x = connectorPosition.getX() + connectorSkin.getWidth() / 2;
-          y = connectorPosition.getY()+connectorSkin.getHeight(); 
-      }
+    double x, y;
+    if (side == Side.LEFT) {
+      x = connectorPosition.getX();
+      y = connectorPosition.getY() + height / 2;
+    } else if (side == Side.RIGHT) {
+      x = connectorPosition.getX() + width;
+      y = connectorPosition.getY() + height / 2;
+    } else if (side == Side.TOP) {
+      x = connectorPosition.getX() + width / 2;
+      y = connectorPosition.getY();
+    } else { // Side.BOTTOM
+      x = connectorPosition.getX() + width / 2;
+      y = connectorPosition.getY() + height;
+    }
 
-      return new Point2D(x, y);
+    return new Point2D(x, y);
   }
-
+  
  /**
    * Gets the position of the cursor relative to some node.
    *
@@ -197,6 +201,22 @@ public class GeometryUtils {
     final double y = region.getLayoutY() + jointSkin.getHeight() / 2;
 
     return new Point2D(x, y);
+  }
+
+  /**
+   * Moves an x or y position value on-pixel.
+   *
+   * <p>
+   * Lines drawn off-pixel look blurry. They should therefore have integer x and y values.
+   * </p>
+   *
+   * @param position
+   *          the position to move on-pixel
+   *
+   * @return the position rounded to the nearest integer
+   */
+  public static Point2D moveOnPixel(final Point2D position) {
+    return new Point2D(moveOnPixel(position.getX()), moveOnPixel(position.getY()));
   }
 
   /**
