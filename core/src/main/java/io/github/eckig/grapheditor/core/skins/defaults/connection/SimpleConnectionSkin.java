@@ -9,11 +9,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
+import com.ergotech.grapheditor.model.GConnectorPort;
+import com.ergotech.grapheditor.model.GJoint;
 
 import io.github.eckig.grapheditor.GConnectionSkin;
+import io.github.eckig.grapheditor.GConnectorSkin;
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.RectangularConnections;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.ConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.DetouredConnectionSegment;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.segment.GappedConnectionSegment;
@@ -131,12 +135,114 @@ public class SimpleConnectionSkin extends GConnectionSkin {
 //    addRectangularConstraints();
   }
 
+  /**
+   * Synchronizes the collection of GJoints and their visual skins with the provided array of points.
+   * <p>
+   * This method ensures that:
+   * <ul>
+   *   <li>Each point in the array has a corresponding GJoint with a positioned skin</li>
+   *   <li>Existing joints are reused and repositioned when possible</li>
+   *   <li>New joints are created when the point count exceeds the current joint count</li>
+   *   <li>Excess joints are removed when the joint count exceeds the point count</li>
+   * </ul>
+   * <p>
+   * Joint skins are centered on their corresponding points using pixel-aligned coordinates.
+   * The skin's layout position is calculated by subtracting half the skin's width and height
+   * from the point coordinates, then applying pixel alignment via {@link GeometryUtils#moveOnPixel}.
+   *
+   * @param points the array of points defining the desired positions and count of joints;
+   *               must not be null
+   * @throws NullPointerException if points is null
+   */
+  public void updateJointsForPoints(List<Point2D> points) {
+    final SkinManager skinLookup = getGraphEditor() == null ? null : (SkinManager)getGraphEditor().getSkinLookup();
+    List<GJoint> existingJoints = getJoints();
+    int pointCount = points.size();
+    int jointCount = existingJoints.size();
+
+    // Position existing joints and create new ones if needed
+    for (int i = 0; i < pointCount; i++) {
+      GJoint gJoint;
+
+      if (i < jointCount) {
+        // Use existing joint
+        gJoint = existingJoints.get(i);
+      } else {
+        // Create new joint (you'll need to implement createJoint())
+        gJoint = getGraphEditor().getModel().getGraphFactory().create(GJoint.class);
+
+        existingJoints.add(gJoint);
+      }
+
+      // Get or create skin for this joint
+      GJointSkin jointSkin = skinLookup.lookupOrCreateJoint(gJoint);
+
+      // Position the skin
+      double newJointX = points.get(i).getX();
+      double newJointY = points.get(i).getY();
+      double newJointLayoutX = GeometryUtils.moveOnPixel(newJointX - jointSkin.getWidth() / 2);
+      double newJointLayoutY = GeometryUtils.moveOnPixel(newJointY - jointSkin.getHeight() / 2);
+
+      jointSkin.getRoot().setLayoutX(newJointLayoutX);
+      jointSkin.getRoot().setLayoutY(newJointLayoutY);
+    }
+
+    // Remove excess joints if we have more joints than points
+    if (jointCount > pointCount) {
+      for (int i = jointCount - 1; i >= pointCount; i--) {
+        GJoint gJointToRemove = existingJoints.get(i);
+        skinLookup.removeJoint(gJointToRemove);
+        existingJoints.remove(i);
+      }
+    }
+  }
+  
   @Override
   public Point2D[] update() {
-    final Point2D[] points = super.update();
-    if ( points != null ) {
-      checkFirstAndLastJoints(points);
+    final GConnection item = getItem();
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    GConnectorPort targetPort = item.getTargetPort();  // this could be null, but that would be a major error so we need it to throw.
+    GConnectorSkin connectorSkin = skinLookup.lookupConnector(targetPort); 
+    GConnectorSkin sourceConnectorSkin = skinLookup.lookupConnector(item.getSourcePort());
+    if ( connectorSkin == null ) { // this is true on delete...
+      return null;
     }
+    final Point2D[] startAndEnd = new Point2D[2];
+
+    // Start: Source position
+    Point2D startPoint = GeometryUtils.getConnectorCenter(sourceConnectorSkin, skinLookup);
+    if ( startPoint == null ) {
+      return null;
+    }
+    startAndEnd[0] = GeometryUtils.moveOnPixel(startPoint);
+
+    // End: Target position
+    Point2D endPoint = GeometryUtils.getConnectorCenter(connectorSkin, skinLookup);
+    if ( endPoint == null ) {
+      return null;
+    }
+    startAndEnd[1] = GeometryUtils.moveOnPixel(endPoint);
+    final Side sourceSide = skinLookup.lookupConnector(getItem().getSourcePort()).getSide();
+    final Side targetSide = skinLookup.lookupConnector(getItem().getTargetPort()).getSide();
+    List<Point2D> calculatedPath = RectangularPathCreator.createPath(startAndEnd[0], startAndEnd[1], sourceSide, targetSide);
+
+    // calculatedPath holds the required location for the joints for this connector.
+    updateJointsForPoints(calculatedPath);
+    final int len = getJoints().size() + 2;
+    final Point2D[] points = new Point2D[len];
+
+    // Middle: joint positions
+    List<GJointSkin> jointSkins = getJoints().stream()
+        .map(joint -> skinLookup.lookupJoint(joint))
+        .collect(Collectors.toList());
+    GeometryUtils.fillJointPositions(jointSkins, points);
+
+    // Start: Source position
+    points[0] = startAndEnd[0];
+
+    // End: Target position
+    points[len - 1] = startAndEnd[1];
+
     return points;
   }
 
@@ -226,12 +332,18 @@ public class SimpleConnectionSkin extends GConnectionSkin {
     final int jointPositionIndex = start ? 1 : points.length - 2;
     List<GJointSkin> jointSkins = getJointSkins();
     final GJointSkin jointSkin = jointSkins.get(start ? 0 : jointSkins.size() - 1);
-    List<Point2D> calculatedPath = RectangularPathCreator.createPath(points[0], points[points.length-1], Side.RIGHT, Side.LEFT);
+    final SkinLookup skinLookup = getGraphEditor() == null ? null : getGraphEditor().getSkinLookup();
+    final Side sourceSide = skinLookup.lookupConnector(getItem().getSourcePort()).getSide();
+    final Side targetSide = skinLookup.lookupConnector(getItem().getTargetPort()).getSide();
+    List<Point2D> calculatedPath = RectangularPathCreator.createPath(points[0], points[points.length-1], sourceSide, targetSide);
     // the calculated path could have more, or less points than the points array...  This should be managed better.
     // likely by returning the new "points"
     // for now, we'll just ignore this
     // Also need to cover the case where the user repositioned the joints, but since that doesn't currently work, that's also ignored
-    for ( int counter = 1 ; counter < points.length-1 ; counter++ ) {
+    // The Joints are really feeling like an afterthought.  The "createPath" method for a left->right connection (our case) will
+    // always return either 2 (if the components are close together) or 4 points.  
+    // the incoming "points" can have 4 or 6 (or more, or less???) points but these are ignored in creating the path
+    for ( int counter = 1 ; counter < calculatedPath.size()-1 ; counter++ ) {
       points[counter] = calculatedPath.get(counter-1);
     }
     if (vertical) {
