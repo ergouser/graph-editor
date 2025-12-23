@@ -56,6 +56,11 @@ public class DefaultConnectionLayouter implements ConnectionLayouter {
     }
   }
 
+  /** redraw all the connection skins.  This will first collect all the points associated
+   * with any connection so that when drawn, skins can calculate intersections or similar
+   * 
+   * @param connections
+   */
   private void redrawAllConnections(Collection<? extends GConnection> connections ) {
     final Map<GConnectionSkin, Point2D[]> connectionPoints = new HashMap<>();
     for (final GConnection connection : connections) {
