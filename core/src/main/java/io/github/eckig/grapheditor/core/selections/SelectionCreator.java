@@ -67,7 +67,7 @@ public class SelectionCreator {
 
   private final EventHandler<MouseEvent> viewReleasedHandler = this::handleViewReleased;
 
-  private final Set<Selectable> selectedElementsBackup = new HashSet<>();
+  private final Set<GSkin<?>> selectedElementsBackup = new HashSet<>();
 
   private Rectangle2D selection;
 
@@ -137,10 +137,10 @@ public class SelectionCreator {
       } else {
         backupSelections();
       }
-      selectionManager.select(skin.getItem());
+      selectionManager.select(skin);
     } else {
       if (event.isShortcutDown()) {
-        selectionManager.clearSelection(skin.getItem());
+        selectionManager.clearSelection(skin);
       }
     }
 
@@ -432,9 +432,9 @@ public class SelectionCreator {
   private void updateSelection(final boolean isShortcutDown) {
     for (GNode node : model.getNodes()) {
       if (isNodeSelected(node, isShortcutDown)) {
-        selectionManager.select(node);
+        selectionManager.select(skinLookup.lookupNode(node));
       } else {
-        selectionManager.clearSelection(node);
+        selectionManager.clearSelection(skinLookup.lookupNode(node));
       }
     }
 
@@ -442,16 +442,16 @@ public class SelectionCreator {
       final GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
       if ( connectionSkin != null ) {
         if (isConnectionSelected(connection, isShortcutDown)) {
-          selectionManager.select(connection);
+          selectionManager.select(connectionSkin);
         } else {
-          selectionManager.clearSelection(connection);
+          selectionManager.clearSelection(connectionSkin);
         }
 
         for (GJoint joint : connectionSkin.getJoints()) {
           if (isJointSelected(joint, isShortcutDown)) {
-            selectionManager.select(joint);
+            selectionManager.select(skinLookup.lookupJoint(joint));
           } else {
-            selectionManager.clearSelection(joint);
+            selectionManager.clearSelection(skinLookup.lookupJoint(joint));
           }
         }
       }

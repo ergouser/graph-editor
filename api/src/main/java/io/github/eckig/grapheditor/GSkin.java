@@ -183,7 +183,7 @@ public abstract class GSkin<T extends Selectable> {
    * </p>
    */
   public void updateSelection() {
-    setSelected(graphEditor != null && graphEditor.getSelectionManager().isSelected(item));
+    setSelected(graphEditor != null && graphEditor.getSelectionManager().isSelected(this));
   }
 
   /**

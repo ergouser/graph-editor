@@ -8,10 +8,10 @@ import java.util.List;
 
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
-import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.GJointSkin;
 import io.github.eckig.grapheditor.GNodeSkin;
+import io.github.eckig.grapheditor.GSkin;
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
@@ -103,21 +103,8 @@ public class SelectionDragManager {
 
         // store the currently selected elements of interest
         // (the ones we want to move alongside the master):
-        for (final Selectable selected : selectionManager.getSelectedItems()) {
-
-            if (selected instanceof GNode n) {
-
-                final GNodeSkin skin = skinLookup.lookupNode(n);
-                if (skin != null) {
-                    currentSelectedElements.add(skin.getRoot());
-                }
-            } else if (selected instanceof GJoint j) {
-
-                final GJointSkin skin = skinLookup.lookupJoint(j);
-                if (skin != null) {
-                    currentSelectedElements.add(skin.getRoot());
-                }
-            }
+        for (final GSkin<?> skin : selectionManager.getSelectedItems()) {
+          currentSelectedElements.add((DraggableBox) skin.getRoot());
         }
 
         // shortcut: if no element is selected or

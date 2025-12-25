@@ -61,6 +61,8 @@ public class GraphEditorContainer extends AutoScrollingWindow {
 
     minimap.setWindow(this);
     minimap.setVisible(false);
+    maxJumpAmount = 20;
+    baseJumpAmount = 5;
   }
 
   @Override

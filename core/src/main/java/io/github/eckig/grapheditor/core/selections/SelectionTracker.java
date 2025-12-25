@@ -7,7 +7,6 @@ import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GJoint;
 import com.ergotech.grapheditor.model.GNode;
-import com.ergotech.grapheditor.model.Selectable;
 
 import io.github.eckig.grapheditor.GSkin;
 import io.github.eckig.grapheditor.SkinLookup;
@@ -21,7 +20,7 @@ import javafx.collections.SetChangeListener;
 public class SelectionTracker
 {
 
-    private final ObservableSet<Selectable> selectedElements = FXCollections.observableSet(new HashSet<>());
+    private final ObservableSet<GSkin<?>> selectedElements = FXCollections.observableSet(new HashSet<>());
     private final SkinLookup skinLookup;
 
     /**
@@ -36,7 +35,7 @@ public class SelectionTracker
         selectedElements.addListener(this::selectedElementsChanged);
     }
 
-    private void selectedElementsChanged(final SetChangeListener.Change<? extends Selectable> change)
+    private void selectedElementsChanged(final SetChangeListener.Change<? extends GSkin<?>> change)
     {
         if (change.wasRemoved())
         {
@@ -48,25 +47,25 @@ public class SelectionTracker
         }
     }
 
-    private void update(final Selectable obj)
+    private void update(final GSkin<?> skin)
     {
-        GSkin<?> skin = null;
-        if (obj instanceof GNode n)
-        {
-            skin = skinLookup.lookupNode(n);
-        }
-        else if (obj instanceof GJoint j)
-        {
-            skin = skinLookup.lookupJoint(j);
-        }
-        else if (obj instanceof GConnection c)
-        {
-            skin = skinLookup.lookupConnection(c);
-        }
-        else if (obj instanceof GConnectorPort c)
-        {
-            skin = skinLookup.lookupConnector(c);
-        }
+//        GSkin<?> skin = null;
+//        if (obj instanceof GNode n)
+//        {
+//            skin = skinLookup.lookupNode(n);
+//        }
+//        else if (obj instanceof GJoint j)
+//        {
+//            skin = skinLookup.lookupJoint(j);
+//        }
+//        else if (obj instanceof GConnection c)
+//        {
+//            skin = skinLookup.lookupConnection(c);
+//        }
+//        else if (obj instanceof GConnectorPort c)
+//        {
+//            skin = skinLookup.lookupConnector(c);
+//        }
 
         if (skin != null)
         {
@@ -85,28 +84,28 @@ public class SelectionTracker
     /**
      * @return the list of currently selected nodes
      */
-    public List<GNode> getSelectedNodes()
+    public List<GSkin<?>> getSelectedNodes()
     {
-        return selectedElements.stream().filter(e -> e instanceof GNode).map(e -> (GNode) e).toList();
+        return selectedElements.stream().filter(e -> e.getItem() instanceof GNode).toList();
     }
 
     /**
      * @return the list of currently selected connections
      */
-    public List<GConnection> getSelectedConnections()
+    public List<GSkin<?>> getSelectedConnections()
     {
-        return selectedElements.stream().filter(e -> e instanceof GConnection).map(e -> (GConnection) e).toList();
+        return selectedElements.stream().filter(e -> e.getItem() instanceof GConnection).toList();
     }
 
     /**
      * @return the list of currently selected joints
      */
-    public List<GJoint> getSelectedJoints()
+    public List<GSkin<?>> getSelectedJoints()
     {
-        return selectedElements.stream().filter(e -> e instanceof GJoint).map(e -> (GJoint) e).toList();
+        return selectedElements.stream().filter(e -> e.getItem() instanceof GJoint).toList();
     }
 
-    public ObservableSet<Selectable> getSelectedItems()
+    public ObservableSet<GSkin<?>> getSelectedItems()
     {
         return selectedElements;
     }

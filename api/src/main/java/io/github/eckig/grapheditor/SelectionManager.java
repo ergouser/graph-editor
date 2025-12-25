@@ -26,7 +26,7 @@ public interface SelectionManager {
      *
      * @return the unmodifiable list of currently selected nodes
      */
-    List<GNode> getSelectedNodes();
+    List<GSkin<?>> getSelectedNodes();
     
     /**
      * Gets the list of currently selected connections.
@@ -37,7 +37,7 @@ public interface SelectionManager {
      *
      * @return the unmodifiable list of currently selected connections
      */
-    List<GConnection> getSelectedConnections();
+    List<GSkin<?>> getSelectedConnections();
 
     /**
      * Gets the list of currently selected joints.
@@ -48,7 +48,7 @@ public interface SelectionManager {
      *
      * @return the unmodifiable list of currently selected joints
      */
-    List<GJoint> getSelectedJoints();
+    List<GSkin<?>> getSelectedJoints();
     
     /**
      * Convenience method to inform if the given object is currently selected. Is
@@ -58,7 +58,17 @@ public interface SelectionManager {
      * @param object
      * @return {@code true} if the given index is selected, {@code false} otherwise.
      */
-    boolean isSelected(Selectable object);
+    boolean isSelected(GSkin<?>  object);
+    
+    /**
+     * Convenience method to inform if the given object is currently selected. Is
+     * functionally equivalent to calling
+     * <code>getSelectedItems().contains(object)</code>.
+     * 
+     * @param object
+     * @return {@code true} if the given index is selected, {@code false} otherwise.
+     */
+    boolean isSelected(Selectable  object);
     
     /**
      * Gets the {@link ObservableSet} of currently-selected items.
@@ -69,14 +79,14 @@ public interface SelectionManager {
      *
      * @return the set of selected items
      */
-    ObservableSet<Selectable> getSelectedItems();
+    ObservableSet<GSkin<?> > getSelectedItems();
     
     /**
      * This method will attempt to select the given object.
      *
-     * @param object The object to attempt to select in the underlying data model.
+     * @param skin The object to attempt to select in the underlying data model.
      */
-    <S extends Selectable> void  select(final S object);
+    void select(final GSkin<?> skin);
     
     /**
      * Selects all selectable elements (nodes, joints, and connections) in the graph editor.
@@ -89,7 +99,7 @@ public interface SelectionManager {
      *
      * @param object The selected item to deselect.
      */
-    <S extends Selectable> void clearSelection(S object);
+    void clearSelection(final GSkin<?> skin);
 
     /**
      * Clears the selection, i.e. de-selects all elements.

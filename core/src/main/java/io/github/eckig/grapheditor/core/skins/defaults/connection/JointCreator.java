@@ -161,7 +161,7 @@ public class JointCreator {
 
         temporarySelectedJointSkin.getRoot().fireEvent(event);
         if (graphEditor != null) {
-          graphEditor.getSelectionManager().select(temporarySelectedJointSkin.getItem());
+          graphEditor.getSelectionManager().select(temporarySelectedJointSkin);
         }
       }
       printJoints("OnMousePressed");
