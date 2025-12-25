@@ -3,10 +3,6 @@
  */
 package io.github.eckig.grapheditor.utils;
 
-import com.ergotech.grapheditor.model.command.Command;
-import com.ergotech.grapheditor.model.command.CompoundCommand;
-import com.ergotech.grapheditor.model.command.SetCommand;
-
 import io.github.eckig.grapheditor.EditorElement;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;

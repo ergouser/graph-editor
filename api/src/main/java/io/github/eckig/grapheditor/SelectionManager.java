@@ -5,9 +5,6 @@ package io.github.eckig.grapheditor;
 
 import java.util.List;
 
-import com.ergotech.grapheditor.model.GConnection;
-import com.ergotech.grapheditor.model.GJoint;
-import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 
 import javafx.collections.ObservableSet;

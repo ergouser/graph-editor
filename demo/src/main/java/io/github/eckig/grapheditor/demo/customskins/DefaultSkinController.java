@@ -2,18 +2,23 @@ package io.github.eckig.grapheditor.demo.customskins;
 
 
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnectorPort;
 import com.ergotech.grapheditor.model.GConnectorPort.Direction;
 import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.GraphFactory;
+import com.ergotech.grapheditor.model.Selectable;
 import com.ergotech.grapheditor.model.command.CommandStack;
 import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.command.RemoveCommand;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.GConnectorSkin;
+import io.github.eckig.grapheditor.GSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connectors.DefaultConnectorTypes;
@@ -128,7 +133,12 @@ public class DefaultSkinController implements SkinController {
 
   @Override
   public void clearConnectors() {
-    Commands.clearConnectors(graphEditor.getModel(), graphEditor.getSelectionManager().getSelectedNodes());
+    final List<GSkin<?>> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedNodes());
+    final List<GNode> selectedNodes = selection.stream()
+        .map(GSkin::getItem)
+        .filter(item -> item instanceof GNode)
+        .map(item -> (GNode) item)
+        .collect(Collectors.toList());    Commands.clearConnectors(graphEditor.getModel(), selectedNodes);
   }
 
   @Override

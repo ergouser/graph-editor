@@ -6,6 +6,7 @@ package io.github.eckig.grapheditor.demo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
@@ -14,8 +15,10 @@ import com.ergotech.grapheditor.model.impl.GModelImpl;
 
 import io.github.eckig.grapheditor.Commands;
 import io.github.eckig.grapheditor.EditorElement;
+import io.github.eckig.grapheditor.GSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.core.DefaultGraphEditor;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 import io.github.eckig.grapheditor.core.skins.defaults.connection.SimpleConnectionSkin;
 import io.github.eckig.grapheditor.core.view.GraphEditorContainer;
 import io.github.eckig.grapheditor.demo.customskins.DefaultSkinController;
@@ -121,7 +124,7 @@ public class GraphEditorDemoController {
 
   private final GraphEditor graphEditor = new DefaultGraphEditor();
 
-  private final SelectionCopier selectionCopier = new SelectionCopier(graphEditor.getSkinLookup(),
+  private final SelectionCopier selectionCopier = new SelectionCopier((SkinManager)graphEditor.getSkinLookup(),
       graphEditor.getSelectionManager());
 
   private final GraphEditorPersistence graphEditorPersistence = new GraphEditorPersistence();
@@ -268,9 +271,14 @@ public class GraphEditorDemoController {
 
   @FXML
   public void deleteSelection() {
-    final List<Selectable> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedItems());
-    graphEditor.delete(selection);
-  }
+    final List<GSkin<?>> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedItems());
+
+    final List<Selectable> selectedItems = selection.stream()
+        .map(GSkin::getItem)
+        .collect(Collectors.toList());    
+
+    graphEditor.delete(selectedItems);
+   }
 
   @FXML
   public void addNode() {
@@ -351,7 +359,7 @@ public class GraphEditorDemoController {
 
     minimapButton.setGraphic(AwesomeIcon.MAP.node());
 
-    final SetChangeListener<? super Selectable> selectedNodesListener = change -> checkConnectorButtonsToDisable();
+    final SetChangeListener<? super GSkin<?>> selectedNodesListener = change -> checkConnectorButtonsToDisable();
     graphEditor.getSelectionManager().getSelectedItems().addListener(selectedNodesListener);
     checkConnectorButtonsToDisable();
   }

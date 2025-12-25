@@ -117,13 +117,13 @@ public class TreeConnectionSkin extends GConnectionSkin {
 
     if (event.isShortcutDown()) {
       if (isSelected()) {
-        editor.getSelectionManager().clearSelection(getItem());
+        editor.getSelectionManager().clearSelection(this);
       } else {
-        editor.getSelectionManager().select(getItem());
+        editor.getSelectionManager().select(this);
       }
     } else if (!isSelected()) {
       getGraphEditor().getSelectionManager().clearSelection();
-      editor.getSelectionManager().select(getItem());
+      editor.getSelectionManager().select(this);
     }
 
     event.consume();

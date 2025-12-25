@@ -298,13 +298,13 @@ public class TitledNodeSkin extends GNodeSkin {
 
         for (final GConnectorSkin skin : inputConnectorSkins) {
             if (skin instanceof TitledConnectorSkin) {
-            	editor.getSelectionManager().select((Selectable)skin.getItem());
+            	editor.getSelectionManager().select(skin);
             }
         }
 
         for (final GConnectorSkin skin : outputConnectorSkins) {
             if (skin instanceof TitledConnectorSkin) {
-            	editor.getSelectionManager().select((Selectable)skin.getItem());
+            	editor.getSelectionManager().select(skin);
             }
         }
     }

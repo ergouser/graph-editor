@@ -22,6 +22,7 @@ import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.core.connections.ConnectionCopier;
+import io.github.eckig.grapheditor.core.skins.SkinManager;
 import io.github.eckig.grapheditor.core.utils.BeanUtils;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -47,7 +48,7 @@ public class SelectionCopier {
 
   private static final double BASE_PASTE_OFFSET = 20;
 
-  private final SkinLookup skinLookup;
+  private final SkinManager skinLookup;
   private final SelectionManager selectionManager;
 
   private final List<GNode> copiedNodes = new ArrayList<>();
@@ -69,7 +70,7 @@ public class SelectionCopier {
    * @param selectionManager
    *            the {@link SelectionManager} instance for the graph editor
    */
-  public SelectionCopier(final SkinLookup skinLookup, final SelectionManager selectionManager) {
+  public SelectionCopier(final SkinManager skinLookup, final SelectionManager selectionManager) {
 
     this.skinLookup = skinLookup;
     this.selectionManager = selectionManager;
@@ -135,13 +136,15 @@ public class SelectionCopier {
     addPastedElements(pastedNodes, pastedConnections, consumer);
 
     for (final GNode pastedNode : pastedNodes) {
-      selectionManager.select(pastedNode);
+      final GNodeSkin nodeSkin = skinLookup.lookupOrCreateNode(pastedNode);
+     selectionManager.select(nodeSkin);
     }
 
     for (final GConnection pastedConnection : pastedConnections) {
-      final GConnectionSkin connectionSkin = skinLookup.lookupConnection(pastedConnection);
+      final GConnectionSkin connectionSkin = skinLookup.lookupOrCreateConnection(pastedConnection);
       for (GJoint joint : connectionSkin.getJoints()) {
-        selectionManager.select(joint);
+        final GJointSkin jointSkin = skinLookup.lookupOrCreateJoint(joint);
+       selectionManager.select(jointSkin);
       }
     }
 
@@ -302,7 +305,7 @@ public class SelectionCopier {
 
     if (!selectionManager.getSelectedItems().isEmpty()) {
 
-      final GNode firstSelectedNode = selectionManager.getSelectedNodes().get(0);
+      final GNode firstSelectedNode = (GNode) selectionManager.getSelectedNodes().get(0).getItem();
       final GNodeSkin firstSelectedNodeSkin = skinLookup.lookupNode(firstSelectedNode);
 
       final Node root = firstSelectedNodeSkin.getRoot();

@@ -1,6 +1,7 @@
 package io.github.eckig.grapheditor.demo.customskins;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.ergotech.grapheditor.model.GConnection;
 import com.ergotech.grapheditor.model.GConnectorPort;
@@ -145,7 +146,20 @@ public class TreeSkinController implements SkinController {
    */
   private void selectReferencedConnections(final List<GNode> nodes) {
 
-    nodes.stream().flatMap(node -> node.getConnectorPorts().stream())
-        .flatMap(connector -> connector.getConnections().stream()).forEach(graphEditor.getSelectionManager()::select);
+//    final List<GSkin<?>> selection = new ArrayList<>(graphEditor.getSelectionManager().getSelectedNodes());
+//    final List<GNode> selectedNodes = selection.stream()
+//        .map(GSkin::getItem)
+//        .filter(item -> item instanceof GNode)
+//        .map(item -> (GNode) item)
+//        .collect(Collectors.toList());    Commands.clearConnectors(graphEditor.getModel(), selectedNodes);
+    final SkinManager skinManager = (SkinManager) graphEditor.getSkinLookup();
+  
+    nodes.stream()
+    .flatMap(node -> node.getConnectorPorts().stream())
+    .flatMap(connector -> connector.getConnections().stream())
+    .map(skinManager::lookupConnection)
+    .filter(Objects::nonNull)
+    .forEach(graphEditor.getSelectionManager()::select);
+    
   }
 }
