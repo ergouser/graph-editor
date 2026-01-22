@@ -445,7 +445,7 @@ public class GraphEditorSkinManager implements SkinManager {
   @Override
   public void removeNode(final GNode pNodeToRemove) {
     if (pNodeToRemove != null) {
-      final GNodeSkin removedSkin = mNodeSkins.get(pNodeToRemove);
+      final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
       if (removedSkin != null) {
         mView.remove(removedSkin);
       }
