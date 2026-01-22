@@ -112,24 +112,21 @@ public class GraphFactory {
    * @return a new instance of the specified class
    * @throws IllegalArgumentException if the class cannot be found, instantiated, or does not implement the interface
    */
-  @SuppressWarnings("unchecked")
-  public static <T> T create(String className, Class<T> interfaceClass, ClassLoader classLoader) {
+  public static <T> T create(
+     final String className,
+     final Class<T> interfaceClass,
+     final ClassLoader classLoader
+  ) {
     try {
-      // Load the class dynamically using the specified class loader
-      Class<?> clazz = Class.forName(className, true, classLoader);
+      final Class<? extends T> clazz =
+         classLoader.loadClass(className).asSubclass(interfaceClass);
 
-      // Check if it implements the required interface
-      if (!interfaceClass.isAssignableFrom(clazz)) {
-        throw new IllegalArgumentException(
-            "Class " + className + " does not implement " + interfaceClass.getName());
-      }
-
-      // Create a new instance
-      return (T) clazz.getDeclaredConstructor().newInstance();
+      return clazz.getDeclaredConstructor().newInstance();
     } catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("Class not found: " + className, e);
     } catch (ReflectiveOperationException e) {
       throw new IllegalArgumentException("Failed to instantiate class: " + className, e);
     }
   }
+
 }
