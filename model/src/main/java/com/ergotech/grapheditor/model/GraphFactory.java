@@ -118,10 +118,13 @@ public class GraphFactory {
      final ClassLoader classLoader
   ) {
     try {
-      final Class<? extends T> clazz =
-         classLoader.loadClass(className).asSubclass(interfaceClass);
+      final Class clazz = classLoader.loadClass(className);
 
-      return clazz.getDeclaredConstructor().newInstance();
+      if (!interfaceClass.isAssignableFrom(clazz)) {
+        throw new IllegalArgumentException("Class " + className + " does not implement " + interfaceClass.getName());
+      }
+
+      return (T) clazz.getDeclaredConstructor().newInstance();
     } catch (ClassNotFoundException e) {
       throw new IllegalArgumentException("Class not found: " + className, e);
     } catch (ReflectiveOperationException e) {
