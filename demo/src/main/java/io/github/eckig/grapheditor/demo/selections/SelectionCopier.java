@@ -109,7 +109,7 @@ public class SelectionCopier {
       }
     }
 
-    copiedConnections.addAll(ConnectionCopier.copyConnections(copyStorage));
+    copiedConnections.addAll(ConnectionCopier.copyConnections(copyStorage,skinLookup));
     saveParentPositionInScene();
   }
 
@@ -177,7 +177,7 @@ public class SelectionCopier {
       pasteStorage.put(copiedNode, pastedNode);
     }
 
-    pastedConnections.addAll(ConnectionCopier.copyConnections(pasteStorage));
+    pastedConnections.addAll(ConnectionCopier.copyConnections(pasteStorage,skinLookup));
   }
 
   /**
