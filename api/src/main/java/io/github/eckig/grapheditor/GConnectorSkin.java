@@ -76,6 +76,7 @@ public abstract class GConnectorSkin extends GSkin<GConnectorPort> {
    * @param value the new value of the x-coordinate.
    */
   public void setX(double value) {
+    if (Double.compare(x.get(), value) == 0) return;
     x.set(value);
   }
 
@@ -103,6 +104,7 @@ public abstract class GConnectorSkin extends GSkin<GConnectorPort> {
    * @param value the new value of the y-coordinate.
    */
   public void setY(double value) {
+   if (Double.compare(y.get(), value) == 0) return;
     y.set(value);
   }
 

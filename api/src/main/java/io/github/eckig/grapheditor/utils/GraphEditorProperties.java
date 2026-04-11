@@ -47,7 +47,7 @@ public class GraphEditorProperties implements GraphEventManager {
 
     public static final double DEFAULT_BOUND_VALUE = 15;
 
-    public static final double DEFAULT_GRID_SPACING = 12;
+    public static final double DEFAULT_GRID_SPACING = 8;
 
     // The distance from the editor edge at which the objects should stop when dragged / resized.
     private double northBoundValue = DEFAULT_BOUND_VALUE;

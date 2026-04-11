@@ -118,6 +118,7 @@ public class GraphFactory {
       // Load the class dynamically using the specified class loader
       Class<?> clazz = Class.forName(className, true, classLoader);
 
+      //debugClassHierarchy(clazz,interfaceClass  );
       // Check if it implements the required interface
       if (!interfaceClass.isAssignableFrom(clazz)) {
         throw new IllegalArgumentException(
@@ -131,5 +132,45 @@ public class GraphFactory {
     } catch (ReflectiveOperationException e) {
       throw new IllegalArgumentException("Failed to instantiate class: " + className, e);
     }
+  }
+  
+  public static void debugClassHierarchy(Class<?> clazz, Class<?> expectedInterface) {
+    System.out.println("=== Class Hierarchy Debug ===");
+    System.out.println("Target class: " + clazz.getName());
+    System.out.println("Expected interface: " + expectedInterface.getName());
+    System.out.println("ClassLoader: " + clazz.getClassLoader());
+    System.out.println("Expected interface ClassLoader: " + expectedInterface.getClassLoader());
+    System.out.println();
+    
+    // Walk up the class hierarchy
+    Class<?> current = clazz;
+    int level = 0;
+    while (current != null) {
+        String indent = "  ".repeat(level);
+        System.out.println(indent + "Class: " + current.getName() + " [" + current.getClassLoader() + "]");
+        
+        // Print all interfaces for this class
+        Class<?>[] interfaces = current.getInterfaces();
+        if (interfaces.length > 0) {
+            for (Class<?> iface : interfaces) {
+                System.out.println(indent + "  implements: " + iface.getName() + " [" + iface.getClassLoader() + "]");
+                
+                // Check identity comparison
+                if (iface.getName().equals(expectedInterface.getName())) {
+                    System.out.println(indent + "    -> Name matches expected interface!");
+                    System.out.println(indent + "    -> Identity equal: " + (iface == expectedInterface));
+                    System.out.println(indent + "    -> ClassLoader equal: " + (iface.getClassLoader() == expectedInterface.getClassLoader()));
+                }
+            }
+        } else {
+            System.out.println(indent + "  (no interfaces)");
+        }
+        
+        current = current.getSuperclass();
+        level++;
+    }
+    
+    System.out.println("\nAssignability check: " + expectedInterface.isAssignableFrom(clazz));
+    System.out.println("===========================\n");
   }
 }

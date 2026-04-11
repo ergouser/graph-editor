@@ -197,10 +197,17 @@ public class GraphEditorSkinManager implements SkinManager {
     // Add listener to mNodeSkins
     mNodeSkins.addListener((MapChangeListener<GNode, GNodeSkin>) change -> {
       if (change.wasAdded() || change.wasRemoved()) {
-        updateConnectors(change.getKey()); // Call updateConnectors with the affected node
+        //updateConnectors(change.getKey()); // Call updateConnectors with the affected node
       }
     });
 
+    // Add listener to mConnectionSkins
+    mConnectionSkins.addListener((MapChangeListener<GConnection, GConnectionSkin>) change -> {
+      if (change.wasAdded() || change.wasRemoved()) {
+        //System.out.println ("Connections Changed");
+      }
+    });
+    //    
     //    // Add listener to mConnectionSkins
     //    mConnectionSkins.addListener((MapChangeListener<GConnection, GConnectionSkin>) change -> {
     //      if (change.wasAdded() || change.wasRemoved()) {
@@ -448,6 +455,7 @@ public class GraphEditorSkinManager implements SkinManager {
       final GNodeSkin removedSkin = mNodeSkins.get(pNodeToRemove);
       if (removedSkin != null) {
         mView.remove(removedSkin);
+        mNodeSkins.remove(pNodeToRemove);
       }
     }
   }
@@ -503,6 +511,7 @@ public class GraphEditorSkinManager implements SkinManager {
       final GConnectionSkin removedSkin = mConnectionSkins.get(pConnectionToRemove);
       if (removedSkin != null) {
         mView.remove(removedSkin);
+        mConnectionSkins.remove(pConnectionToRemove);
       }
     }
   }

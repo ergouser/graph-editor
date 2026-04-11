@@ -413,8 +413,11 @@ public class SelectionCreator {
 
   private boolean isNodeSelected(final GNode node, final boolean isShortcutDown) {
     final GNodeSkin skin = skinLookup.lookupNode(node);
+    if ( skin != null ) {
     return selection.contains(skin.getX(), skin.getY(), skin.getWidth(), skin.getHeight())
         || isShortcutDown && selectedElementsBackup.contains(node);
+    }
+    return false;
   }
 
   private boolean isJointSelected(final GJoint joint, final boolean isShortcutDown) {
