@@ -452,10 +452,10 @@ public class GraphEditorSkinManager implements SkinManager {
   @Override
   public void removeNode(final GNode pNodeToRemove) {
     if (pNodeToRemove != null) {
-      final GNodeSkin removedSkin = mNodeSkins.remove(pNodeToRemove);
+      final GNodeSkin removedSkin = mNodeSkins.get(pNodeToRemove);
       if (removedSkin != null) {
         mView.remove(removedSkin);
-        mNodeSkins.remove(pNodeToRemove);
+        //mNodeSkins.remove(pNodeToRemove);
       }
     }
   }
@@ -481,11 +481,10 @@ public class GraphEditorSkinManager implements SkinManager {
     // ConnectorPorts are not part of the main graph, they are part of the node
     // so are not removed from the view here.
     if (pConnectorToRemove != null) {
-      // remove the tail skins - they are transient views.
-      final GTailSkin removedTailSkin = mTailSkins.remove(pConnectorToRemove);
-      if (removedTailSkin != null) {
-        removedTailSkin.dispose();
-      }
+      // remove the skins - they are transient views.
+      // remove node will dispose the skin, but we need addnode to 
+      // recreate the skin for the new node, so we need to destroy the skin here.
+      disposeConnector(pConnectorToRemove);
     }
   }
 
@@ -511,7 +510,7 @@ public class GraphEditorSkinManager implements SkinManager {
       final GConnectionSkin removedSkin = mConnectionSkins.get(pConnectionToRemove);
       if (removedSkin != null) {
         mView.remove(removedSkin);
-        mConnectionSkins.remove(pConnectionToRemove);
+        //mConnectionSkins.remove(pConnectionToRemove);
       }
     }
   }
