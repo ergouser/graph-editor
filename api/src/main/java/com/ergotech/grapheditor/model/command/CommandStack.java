@@ -56,7 +56,7 @@ public class CommandStack {
   private boolean stackChangeNotificationsSuspended = false;
 
   /*The command stack listener. May be null.*/
-  CommandStackListener listener;
+  protected CommandStackListener listener;
 
   ListChangeListener<Command> listChangeListener = change -> {
     if (!stackChangeNotificationsSuspended && listener != null ) {
@@ -78,6 +78,8 @@ public class CommandStack {
       }
     }
   };
+  
+  private final ObservableList<Runnable> topRefreshListeners = FXCollections.observableArrayList();
 
   /**
    * Constructs a CommandStack and sets up listeners for property changes.
@@ -85,9 +87,10 @@ public class CommandStack {
   protected CommandStack() {
     commands = FXCollections.observableArrayList(cmd -> new Observable[]{cmd.executedProperty()});
 
-    // Update canUndo and canRedo whenever 'top' changes
+    // Update canUndo and canRedo whenever 'top' changes fire a refresh to the listeners.
     top.addListener((observable, oldValue, newValue) -> {
       updateCanUndoRedo();
+      fireTopRefresh();
     });
     commands.addListener(listChangeListener);
   }
@@ -121,6 +124,24 @@ public class CommandStack {
   public void resumeStackChangeNotifications() {
     stackChangeNotificationsSuspended = false;
   }
+  
+  /** Add a listener to be notified when the top of the stack changes or when a refresh is forced. */
+  public void addTopRefreshListener(Runnable listener) {
+    topRefreshListeners.add(listener);
+  }
+
+  /** Remove a listener from the top refresh notifications. */
+  public void removeTopRefreshListener(Runnable listener) {
+    topRefreshListeners.remove(listener);
+  }
+
+  /** Notify listeners that the top of the stack has changed or that a refresh is needed. */
+  public void fireTopRefresh() {
+    for (Runnable listener : topRefreshListeners) {
+      listener.run();
+    }
+  }
+
   /**
    * Executes the given command and adds it to the command stack.
    *
@@ -138,6 +159,8 @@ public class CommandStack {
         commands.subList(top.get() + 1, commands.size()).clear();
       }
 
+      // when a command is added, all the commands eligible for redo must be
+      // removed.  They become inaccessible after this command is added.
       commands.add(command);
       top.set(top.get() + 1);
     }
