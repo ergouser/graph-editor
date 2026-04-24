@@ -1,5 +1,6 @@
 package com.ergotech.grapheditor.model.command;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.util.Objects;
@@ -16,8 +17,10 @@ public class SetPropertyCommand<V> extends AbstractCommand {
 
   // Optional, for temporary binding during execute/undo
   private final Object listenerTarget;
-  private final VetoableChangeListener listener;
-  private final BiFunction<Object, VetoableChangeListener, Runnable> listenerBinder;
+  private final PropertyChangeListener propertyChangeListener;
+  private final BiFunction<Object, PropertyChangeListener, Runnable> propertyListenerBinder;
+  private final VetoableChangeListener vetoableChangeListener;
+  private final BiFunction<Object, VetoableChangeListener, Runnable> vetoableListenerBinder;
 
   /** Convenience method to create the set property command. */
   public static <S> SetPropertyCommand<S> create(Property<S> property, S newValue) {
@@ -34,14 +37,19 @@ public class SetPropertyCommand<V> extends AbstractCommand {
       Property<S> property,
       S newValue,
       T listenerTarget,
-      VetoableChangeListener listener,
-      BiFunction<? super T, ? super VetoableChangeListener, Runnable> binder) {
+      PropertyChangeListener propertyChangeListener,
+      BiFunction<? super T, ? super PropertyChangeListener, Runnable> propertyBinder,
+      VetoableChangeListener vetoableChangeListener,
+      BiFunction<? super T, ? super VetoableChangeListener, Runnable> vetoablePropertyBinder) {
 
     @SuppressWarnings("unchecked")
-    BiFunction<Object, VetoableChangeListener, Runnable> erased =
-        (BiFunction<Object, VetoableChangeListener, Runnable>) (BiFunction<?, ?, ?>) binder;
+    BiFunction<Object, PropertyChangeListener, Runnable> pBinder =
+        (BiFunction<Object, PropertyChangeListener, Runnable>) (BiFunction<?, ?, ?>) propertyBinder;
+    @SuppressWarnings("unchecked")
+    BiFunction<Object, VetoableChangeListener, Runnable> vBinder =
+        (BiFunction<Object, VetoableChangeListener, Runnable>) (BiFunction<?, ?, ?>) vetoablePropertyBinder;
 
-    return new SetPropertyCommand<>(property, newValue, listenerTarget, listener, erased);
+    return new SetPropertyCommand<>(property, newValue, listenerTarget, propertyChangeListener, pBinder, vetoableChangeListener, vBinder);
   }
 
   /**
@@ -72,8 +80,10 @@ public class SetPropertyCommand<V> extends AbstractCommand {
       T object,
       String attributeName,
       V newValue,
-      VetoableChangeListener listener,
-      BiFunction<? super T, ? super VetoableChangeListener, Runnable> binder) {
+      PropertyChangeListener propertyChangeListener,
+      BiFunction<? super T, ? super PropertyChangeListener, Runnable> propertyBinder,
+      VetoableChangeListener vetoableChangeListener,
+      BiFunction<? super T, ? super VetoableChangeListener, Runnable> vetoablePropertyBinder) {
 
     try {
       @SuppressWarnings("unchecked")
@@ -84,10 +94,13 @@ public class SetPropertyCommand<V> extends AbstractCommand {
           .build();
 
       @SuppressWarnings("unchecked")
-      BiFunction<Object, VetoableChangeListener, Runnable> erased =
-          (BiFunction<Object, VetoableChangeListener, Runnable>) (BiFunction<?, ?, ?>) binder;
+      BiFunction<Object, PropertyChangeListener, Runnable> pBinder =
+          (BiFunction<Object, PropertyChangeListener, Runnable>) (BiFunction<?, ?, ?>) propertyBinder;
+      @SuppressWarnings("unchecked")
+      BiFunction<Object, VetoableChangeListener, Runnable> vBinder =
+          (BiFunction<Object, VetoableChangeListener, Runnable>) (BiFunction<?, ?, ?>) vetoablePropertyBinder;
 
-      return new SetPropertyCommand<>(property, newValue, object, listener, erased);
+      return new SetPropertyCommand<>(property, newValue, object, propertyChangeListener, pBinder, vetoableChangeListener, vBinder);
 
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -96,21 +109,25 @@ public class SetPropertyCommand<V> extends AbstractCommand {
   }
 
   public SetPropertyCommand(Property<V> property, V newValue) {
-    this(property, newValue, null, null, null);
+    this(property, newValue, null, null, null, null, null);
   }
 
   private SetPropertyCommand(
       Property<V> property,
       V newValue,
       Object listenerTarget,
-      VetoableChangeListener listener,
-      BiFunction<Object, VetoableChangeListener, Runnable> listenerBinder) {
+      PropertyChangeListener propertyChangeListener,
+      BiFunction<Object, PropertyChangeListener, Runnable> propertyListenerBinder,
+      VetoableChangeListener vetoableChangeListener,
+      BiFunction<Object, VetoableChangeListener, Runnable> vetoableListenerBinder) {
 
     this.property = Objects.requireNonNull(property, "property");
     this.newValue = newValue;
     this.listenerTarget = listenerTarget;
-    this.listener = listener;
-    this.listenerBinder = listenerBinder;
+    this.propertyChangeListener = propertyChangeListener;
+    this.propertyListenerBinder = propertyListenerBinder;
+    this.vetoableChangeListener = vetoableChangeListener;
+    this.vetoableListenerBinder = vetoableListenerBinder;
   }
 
   @Override
@@ -122,7 +139,9 @@ public class SetPropertyCommand<V> extends AbstractCommand {
     oldValue = property.getValue();
 
     // Add listener -> mutate -> remove listener
-    Runnable unbind = bindListenerIfConfigured();
+    // Add listener -> mutate -> remove listener
+    Runnable unbindProperty = bindPropertyListenerIfConfigured();
+    Runnable unbindVeto = bindVetoListenerIfConfigured();
     try {
       property.setValue(newValue);
       setExecuted(true);
@@ -139,10 +158,13 @@ public class SetPropertyCommand<V> extends AbstractCommand {
       setExecuted(false);
       throw e; // rethrow to allow handling by caller to prevent the command from being added to the stack
     } finally {
-      if (unbind != null) {
-        unbind.run();
+      if (unbindProperty != null) {
+        unbindProperty.run();
       }
-    }
+      if (unbindVeto != null) {
+        unbindVeto.run();
+      }
+     }
   }
 
   @Override
@@ -155,7 +177,8 @@ public class SetPropertyCommand<V> extends AbstractCommand {
     newValue = property.getValue();
 
     // Add listener -> mutate -> remove listener
-    Runnable unbind = bindListenerIfConfigured();
+    Runnable unbindProperty = bindPropertyListenerIfConfigured();
+    Runnable unbindVeto = bindVetoListenerIfConfigured();
     try {
       property.setValue(oldValue);
       setExecuted(false);
@@ -176,17 +199,28 @@ public class SetPropertyCommand<V> extends AbstractCommand {
       setExecuted(true); // undo did not succeed, so we are still in the executed state
       throw e; // rethrow to allow handling by caller to prevent the command from being added to the stack
    } finally {
-      if (unbind != null) {
-        unbind.run();
-      }
+     if (unbindProperty != null) {
+       unbindProperty.run();
+     }
+     if (unbindVeto != null) {
+       unbindVeto.run();
+     }
     }
   }
 
-  private Runnable bindListenerIfConfigured() {
-    if (listenerBinder == null || listenerTarget == null || listener == null) {
+  private Runnable bindVetoListenerIfConfigured() {
+    if (vetoableListenerBinder == null || listenerTarget == null || vetoableChangeListener == null) {
       return null;
     }
-    Runnable unbind = listenerBinder.apply(listenerTarget, listener);
+    Runnable unbind = vetoableListenerBinder.apply(listenerTarget, vetoableChangeListener);
+    return (unbind != null) ? unbind : () -> {};
+  }
+
+  private Runnable bindPropertyListenerIfConfigured() {
+    if (propertyListenerBinder == null || listenerTarget == null || propertyChangeListener == null) {
+      return null;
+    }
+    Runnable unbind = propertyListenerBinder.apply(listenerTarget, propertyChangeListener);
     return (unbind != null) ? unbind : () -> {};
   }
 
