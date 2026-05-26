@@ -3,6 +3,7 @@
  */
 package io.github.eckig.grapheditor.core;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -12,6 +13,8 @@ import com.ergotech.grapheditor.model.GModel;
 import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 import com.ergotech.grapheditor.model.command.Command;
+import com.ergotech.grapheditor.model.command.CommandStack;
+import com.ergotech.grapheditor.model.command.CompoundCommand;
 import com.ergotech.grapheditor.model.impl.GModelImpl;
 
 import io.github.eckig.grapheditor.GConnectorValidator;
@@ -175,7 +178,16 @@ public class DefaultGraphEditor implements GraphEditor {
 
   @Override
   public void delete(Collection<Selectable> pItems) {
-    getModelEditingManager().remove(pItems,mSkinManager);
+    final CompoundCommand removeCommand = getModelEditingManager().buildRemoveCommand(pItems,mSkinManager);
+
+      if (!removeCommand.isEmpty() && removeCommand.canExecute()) {
+          try {
+              CommandStack.getCommandStack(getModel()).execute(removeCommand);
+          } catch ( Exception e ) {
+              // keep the default behavior of remove, where there is no error handling, but permit it
+              throw new UndeclaredThrowableException(e);
+          }
+      }
   }
 
   private ModelEditingManager getModelEditingManager() {

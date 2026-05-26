@@ -91,9 +91,9 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   }
 
   @Override
-  public void remove(final Collection<Selectable> pToRemove, final SkinLookup skinLookup ) {
+  public CompoundCommand buildRemoveCommand(final Collection<Selectable> pToRemove, final SkinLookup skinLookup ) {
     if (pToRemove == null || pToRemove.isEmpty()) {
-      return;
+      return new CompoundCommand();
     }
 
     final CompoundCommand command = new CompoundCommand();
@@ -162,16 +162,8 @@ public class DefaultModelEditingManager implements ModelEditingManager {
         command.append(RemoveCommand.create(matchingSkin, owner -> matchingSkin.getJoints(), joint));
       }
     }
-    
 
-    if (!command.isEmpty() && command.canExecute()) {
-      try {
-        CommandStack.getCommandStack(model).execute(command);
-      } catch ( Exception e ) {
-        // keep the default behavior of remove, where there is no error handling, but permit it 
-        throw new UndeclaredThrowableException(e);
-      }
-    }
+    return command;
   }
 
   /**
