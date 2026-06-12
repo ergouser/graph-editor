@@ -131,7 +131,9 @@ public class DefaultModelEditingManager implements ModelEditingManager {
       } else if (obj instanceof GConnection connection && editContext.canRemove(obj)) {
         delete.add(obj);
         GConnectionSkin connectionSkin = skinLookup.lookupConnection(connection);
-        delete.addAll(connectionSkin.getJoints());
+        if ( connectionSkin != null ) {
+          delete.addAll(connectionSkin.getJoints());
+        }
       } else if (obj instanceof GJoint && editContext.canRemove(obj)) {
         delete.add(obj);
       }
