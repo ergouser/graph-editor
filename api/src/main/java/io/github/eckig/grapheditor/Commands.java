@@ -159,12 +159,19 @@ public class Commands {
 
 
   /**
-   * Clears everything in the given model.
+   * Builds, but does not execute, the command that clears everything in the given model.
+   *
+   * <p>
+   * Callers that need to wrap or decorate the command before it reaches the stack should use this
+   * and then {@link #executeCommand(GModel, Command)}; callers that just want it run can use
+   * {@link #clear(GModel)}.
+   * </p>
    *
    * @param model
    *          the {@link GModel} to be cleared
+   * @return a {@link CompoundCommand} that removes every node (and its connections) from the model
    */
-  public static void clear(final GModel model) {
+  public static CompoundCommand buildClear(final GModel model) {
 
     final CompoundCommand command = new CompoundCommand();
 
@@ -172,14 +179,17 @@ public class Commands {
     for (final GNode node : existingNodes) {
       removeNode(model, node, command);
     }
-    if (command.canExecute()) {
-      try {
-        CommandStack.getCommandStack(model).execute(command);
-      } catch ( Exception e ) {
-        // keep the default behavior of clear, where there is no error handling, but permit it 
-        throw new UndeclaredThrowableException(e);
-      }
-    }
+    return command;
+  }
+
+  /**
+   * Clears everything in the given model.
+   *
+   * @param model
+   *          the {@link GModel} to be cleared
+   */
+  public static void clear(final GModel model) {
+    executeCommand(model, buildClear(model));
   }
 
   /**

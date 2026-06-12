@@ -13,6 +13,8 @@ import com.ergotech.grapheditor.model.GNode;
 import com.ergotech.grapheditor.model.Selectable;
 import com.ergotech.grapheditor.model.command.Command;
 
+import com.ergotech.grapheditor.model.command.CompoundCommand;
+
 import io.github.eckig.grapheditor.SkinLookup;
 import io.github.eckig.grapheditor.utils.RemoveContext;
 
@@ -73,6 +75,6 @@ public interface ModelEditingManager
      * @param pToRemove
      *            elements to remove
      */
-    void remove(final Collection<Selectable> pToRemove, final SkinLookup skinLookup);
+    CompoundCommand buildRemoveCommand(final Collection<Selectable> pToRemove, final SkinLookup skinLookup);
 
 }

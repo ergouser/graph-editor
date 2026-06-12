@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import com.ergotech.grapheditor.model.GConnection;
@@ -40,6 +41,15 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   private BiFunction<RemoveContext, GConnection, Command> mOnConnectionRemoved;
 
   private BiFunction<RemoveContext, GNode, Command> mOnNodeRemoved;
+
+  /**
+   * Decorator applied to commands immediately before they are pushed onto the command stack. The
+   * default is the identity (no-op). MIStudio uses this to wrap stack pushes so an undo/redo raises
+   * the diagram window, since the diagram and design editors share one stack. Only the internally
+   * executed pushes (currently {@link #updateLayoutValues(SkinLookup)}) go through this; the
+   * build-only paths return their command for the caller to wrap.
+   */
+  private UnaryOperator<Command> mCommandDecorator = UnaryOperator.identity();
   
   /**
    * Creates a new model editing manager. Only one instance should exist per {@link DefaultGraphEditor} instance.
@@ -69,6 +79,17 @@ public class DefaultModelEditingManager implements ModelEditingManager {
     mOnNodeRemoved = pOnNodeRemoved;
   }
 
+  /**
+   * Sets the decorator applied to commands before they are pushed onto the command stack. Passing
+   * {@code null} resets it to the identity.
+   *
+   * @param pCommandDecorator
+   *          the decorator to apply, or {@code null} for none
+   */
+  public void setCommandDecorator(final UnaryOperator<Command> pCommandDecorator) {
+    mCommandDecorator = pCommandDecorator == null ? UnaryOperator.identity() : pCommandDecorator;
+  }
+
   @Override
   public void updateLayoutValues(final SkinLookup skinLookup) {
     final CompoundCommand command = new CompoundCommand();
@@ -79,9 +100,9 @@ public class DefaultModelEditingManager implements ModelEditingManager {
 
       if (command.canExecute()) {
         try {
-          CommandStack.getCommandStack(model).execute(command);
+          CommandStack.getCommandStack(model).execute(mCommandDecorator.apply(command));
         } catch ( Exception e ) {
-          // keep the default behavior of updateLayoutValues, where there is no error handling, but permit it 
+          // keep the default behavior of updateLayoutValues, where there is no error handling, but permit it
           throw new UndeclaredThrowableException(e);
         }
       }
@@ -91,9 +112,9 @@ public class DefaultModelEditingManager implements ModelEditingManager {
   }
 
   @Override
-  public void remove(final Collection<Selectable> pToRemove, final SkinLookup skinLookup ) {
+  public CompoundCommand buildRemoveCommand(final Collection<Selectable> pToRemove, final SkinLookup skinLookup ) {
     if (pToRemove == null || pToRemove.isEmpty()) {
-      return;
+      return new CompoundCommand();
     }
 
     final CompoundCommand command = new CompoundCommand();
@@ -164,16 +185,8 @@ public class DefaultModelEditingManager implements ModelEditingManager {
         command.append(RemoveCommand.create(matchingSkin, owner -> matchingSkin.getJoints(), joint));
       }
     }
-    
 
-    if (!command.isEmpty() && command.canExecute()) {
-      try {
-        CommandStack.getCommandStack(model).execute(command);
-      } catch ( Exception e ) {
-        // keep the default behavior of remove, where there is no error handling, but permit it 
-        throw new UndeclaredThrowableException(e);
-      }
-    }
+    return command;
   }
 
   /**
