@@ -23,6 +23,7 @@ import io.github.eckig.grapheditor.GNodeSkin;
 import io.github.eckig.grapheditor.GraphEditor;
 import io.github.eckig.grapheditor.SelectionManager;
 import io.github.eckig.grapheditor.SkinLookup;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -237,8 +238,22 @@ class MinimapNodeGroup extends Parent {
 
   /**
    * Draws the model's nodes at a scaled-down size to be displayed in the minimap.
+   * Checks if the current thread is the JavaFX Application Thread and if not, runs the drawing code on the JavaFX Application Thread to avoid thread-safety issues.
+    * This method can be called from any thread.
    */
   public void draw() {
+    if (!Platform.isFxApplicationThread()) {
+      Platform.runLater(() -> drawOnFXThread());
+    } else {
+      drawOnFXThread();
+    }
+  }
+
+  /**
+   * Draws the model's nodes at a scaled-down size to be displayed in the minimap.
+   * This method must be called on the JavaFX Application Thread to avoid thread-safety issues.
+   */
+public void drawOnFXThread() {
     nodes.clear();
     if (getChildren().size() > 1) {
       getChildren().remove(1, getChildren().size());

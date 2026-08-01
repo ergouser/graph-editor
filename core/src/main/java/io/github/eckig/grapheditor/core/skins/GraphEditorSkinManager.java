@@ -1,5 +1,6 @@
 package io.github.eckig.grapheditor.core.skins;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -541,7 +542,9 @@ public class GraphEditorSkinManager implements SkinManager {
   public void updateConnectors(final GNode pNode) {
     final GNodeSkin nodeSkin = mNodeSkins.get(pNode);
     if (nodeSkin != null) {
-      final List<GConnectorSkin> nodeConnectorSkins = pNode.getConnectorPorts().stream().map(this::lookupOrCreateConnector)
+      
+      Collection <? extends GConnectorPort> ports = pNode.getConnectorPorts();
+      final List<GConnectorSkin> nodeConnectorSkins = ports.stream().map(this::lookupOrCreateConnector)
           .collect(Collectors.toList());
       nodeSkin.setConnectorSkins(nodeConnectorSkins);
     }
@@ -617,11 +620,7 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public GNodeSkin lookupOrCreateNode(final GNode pNode) {
-    GNodeSkin nodeSkin = mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
-    if (nodeSkin != null && !(nodeSkin instanceof VirtualSkin) && nodeSkin.getRoot().getParent() == null) {
-      mView.add(nodeSkin);
-    }
-    return nodeSkin;
+    return mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
   }
 
   @Override
@@ -632,21 +631,12 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public GConnectionSkin lookupOrCreateConnection(final GConnection pConnection) {
-    GConnectionSkin connectionSkin = mConnectionSkins.computeIfAbsent(pConnection, this::createConnectionSkin);
-    if (connectionSkin != null && !(connectionSkin instanceof VirtualSkin)
-        && connectionSkin.getRoot().getParent() == null) {
-      mView.add(connectionSkin);
-    }
-    return connectionSkin;
+    return mConnectionSkins.computeIfAbsent(pConnection, this::createConnectionSkin);
   }
 
   @Override
   public GJointSkin lookupOrCreateJoint(final GJoint pJoint) {
-    GJointSkin jointSkin = mJointSkins.computeIfAbsent(pJoint, this::createJointSkin);
-    if (jointSkin != null && !(jointSkin instanceof VirtualSkin) && jointSkin.getRoot().getParent() == null) {
-      mView.add(jointSkin);
-    }
-    return jointSkin;
+    return mJointSkins.computeIfAbsent(pJoint, this::createJointSkin);
   }
 
   @Override

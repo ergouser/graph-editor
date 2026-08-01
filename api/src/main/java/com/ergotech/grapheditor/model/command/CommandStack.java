@@ -2,6 +2,7 @@ package com.ergotech.grapheditor.model.command;
 
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.Observable;
@@ -137,7 +138,10 @@ public class CommandStack {
 
   /** Notify listeners that the top of the stack has changed or that a refresh is needed. */
   public void fireTopRefresh() {
-    for (Runnable listener : topRefreshListeners) {
+    List<Runnable> listenersCopy = List.copyOf(topRefreshListeners);
+    // Avoid concurrent modification issues by iterating over a copy of the listeners list.
+    // although it's not clear why a listener would modify the listeners list...
+    for (Runnable listener : listenersCopy) {
       listener.run();
     }
   }

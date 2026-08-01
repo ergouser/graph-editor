@@ -43,11 +43,6 @@ subprojects {
         testImplementation "junit:junit:${junitVersion}"
         implementation "org.slf4j:slf4j-api:${orgSlf4jVersion}"
         implementation 'org.slf4j:slf4j-simple:2.0.11'
-        implementation "org.openjfx:javafx-controls:${orgOpenjfxVersion}"
-        implementation "org.openjfx:javafx-fxml:${orgOpenjfxVersion}"
-        implementation "org.openjfx:javafx-base:${orgOpenjfxVersion}"
-        implementation "org.openjfx:javafx-graphics:${orgOpenjfxVersion}"
-        implementation "org.openjfx:javafx-web:${orgOpenjfxVersion}"
         testImplementation "org.testfx:openjfx-monocle:${openjfxMonocleVersion}"
     }
 
