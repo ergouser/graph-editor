@@ -618,9 +618,43 @@ public class GraphEditorSkinManager implements SkinManager {
     }
   }
 
+  /**
+   * Re-adds a cached skin to the view if it is currently detached from it.
+   * <p>
+   * {@link #removeNode(GNode)} and {@link #removeConnection(GConnection)} are soft removals: they
+   * detach the skin's root from the view but leave the skin in its map so that an undo can restore
+   * it. Because the skin is still mapped, the {@code computeIfAbsent} in the {@code lookupOrCreate*}
+   * methods returns it without creating a new one, so {@code init*Skin} — the only other place that
+   * adds a skin to the view — never runs. Without this re-attachment the model element comes back on
+   * undo but nothing is drawn for it.
+   * </p>
+   * <p>
+   * A newly created skin was already added by its {@code init*Skin}, and its root therefore has a
+   * parent; the parent check keeps this from adding it a second time, which the view's {@code add}
+   * methods do not guard against.
+   * </p>
+   *
+   * @param pSkin the skin to re-attach, may be {@code null}
+   */
+  private void reattach(final GSkin<?> pSkin) {
+    if (pSkin == null || pSkin instanceof VirtualSkin || pSkin.getRoot() == null
+        || pSkin.getRoot().getParent() != null) {
+      return;
+    }
+    if (pSkin instanceof GNodeSkin) {
+      mView.add((GNodeSkin) pSkin);
+    } else if (pSkin instanceof GConnectionSkin) {
+      mView.add((GConnectionSkin) pSkin);
+    } else if (pSkin instanceof GJointSkin) {
+      mView.add((GJointSkin) pSkin);
+    }
+  }
+
   @Override
   public GNodeSkin lookupOrCreateNode(final GNode pNode) {
-    return mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
+    final GNodeSkin nodeSkin = mNodeSkins.computeIfAbsent(pNode, this::createNodeSkin);
+    reattach(nodeSkin);
+    return nodeSkin;
   }
 
   @Override
@@ -631,12 +665,16 @@ public class GraphEditorSkinManager implements SkinManager {
 
   @Override
   public GConnectionSkin lookupOrCreateConnection(final GConnection pConnection) {
-    return mConnectionSkins.computeIfAbsent(pConnection, this::createConnectionSkin);
+    final GConnectionSkin connectionSkin = mConnectionSkins.computeIfAbsent(pConnection, this::createConnectionSkin);
+    reattach(connectionSkin);
+    return connectionSkin;
   }
 
   @Override
   public GJointSkin lookupOrCreateJoint(final GJoint pJoint) {
-    return mJointSkins.computeIfAbsent(pJoint, this::createJointSkin);
+    final GJointSkin jointSkin = mJointSkins.computeIfAbsent(pJoint, this::createJointSkin);
+    reattach(jointSkin);
+    return jointSkin;
   }
 
   @Override
